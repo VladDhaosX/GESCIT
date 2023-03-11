@@ -1,0 +1,8 @@
+> Api creada
+> IisNode Integrado
+> Conexion a DB realizada
+> Swagger Implementado
+    > Falta organizar comentarios
+> Sp de Login hecho
+    > Falta ir a consultar ActiveDirectory y registrar esos datos en tabla de Usuarios y tabla de Clientes
+> Sp de Aviso de Privacidad Realizado

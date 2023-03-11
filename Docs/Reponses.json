@@ -1,0 +1,25 @@
+response: [
+    UserModules:{
+        UserRol:{
+            Id:"",
+            Key:"",
+            Name:"",
+            Description:""
+        }
+        ModuleCategories: [{
+            Id: "",
+            Key: "",
+            Name: "",
+            Description: ""
+        }],
+        Modules:{
+            [{
+                Id: "",
+                Key: "",
+                ModuleCategoriesId: "",
+                Name: "",
+                Description: ""
+            }],
+        }
+    }
+]

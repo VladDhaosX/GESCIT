@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
+    data-assets-path="../../assets/" data-template="vertical-menu-template-free">
+
+<head>
+    <%- include('Utils/head') %>
+</head>
+
+<body>
+    <main>
+        <div class="layout-wrapper layout-content-navbar">
+            <div class="layout-container">
+                <!-- Menú lateral -->
+                <%- include('Utils/sidebar') %>
+                    <div class="layout-page">
+                        <!-- Contenido de la página -->
+                            <%- include(Page) %>
+                        <!-- / Contenido de la página -->
+                    </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <!-- Menú inferior -->
+        <%- include('Utils/footer') %>
+        <script async defer src="../js/utils.js"></script>
+    </footer>
+</body>
+
+</html>
