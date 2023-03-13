@@ -1,79 +1,88 @@
 
 ALTER PROCEDURE SpAddOrUpdateTransport
-    @TransportId INT = NULL,
-    @ClientId INT,
+    @TransportId INT,
+	@UserId INT,
     @TransportTypeId INT,
-    @LicensePlate1 VARCHAR(10),
-    @LicensePlate2 VARCHAR(10),
-    @LicensePlate3 VARCHAR(10),
+    @TransportPlate1 VARCHAR(10),
+    @TransportPlate2 VARCHAR(10),
+    @TransportPlate3 VARCHAR(10),
     @Capacity INT,
     @StatusId INT
 AS
 BEGIN
-    IF @TransportId IS NOT NULL
-    BEGIN
-        -- Actualizar registro existente
-        UPDATE Transports
-        SET
-            ClientId = @ClientId,
-            TransportTypeId = @TransportTypeId,
-            LicensePlate1 = @LicensePlate1,
-            LicensePlate2 = @LicensePlate2,
-            LicensePlate3 = @LicensePlate3,
-            Capacity = @Capacity,
-            StatusId = @StatusId
-        WHERE Id = @TransportId
-    END
-    ELSE
+	
+	DECLARE @ClientId INT;
+	SELECT @ClientId = ClientId FROM Users WHERE Id = @UserId
+
+    IF @TransportId IS NULL OR @TransportId = 0
     BEGIN
         -- Insertar nuevo registro
         INSERT INTO Transports (
             ClientId,
             TransportTypeId,
-            LicensePlate1,
-            LicensePlate2,
-            LicensePlate3,
+            TransportPlate1,
+            TransportPlate2,
+            TransportPlate3,
             Capacity,
             StatusId
         )
         VALUES (
             @ClientId,
             @TransportTypeId,
-            @LicensePlate1,
-            @LicensePlate2,
-            @LicensePlate3,
+            @TransportPlate1,
+            @TransportPlate2,
+            @TransportPlate3,
             @Capacity,
             @StatusId
         )
+    END
+    ELSE
+    BEGIN
+        -- Actualizar registro existente
+        UPDATE Transports
+        SET
+            ClientId = @ClientId,
+            TransportTypeId = @TransportTypeId,
+            TransportPlate1 = @TransportPlate1,
+            TransportPlate2 = @TransportPlate2,
+            TransportPlate3 = @TransportPlate3,
+            Capacity = @Capacity,
+            StatusId = @StatusId
+        WHERE Id = @TransportId
     END
 END
 
 GO
 
 --Stored Procedure para consultar la tabla Transports y reemplazar valores NULL por una cadena vacía
-CREATE PROCEDURE GetTransports
-  @TransportId int = NULL
+ALTER PROCEDURE SpGetTransports
+  @TransportId int,
+  @UserId INT
 AS
 BEGIN
-  IF @TransportId IS NULL
+
+	DECLARE @ClientId INT;
+	SELECT @ClientId = ClientId FROM Users WHERE Id = @UserId;
+
+  IF @TransportId IS NULL OR @TransportId = 0
     SELECT 
       Id,
       ClientId,
       TransportTypeId,
-      ISNULL(LicensePlate1, '') as LicensePlate1,
-      ISNULL(LicensePlate2, '') as LicensePlate2,
-      ISNULL(LicensePlate3, '') as LicensePlate3,
+      ISNULL(TransportPlate1, '') as TransportPlate1,
+      ISNULL(TransportPlate2, '') as TransportPlate2,
+      ISNULL(TransportPlate3, '') as TransportPlate3,
       Capacity,
       StatusId
-    FROM Transports;
+    FROM Transports WHERE ClientId = @ClientId;
   ELSE
     SELECT 
       Id,
       ClientId,
       TransportTypeId,
-      ISNULL(LicensePlate1, '') as LicensePlate1,
-      ISNULL(LicensePlate2, '') as LicensePlate2,
-      ISNULL(LicensePlate3, '') as LicensePlate3,
+      ISNULL(TransportPlate1, '') as TransportPlate1,
+      ISNULL(TransportPlate2, '') as TransportPlate2,
+      ISNULL(TransportPlate3, '') as LicensePlate3,
       Capacity,
       StatusId
     FROM Transports

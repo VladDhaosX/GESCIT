@@ -1,9 +1,9 @@
-const TransportLineDao = require('../../models/Catalogs/TransportDao');
+const TransportLineDao = require('../../models/Catalogs/TransportLineDao');
 
 const addOrUpdateTransportLineHandler = async (req, res) => {
     try {
-        const { Id, ClientId, LineName, LineType, StatusId } = req.body;
-        const transportLine = { Id, ClientId,LineName, LineType, StatusId };
+        const { TransportLineId, UserId, NameLine, TransportLineTypeId, StatusId } = req.body;
+        const transportLine = { TransportLineId, UserId, NameLine, TransportLineTypeId, StatusId };
         const result = await TransportLineDao.addOrUpdateTransportLine(transportLine);
         res.json(result);
     } catch (error) {
@@ -12,6 +12,18 @@ const addOrUpdateTransportLineHandler = async (req, res) => {
     }
 };
 
+const getTransportLinesHandler = async (req, res) => {
+	try {
+        const { TransportLineId, UserId } = req.body;
+		const transportLines = await TransportLineDao.getTransportLines(TransportLineId, UserId );
+		res.json(transportLines);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: 'Error al obtener las líneas de transporte.' });
+	}
+};
+
 module.exports = {
-    addOrUpdateTransportLineHandler: addOrUpdateTransportLineHandler
+    addOrUpdateTransportLineHandler: addOrUpdateTransportLineHandler,
+    getTransportLinesHandler: getTransportLinesHandler
 };

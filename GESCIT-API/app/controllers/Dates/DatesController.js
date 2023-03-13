@@ -1,4 +1,4 @@
-const DatesDao = require('../../models/Catalogs/DatesDao');
+const DatesDao = require('../../models/Dates/DatesDao');
 
 const addOrUpdateAppointmentHandler = async (req, res) => {
     try {

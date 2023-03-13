@@ -8,6 +8,7 @@ const swaggerSpec = require('./config/swagger/swagger');
 
 const configurationRoutes = require('./routes/configurationRoutes');
 const datesRoutes = require('./routes/datesRoutes');
+const catalogsRoutes = require('./routes/catalogsRoutes');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,6 +21,8 @@ app.use(morgan('tiny'));
 app.use('/GesCitApi/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/GesCitApi/configuration', configurationRoutes);
+
+app.use('/GesCitApi/catalogs', catalogsRoutes);
 
 app.use('/GesCitApi/dates', datesRoutes);
 

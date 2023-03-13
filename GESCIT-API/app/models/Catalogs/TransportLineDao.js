@@ -5,20 +5,36 @@ const addOrUpdateTransportLine = async (transportLine) => {
     try {
         let pool = await sql.connect(config);
         let result = await pool.request()
-            .input('Id', sql.Int, transportLine.Id)
-            .input('ClientId', sql.Int, transportLine.ClientId)
-            .input('LineName', sql.VarChar(255), transportLine.LineName)
-            .input('LineType', sql.VarChar(255), transportLine.LineType)
+            .input('TransportLineId', sql.Int, transportLine.TransportLineId)
+            .input('UserId', sql.Int, transportLine.UserId)
+            .input('NameLine', sql.VarChar(255), transportLine.NameLine)
+            .input('TransportLineTypeId', sql.Int, transportLine.TransportLineTypeId)
             .input('StatusId', sql.Int, transportLine.StatusId)
             .execute('SpAddOrUpdateTransportLine');
 
-        return result;
+        return result.recordset;
 
     } catch (error) {
         console.error(error);
     }
 };
 
+const getTransportLines = async (TransportLineId, UserId ) => {
+	try {
+		let pool = await sql.connect(config);
+		let result = await pool.request()
+			.input('TransportLineId', sql.Int, TransportLineId)
+			.input('UserId', sql.Int, UserId)
+			.execute('SpGetTransportLines');
+
+		return result.recordset;
+	} catch (error) {
+		console.error(error);
+	}
+};
+
+
 module.exports = {
-    addOrUpdateTransportLine: addOrUpdateTransportLine
+    addOrUpdateTransportLine: addOrUpdateTransportLine,
+    getTransportLines: getTransportLines,
 };

@@ -18,5 +18,5 @@ const addOrUpdateDocument = async (document) => {
 };
 
 module.exports = {
-    addOrUpdateDriver: addOrUpdateDriver
+    addOrUpdateDocument: addOrUpdateDocument
 };

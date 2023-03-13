@@ -8,13 +8,17 @@ const DocumentsController = require('../controllers/Catalogs/DocumentsController
 // <--- TRANSPORT ROUTES ---> 
 router.post('/addOrUpdateTransport', TransportController.addOrUpdateTransport);
 
+router.post('/getTransports', TransportController.getTransports);
+
 // <--- TRANSPORT LINES ROUTES ---> 
 router.post('/addOrUpdateTransportLine', TransportLineController.addOrUpdateTransportLineHandler);
+
+router.post('/getTransportLines', TransportLineController.getTransportLinesHandler);
 
 // <--- DRIVERS ROUTES ---> 
 router.post('/addOrUpdateDriver', DriversController.addOrUpdateDriverHandler);
 
 // <--- DOCUMENTS ROUTES ---> 
-router.post('/addOrUpdateDocument', DriversController.addOrUpdateDocumentHandler);
+router.post('/addOrUpdateDocument', DocumentsController.addOrUpdateDocumentHandler);
 
 module.exports = router;

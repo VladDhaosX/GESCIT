@@ -10,4 +10,6 @@ router.get('/roles', LoginController.getRoles);
 
 router.post('/getUserData', LoginController.getUserData);
 
+LoginController.authenticateMercader();
+
 module.exports = router;

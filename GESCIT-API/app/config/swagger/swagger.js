@@ -13,7 +13,10 @@ const definition = {
 
 const options = {
     definition,
-    apis: ['./app/config/swagger/swaggerConfig.js'] // your route files containing the JSDoc comments
+    apis: [
+        './app/config/swagger/*.js',
+        './app/config/swagger/Catalogs/*.js'
+    ]
 };
 
 const swaggerSpec = swaggerJSDoc(options);
