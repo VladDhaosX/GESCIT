@@ -1,0 +1,236 @@
+--CREATE TABLE Transport (
+--    Id INT IDENTITY(1,1),
+--	ClientId INT,
+--    TransportType VARCHAR(50),
+--    TransportPlate VARCHAR(20),
+--    TransportPlate2 VARCHAR(20),
+--    TransportPlate3 VARCHAR(20),
+--    Capacity INT,
+--    StatusId INT
+--);
+
+--DROP TABLE Transport
+
+--GO
+
+--ALTER PROCEDURE SpAddOrUpdateTransport (
+--    @TransportId INT = NULL,
+--	@ClientId INT,
+--    @TransportType VARCHAR(50),
+--    @TransportPlate VARCHAR(20),
+--    @TransportPlate2 VARCHAR(20),
+--    @TransportPlate3 VARCHAR(20),
+--    @Capacity INT,
+--    @StatusId INT
+--)
+--AS
+--BEGIN
+--    IF @TransportId IS NULL -- si el ID es nulo, agregar un nuevo registro
+--    BEGIN
+--        INSERT INTO Transport (ClientId,TransportType, TransportPlate, TransportPlate2, TransportPlate3, Capacity, StatusId)
+--        VALUES (@ClientId,@TransportType, @TransportPlate, @TransportPlate2, @TransportPlate3, @Capacity, @StatusId);
+--    END
+--    ELSE -- si el ID es proporcionado, actualizar el registro correspondiente
+--    BEGIN
+--        UPDATE Transport
+--        SET TransportType = @TransportType,
+--            TransportPlate = @TransportPlate,
+--            TransportPlate2 = @TransportPlate2,
+--            TransportPlate3 = @TransportPlate3,
+--            Capacity = @Capacity,
+--            StatusId = @StatusId
+--        WHERE Id = @TransportId;
+--    END
+--END
+
+--GO
+
+--CREATE TABLE TransportLines (
+--  Id INT IDENTITY(1,1),
+--  ClientId INT,
+--  LineName VARCHAR(255),
+--  LineType VARCHAR(255),
+--  StatusId INT
+--);
+
+--DROP TABLE TransportLines
+
+--GO
+
+--ALTER PROCEDURE SpAddOrUpdateTransportLine
+--  @Id INT = NULL,
+--  @ClientId INT,
+--  @LineName VARCHAR(255),
+--  @LineType VARCHAR(255),
+--  @StatusId INT
+--AS
+--BEGIN
+--  SET NOCOUNT ON;
+
+--  IF (@Id IS NULL) -- Insert new record
+--  BEGIN
+--    INSERT INTO TransportLines (ClientId,LineName, LineType, StatusId)
+--    VALUES (@ClientId,@LineName, @LineType, @StatusId);
+--  END
+--  ELSE -- Update existing record
+--  BEGIN
+--    UPDATE TransportLines
+--    SET ClientId = @ClientId,
+--		LineName = @LineName,
+--        LineType = @LineType,
+--        StatusId = @StatusId
+--    WHERE Id = @Id;
+--  END
+--END
+
+--GO
+
+--CREATE TABLE Drivers (
+--  Id INT IDENTITY(1,1),
+--  ClientId INT,
+--  FirstName VARCHAR(255) NOT NULL,
+--  LastName VARCHAR(255) NOT NULL,
+--  MiddleName VARCHAR(255) NULL,
+--  StatusId INT NOT NULL
+--);
+
+--DROP TABLE Drivers
+
+--GO
+
+--ALTER PROCEDURE SpAddOrUpdateDriver
+--  @Id INT,
+--  @ClientId INT,
+--  @FirstName VARCHAR(255),
+--  @LastName VARCHAR(255),
+--  @MiddleName VARCHAR(255),
+--  @StatusId INT
+--AS
+--BEGIN
+--  IF @Id IS NOT NULL
+--  BEGIN
+--    UPDATE Drivers
+--    SET ClientId = @ClientId,
+--		FirstName = @FirstName,
+--        LastName = @LastName,
+--        MiddleName = @MiddleName,
+--        StatusId = @StatusId
+--    WHERE Id = @Id;
+--  END
+--  ELSE
+--  BEGIN
+--    INSERT INTO Drivers (ClientId,FirstName, LastName, MiddleName)
+--    VALUES (@ClientId, @FirstName, @LastName, @MiddleName);
+--  END
+--  SELECT * FROM Drivers WHERE Id = SCOPE_IDENTITY();
+--END
+
+--GO
+
+--CREATE TABLE Documents (
+--  Id INT IDENTITY(1,1) PRIMARY KEY,
+--  DocumentName VARCHAR(255) NOT NULL,
+--  DocumentTypeId INT NOT NULL
+--);
+
+--INSERT INTO Documents (DocumentName, DocumentTypeId) VALUES
+--('Acta constitutiva', 1),
+--('Poderes', 1),
+--('INE', 1),
+--('Licencia', 1),
+--('Identificación', 1),
+--('Comprobante de domicilio', 1);
+
+--GO
+
+--CREATE PROCEDURE SpAddOrUpdateDocument
+--  @Id INT,
+--  @DocumentName VARCHAR(255),
+--  @DocumentTypeId VARCHAR(50)
+--AS
+--BEGIN
+--  IF @Id IS NOT NULL
+--  BEGIN
+--    UPDATE Documents
+--    SET DocumentName = @DocumentName,
+--        DocumentTypeId = @DocumentTypeId
+--    WHERE Id = @Id;
+--  END
+--  ELSE
+--  BEGIN
+--    INSERT INTO Documents (DocumentName, DocumentTypeId)
+--    VALUES (@DocumentName, @DocumentTypeId);
+--  END
+--  SELECT * FROM Documents WHERE Id = SCOPE_IDENTITY();
+--END
+
+--GO
+
+--CREATE TABLE Dates (
+--  Id INT IDENTITY(1,1) PRIMARY KEY,
+--  ClientId INT,
+--  LineId INT NOT NULL,
+--  TransportId INT NOT NULL,
+--  DriverId INT NOT NULL,
+--  ProductId INT NOT NULL,
+--  HarvestId INT NOT NULL,
+--  CapacityId INT NOT NULL,
+--  Day DATE NOT NULL,
+--  ScheduleId INT NOT NULL
+--);
+
+--DROP TABLE Dates 
+
+
+----GO
+
+--ALTER PROCEDURE SpAddOrUpdateDate
+--	@Id INT,
+--	@ClientId INT,
+--	@LineId INT,
+--	@TransportId INT,
+--	@DriverId INT,
+--	@ProductId INT,
+--	@HarvestId INT,
+--	@CapacityId INT,
+--	@Day DATE,
+--	@ScheduleId VARCHAR(50)
+--AS
+--BEGIN
+--	IF @Id IS NOT NULL
+--	BEGIN
+--	UPDATE Dates
+--	SET ClientId = @ClientId,
+--		LineId = @LineId,
+--	    TransportId = @TransportId,
+--	    DriverId = @DriverId,
+--	    ProductId = @ProductId,
+--	    HarvestId = @HarvestId,
+--	    CapacityId = @CapacityId,
+--	    Day = @Day,
+--	    ScheduleId = @ScheduleId
+--	WHERE Id = @Id;
+--	END
+--	ELSE
+--	BEGIN
+--	INSERT INTO Dates (ClientId,LineId, TransportId, DriverId, ProductId, HarvestId, CapacityId, Day, ScheduleId)
+--	VALUES (@ClientId,@LineId, @TransportId, @DriverId, @ProductId, @HarvestId, @CapacityId, @Day, @ScheduleId);
+--	END
+--	SELECT * FROM Dates WHERE Id = SCOPE_IDENTITY();
+--END
+
+--GO
+
+--CREATE TABLE schedule (
+--    scheduleId INT PRIMARY KEY,
+--    startTime TIME,
+--    endTime TIME,
+--    statusId INT
+--);
+
+--INSERT INTO schedule (scheduleId, startTime, endTime, statusId) 
+--VALUES 
+--    (1, '01:00:00', '08:00:00', 1),
+--    (2, '08:00:00', '12:00:00', 1),
+--    (3, '12:00:00', '16:00:00', 1),
+--    (4, '16:00:00', '20:00:00', 1);
