@@ -10,19 +10,18 @@ const configurationRoutes = require('./routes/configurationRoutes');
 const datesRoutes = require('./routes/datesRoutes');
 
 const app = express();
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(helmet());
 app.use(morgan('tiny'));
 
+// Agregar la documentación de Swagger
+app.use('/GesCitApi/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use('/GesCitApi/configuration', configurationRoutes);
 
 app.use('/GesCitApi/dates', datesRoutes);
-
-// Agregar la documentación de Swagger
-app.use('/GesCitApi/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Inicia el servidor
 app.get('/GesCitApi/', (req, res) => {

@@ -7,7 +7,7 @@ const addOrUpdateTransport = async (transport) => {
         let result = await pool.request()
             .input('TransportId', sql.Int, transport.TransportId)
             .input('ClientId', sql.Int, transport.ClientId)
-            .input('TransportType', sql.VarChar(50), transport.TransportType)
+            .input('TransportTypeId', sql.VarChar(50), transport.TransportType)
             .input('TransportPlate', sql.VarChar(20), transport.TransportPlate)
             .input('TransportPlate2', sql.VarChar(20), transport.TransportPlate2)
             .input('TransportPlate3', sql.VarChar(20), transport.TransportPlate3)
@@ -22,7 +22,22 @@ const addOrUpdateTransport = async (transport) => {
     }
 };
 
+const getTransports = async (TransportId) => {
+    try {
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .input('TransportId', sql.Int, TransportId)
+            .execute('GetTransports');
+
+        return result;
+
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 
 module.exports = {
-    addOrUpdateTransport: addOrUpdateTransport
+    addOrUpdateTransport: addOrUpdateTransport,
+    getTransports: getTransports
 };
