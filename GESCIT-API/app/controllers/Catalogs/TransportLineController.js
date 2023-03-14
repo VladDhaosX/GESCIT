@@ -7,8 +7,7 @@ const addOrUpdateTransportLineHandler = async (req, res) => {
         const result = await TransportLineDao.addOrUpdateTransportLine(transportLine);
         res.json(result);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error al agregar o actualizar la línea de transporte.' });
+        res.status(500).json({ error: error, message: error.message});
     }
 };
 
@@ -19,7 +18,7 @@ const getTransportLinesHandler = async (req, res) => {
 		res.json(transportLines);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: 'Error al obtener las líneas de transporte.' });
+        res.status(500).json({ error: error, message: error.message});
 	}
 };
 

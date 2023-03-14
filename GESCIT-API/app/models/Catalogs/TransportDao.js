@@ -13,16 +13,25 @@ const addOrUpdateTransport = async (transport) => {
             .input('TransportPlate3', sql.VarChar(20), transport.TransportPlate3)
             .input('Capacity', sql.Int, transport.Capacity)
             .input('StatusId', sql.Int, transport.StatusId)
+            .output('Success', sql.Bit)
+            .output('Message', sql.VarChar(50))
             .execute('SpAddOrUpdateTransport');
 
-        return result.recordset;
-
+        return {
+            success: result.output.Success,
+            message: result.output.Message,
+            data: result.recordset
+        };
     } catch (error) {
-        console.error(error);
+        return {
+            success: false,
+            message: error.message,
+            error: error,
+        };
     }
 };
 
-const getTransports = async (TransportId,UserId) => {
+const getTransports = async (TransportId, UserId) => {
     try {
         let pool = await sql.connect(config);
         let result = await pool.request()
@@ -30,9 +39,17 @@ const getTransports = async (TransportId,UserId) => {
             .input('UserId', sql.Int, UserId)
             .execute('SpGetTransports');
 
-        return result.recordset;
+        return {
+            success: true,
+            message: "Consulta realizada con exito.",
+            data: result.recordset
+        };
     } catch (error) {
-        console.error(error);
+        return {
+            success: false,
+            message: error.message,
+            error: error,
+        };
     }
 };
 

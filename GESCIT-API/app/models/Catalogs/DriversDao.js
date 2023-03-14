@@ -3,20 +3,27 @@ const config = require('../../config/database');
 
 const addOrUpdateDriver = async (driver) => {
     try {
-        let pool = await sql.connect(config);
-        let result = await pool.request()
-            .input('Id', sql.Int, driver.Id)
-            .input('ClientId', sql.Int, driver.ClientId)
-            .input('FirstName', sql.VarChar(255), driver.FirstName)
-            .input('LastName', sql.VarChar(255), driver.LastName)
-            .input('MiddleName', sql.VarChar(255), driver.MiddleName)
-            .input('StatusId', sql.Int, driver.StatusId)
-            .execute('SpAddOrUpdateDriver');
+        const pool = await sql.connect(config);
+        const request = pool.request();
+        request.input('Id', sql.Int, driver.Id);
+        request.input('ClientId', sql.Int, driver.ClientId);
+        request.input('Name', sql.VarChar(255), driver.Name);
+        request.input('LastName', sql.VarChar(255), driver.LastName);
+        request.input('SecondLastName', sql.VarChar(255), driver.SecondLastName);
+        request.input('StatusId', sql.Int, driver.StatusId);
+        request.output('Success', sql.Bit);
+        request.output('Message', sql.VarChar(50));
+        const result = await request.execute('SpAddOrUpdateDriver');
 
-        return result.recordset[0];
-
+        return {
+            success: result.output.Success,
+            message: result.output.Message
+        };;
     } catch (error) {
-        console.error(error);
+        return {
+            success: false,
+            message: error.Message
+        };;
     }
 };
 

@@ -1,26 +1,27 @@
-SELECT * FROM Users
-SELECT * FROM Roles
-SELECT * FROM ModulePermissions
+--SELECT * FROM Users
+--SELECT * FROM Roles
+--SELECT * FROM ModulePermissions
 
 --DROP TABLE Users
 --TRUNCATE TABLE Users
 
-CREATE TABLE Users (
-  Id INT IDENTITY(1,1) PRIMARY KEY,
-  userId VARCHAR(50),
-  name VARCHAR(50),
-  mail VARCHAR(50),
-  userName VARCHAR(50),
-  userTypeId INT,
-  password VARCHAR(50),
-  PrivacyNotice INT,
-  RolId INT
-);
+--CREATE TABLE Users (
+--  Id INT IDENTITY(1,1) PRIMARY KEY,
+--  ActiveDirectoryId uniqueidentifier,
+--  name VARCHAR(50),
+--  mail VARCHAR(50),
+--  userName VARCHAR(50),
+--  userTypeId INT,
+--  password VARCHAR(50),
+--  PrivacyNotice INT,
+--  RolId INT,
+--  ClientId INT
+--);
 
 GO
 
 ALTER PROCEDURE SpLoginUser
-@userId VARCHAR(50),
+@ActiveDirectoryId VARCHAR(50),
 @name VARCHAR(50),
 @mail VARCHAR(50),
 @userName VARCHAR(50),
@@ -39,7 +40,7 @@ BEGIN
 	IF @userTypeId = 1 SET @RolId = 0 ELSE IF @userTypeId = 2 SET @RolId = 4;
 
 	BEGIN TRY
-		IF EXISTS(SELECT * FROM Users WHERE userId = @userId)
+		IF EXISTS(SELECT * FROM Users WHERE ActiveDirectoryId = @ActiveDirectoryId)
 		BEGIN
 			UPDATE Users SET
 			name = @name,
@@ -48,17 +49,17 @@ BEGIN
 			userTypeId = @userTypeId,
 			password = @password,
 			RolId = @RolId
-			WHERE userId = @userId;
+			WHERE ActiveDirectoryId = @ActiveDirectoryId;
 			
 			SET @success = 1;
-			SET @Id = (SELECT Id FROM Users WHERE userId = @userId);
-			SET @PrivacyNotice = (SELECT PrivacyNotice FROM Users WHERE userId = @userId);
+			SET @Id = (SELECT Id FROM Users WHERE ActiveDirectoryId = @ActiveDirectoryId);
+			SET @PrivacyNotice = (SELECT PrivacyNotice FROM Users WHERE ActiveDirectoryId = @ActiveDirectoryId);
 			SET @successMessage = 'El registro se actualizó correctamente.';
 		END
 		ELSE
 		BEGIN
-			INSERT INTO Users (userId, name, mail, userName, userTypeId, password, RolId)
-			VALUES (@userId, @name, @mail, @userName, @userTypeId, @password,@RolId);
+			INSERT INTO Users (ActiveDirectoryId, name, mail, userName, userTypeId, password, RolId)
+			VALUES (@ActiveDirectoryId, @name, @mail, @userName, @userTypeId, @password,@RolId);
 	  
 			SET @Id = SCOPE_IDENTITY();
 			SET @success = 1;
