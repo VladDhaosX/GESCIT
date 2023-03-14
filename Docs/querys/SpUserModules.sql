@@ -12,11 +12,12 @@ AS BEGIN
 		, m.Name
 		, m.Description
 	FROM Modules m 
-		LEFT JOIN ModulePermissions mp ON mp.ModuleId = m.Id
-	WHERE mp.RolId = @RolId
+		LEFT JOIN RolesPermissions rp ON rp.ModuleId = m.Id
+	WHERE rp.RolId = @RolId
 
 END
 
 GO
 
 EXEC SpUserModules 1
+

@@ -28,7 +28,7 @@ app.use('/GesCitApi/dates', datesRoutes);
 
 // Inicia el servidor
 app.get('/GesCitApi/', (req, res) => {
-    res.redirect('/GesCitApi/api-docs');
-  });
+  res.redirect('/GesCitApi/api-docs');
+});
 
 module.exports = app;

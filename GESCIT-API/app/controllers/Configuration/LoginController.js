@@ -5,41 +5,90 @@ const request = require('request');
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    const response = await LoginDao.login(username, password);
+    let data = await authenticateVClient(username, password);
+    let response;
+    let userTypeId;
+
+    if (data.success) {
+      let { id, name, mail, userName } = data.data;
+      userTypeId = 2;
+      response = await registerUser(id, name, mail, userName, userTypeId, password);
+    } else {
+      userTypeId = 1;
+      data = await authenticateMercader(username, password);
+      if (data.success) {
+        let { id, name, mail, userName } = data.data;
+        response = await registerUser(id, name, mail, userName, userTypeId, password);
+      } else {
+        res.status(500).json({ success: false, message: data.message });
+      };
+    };
+
+    console.log(response);
     res.json(response);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al realizar el login.' });
-  }
+    res.status(500).json({ success: false, message: 'Error al realizar el login.' });
+  };
 };
 
-const authenticateMercader = async () => {
-  const url = 'https://portalweb.almer.com.mx/ADConnect/api/authenticate';
+const registerUser = async (id, name, mail, userName, userTypeId,password) => {
+  return response = await LoginDao.login(id, name, mail, userName, userTypeId,password);
+};
+
+const authenticateVClient = async (userName, password) => {
+  const url = 'https://portalweb.almer.com.mx/ADConnect/api/authenticateCustomer';
   const data = {
-    userName: 'nombredeusuario',
-    password: 'contraseña'
+    userName: userName,
+    password: password
   };
 
-  request.post({
-    url: url,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  }, (error, response, body) => {
-    if (error) {
-      console.error(error);
-    } else if (response.statusCode !== 200) {
-      console.error('Error en la solicitud de autenticación');
-    } else {
-      const responseBody = JSON.parse(body);
-      console.log(responseBody);
-      if (responseBody.success){
-        console.log(responseBody.data);
+  console.log(data);
+
+  return new Promise((resolve, reject) => {
+    request.post({
+      url: url,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }, (error, response, body) => {
+      if (error) {
+        reject(error);
+      } else if (response.statusCode !== 200) {
+        reject(new Error('Error en la solicitud de autenticación'));
       } else {
-        console.log(responseBody.message);
+        resolve(JSON.parse(body));
       };
-    };
+    });
+  });
+};
+
+const authenticateMercader = async (userName, password) => {
+  const url = 'https://portalweb.almer.com.mx/ADConnect/api/authenticate';
+  const data = {
+    userName: userName,
+    password: password
+  };
+
+  console.log(data);
+
+  return new Promise((resolve, reject) => {
+    request.post({
+      url: url,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }, (error, response, body) => {
+      if (error) {
+        reject(error);
+      } else if (response.statusCode !== 200) {
+        reject(new Error('Error en la solicitud de autenticación'));
+      } else {
+        resolve(JSON.parse(body));
+      };
+    });
   });
 };
 

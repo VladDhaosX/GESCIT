@@ -1,30 +1,41 @@
 const sql = require('mssql');
 const config = require('../../config/database');
 
-const login = async (username, password) => {
+const login = async (userId, name, mail, userName, userTypeId, password) => {
   try {
     let pool = await sql.connect(config);
-    let userId = "";
+    let Id = 0;
+    let success = false;
+    let PrivacyNotice = 0;
     let successMessage = "";
     let errorMessage = "";
 
     // Execute stored procedure to login user
     let result = await pool.request()
-      .input('username', sql.VarChar(50), username)
+      .input('userId', sql.VarChar(50), userId)
+      .input('name', sql.VarChar(50), name)
+      .input('mail', sql.VarChar(50), mail)
+      .input('userName', sql.VarChar(50), userName)
+      .input('userTypeId', sql.Int, userTypeId)
       .input('password', sql.VarChar(50), password)
+      .output('success', sql.Bit)
+      .output('Id', sql.Int)
+      .output('PrivacyNotice', sql.Int)
       .output('successMessage', sql.VarChar(100))
       .output('errorMessage', sql.VarChar(100))
-      .output('userId', sql.Int)
       .execute('SpLoginUser');
     // Check for success or error message
     if (result.output.successMessage) {
       successMessage = result.output.successMessage;
-      userId = result.output.userId;
+      Id = result.output.Id;
+      PrivacyNotice = result.output.PrivacyNotice;
+      success = result.output.success;
     } else {
       errorMessage = result.output.errorMessage;
+      success = result.output.success;
     }
 
-    return { userId,successMessage,errorMessage };
+    return { success,Id,PrivacyNotice,successMessage,errorMessage };
 
   } catch (error) {
     console.error(error);
@@ -101,7 +112,6 @@ const getUserRole = async (userId) => {
     console.error(error);
   }
 };
-
 
 module.exports = {
   login: login,

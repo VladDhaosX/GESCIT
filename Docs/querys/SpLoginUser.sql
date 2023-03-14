@@ -1,51 +1,75 @@
-ALTER PROCEDURE SpLoginUser
-    @username VARCHAR(MAX),
-    @password VARCHAR(MAX),
-    @successMessage VARCHAR(MAX) OUTPUT,
-    @errorMessage VARCHAR(MAX) OUTPUT,
-	@userId INT OUTPUT
-AS
-BEGIN
-    SET NOCOUNT ON;
+SELECT * FROM Users
+SELECT * FROM Roles
+SELECT * FROM ModulePermissions
 
-    DECLARE @userPassword VARCHAR(MAX);
-    DECLARE @userStatusId INT;
-    DECLARE @PrivacyNotice INT;
+--DROP TABLE Users
+--TRUNCATE TABLE Users
 
-    -- Check if user exists
-    SELECT @userId = Id, @userPassword = Password, @userStatusId = StatusId, @PrivacyNotice = PrivacyNotice
-    FROM Users
-    WHERE [User] = @username
-
-    IF @@ROWCOUNT = 0
-    BEGIN
-        SET @errorMessage = 'El usuario no existe';
-        RETURN;
-    END
-
-    -- Check if password is correct
-    IF @userPassword <> @password
-    BEGIN
-        SET @errorMessage = 'La contraseña es incorrecta';
-        RETURN;
-    END
-
-    -- Check if user is active
-    IF @userStatusId <> 1
-    BEGIN
-        SET @errorMessage = 'El usuario no está activo';
-        RETURN;
-    END
-
-    -- Check if Privacy Notice is accepted
-    IF @PrivacyNotice <> 1
-    BEGIN
-        SET @errorMessage = 'Es necesario aceptar el archivo de privacidad';
-        RETURN;
-    END
-
-    SET @successMessage = 'Inicio de sesión exitoso';
-END
+CREATE TABLE Users (
+  Id INT IDENTITY(1,1) PRIMARY KEY,
+  userId VARCHAR(50),
+  name VARCHAR(50),
+  mail VARCHAR(50),
+  userName VARCHAR(50),
+  userTypeId INT,
+  password VARCHAR(50),
+  PrivacyNotice INT,
+  RolId INT
+);
 
 GO
 
+ALTER PROCEDURE SpLoginUser
+@userId VARCHAR(50),
+@name VARCHAR(50),
+@mail VARCHAR(50),
+@userName VARCHAR(50),
+@userTypeId INT,
+@password VARCHAR(50),
+@success BIT OUTPUT,
+@Id INT OUTPUT,
+@PrivacyNotice INT OUTPUT,
+@successMessage VARCHAR(100) OUTPUT,
+@errorMessage VARCHAR(100) OUTPUT
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	DECLARE @RolId INT;
+	IF @userTypeId = 1 SET @RolId = 0 ELSE IF @userTypeId = 2 SET @RolId = 4;
+
+	BEGIN TRY
+		IF EXISTS(SELECT * FROM Users WHERE userId = @userId)
+		BEGIN
+			UPDATE Users SET
+			name = @name,
+			mail = @mail,
+			userName = @userName,
+			userTypeId = @userTypeId,
+			password = @password,
+			RolId = @RolId
+			WHERE userId = @userId;
+			
+			SET @success = 1;
+			SET @Id = (SELECT Id FROM Users WHERE userId = @userId);
+			SET @PrivacyNotice = (SELECT PrivacyNotice FROM Users WHERE userId = @userId);
+			SET @successMessage = 'El registro se actualizó correctamente.';
+		END
+		ELSE
+		BEGIN
+			INSERT INTO Users (userId, name, mail, userName, userTypeId, password, RolId)
+			VALUES (@userId, @name, @mail, @userName, @userTypeId, @password,@RolId);
+	  
+			SET @Id = SCOPE_IDENTITY();
+			SET @success = 1;
+			SET @PrivacyNotice = 0;
+			SET @successMessage = 'El registro se insertó correctamente.';
+		END
+	END TRY
+	BEGIN CATCH
+		SET @errorMessage = 'Error al intentar actualizar o insertar el registro.';
+		SET @success = 0;
+	END CATCH
+END
+
+GO

@@ -27,10 +27,13 @@ CREATE TABLE Modules (
 	, StatusId INT
 	)
 	
-CREATE TABLE ModulePermissions (
+CREATE TABLE RolesPermissions (
 	RolId INT
 	, ModuleId INT
 	)
+	
+	INSERT INTO RolesPermissions(RolId,ModuleId)
+	SELECT r.Id,m.Id FROM Roles r, Modules m WHERE r.Id = 1
 
 CREATE TABLE Actions (
 	Id INT IDENTITY(1,1)

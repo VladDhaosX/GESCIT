@@ -12,8 +12,8 @@ AS BEGIN
 		, mc.Description
 	FROM ModuleCategories mc 
 		LEFT JOIN Modules m ON m.ModuleCategoriesId = mc.Id
-		LEFT JOIN ModulePermissions mp ON mp.ModuleId = m.Id
-	WHERE mp.RolId = @RolId
+		LEFT JOIN RolesPermissions rp ON rp.ModuleId = m.Id
+	WHERE rp.RolId = @RolId
 
 END
 
