@@ -56,7 +56,7 @@ GO
 
 --Stored Procedure para consultar la tabla Transports y reemplazar valores NULL por una cadena vacía
 ALTER PROCEDURE SpGetTransports
-  @TransportId int,
+  @TransportId INT,
   @UserId INT
 AS
 BEGIN
@@ -89,3 +89,11 @@ BEGIN
     WHERE Id = @TransportId;
 END;
 GO
+
+EXEC SpGetTransports 0,1
+
+SELECT * FROM Transports
+
+GO
+
+SELECT * FROM TransportType

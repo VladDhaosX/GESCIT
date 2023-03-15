@@ -53,8 +53,29 @@ const getTransports = async (TransportId, UserId) => {
     }
 };
 
+const getTransportType = async () => {
+    try {
+        let pool = await sql.connect(config);
+        let result = await pool.request()
+            .execute('SpGetTransportType');
+
+        return {
+            success: true,
+            message: "Consulta realizada con exito.",
+            data: result.recordset
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: error.message,
+            error: error,
+        };
+    }
+};
+
 
 module.exports = {
     addOrUpdateTransport: addOrUpdateTransport,
-    getTransports: getTransports
+    getTransports: getTransports,
+    getTransportType: getTransportType
 };

@@ -14,17 +14,28 @@ const addOrUpdateTransport = async (req, res) => {
 
 const getTransports = async (req, res) => {
   try {
-    const { TransportId,UserId } = req.body;
-    const response = await TransportDao.getTransports(TransportId,UserId);
+    let { transportId,userId } = req.body;
+    transportId = transportId === undefined ? 0 : transportId = transportId;
+    userId = userId === undefined ? 0 : userId;
+    console.log(transportId, userId);
+    const response = await TransportDao.getTransports(transportId,userId);
     res.json(response);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error al consultar transportes.' });
+    res.status(500).json({ message: error.message });
   }
 };
 
+const getTransportType = async (req, res) => {
+  try {
+    const response = await TransportDao.getTransportType();
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   addOrUpdateTransport: addOrUpdateTransport,
-  getTransports: getTransports
+  getTransports: getTransports,
+  getTransportType: getTransportType
 };

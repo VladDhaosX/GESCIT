@@ -130,7 +130,6 @@ const getUserData = async (req, res) => {
       userModules: userModules
     };
 
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.json(response);
   } catch (error) {
     console.error(error);

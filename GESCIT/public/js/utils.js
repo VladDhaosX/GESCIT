@@ -28,7 +28,7 @@ const createMenu = async () => {
             .forEach((module) => {
                 const $moduleItem = $('<li>').addClass('menu-item')
                     .append($('<a>').attr('href', 'javascript:void(0);').addClass('menu-link')
-                        .append($('<i>').addClass(`menu-icon tf-icons bx ${module.Key}`))
+                        .append($('<i>').addClass(`menu-icon tf-icons bx ${module.Icon}`))
                         .append($('<div>').attr('data-i18n', module.Name).text(module.Name)));
                 $menu.append($moduleItem);
             });

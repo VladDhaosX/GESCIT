@@ -10,6 +10,8 @@ router.post('/addOrUpdateTransport', TransportController.addOrUpdateTransport);
 
 router.post('/getTransports', TransportController.getTransports);
 
+router.get('/getTransportType', TransportController.getTransportType);
+
 // <--- TRANSPORT LINES ROUTES ---> 
 router.post('/addOrUpdateTransportLine', TransportLineController.addOrUpdateTransportLineHandler);
 
