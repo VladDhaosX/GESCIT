@@ -98,6 +98,9 @@ CREATE TABLE Drivers (
 	, StatusId INT
 	)
 
+
+SELECT * FROM Drivers
+
 CREATE TABLE Products (
 	Id INT IDENTITY(1,1)
 	, [Key] VARCHAR(MAX)

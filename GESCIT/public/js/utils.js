@@ -1,3 +1,11 @@
+$(document).ready(async () => {
+    sessionStorage.setItem('userId', 1);
+    await createMenu();
+    // await ToastsNotification("titulo","mensaje","Danger","Middle center"); <- Prueba de Notificacion
+    // await ToastsNotification("titulo","mensaje","Danger","Top right"); <- Prueba de Notificacion
+});
+
+
 const fetchUserData = async () => {
     try {
         const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
@@ -35,7 +43,54 @@ const createMenu = async () => {
     });
 };
 
-$(document).ready(() => {
-    sessionStorage.setItem('userId', 1);
-    createMenu();
-});
+const tooltipTrigger = async () => {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+};
+
+
+const ToastsNotification = async (titulo,message,type, placement) => {
+    const placementList = {
+        'Top left': 'top-0 start-0',
+        'Top center': 'top-0 start-50 translate-middle-x',
+        'Top right': 'top-0 end-0',
+        'Middle left': 'top-50 start-0 translate-middle-y',
+        'Middle center': 'top-50 start-50 translate-middle',
+        'Middle right': 'top-50 end-0 translate-middle-y',
+        'Bottom left': 'bottom-0 start-0',
+        'Bottom center': 'bottom-0 start-50 translate-middle-x',
+        'Bottom right': 'bottom-0 end-0'
+    }
+    const typeList = {
+        'Primary':'bg-primary' ,
+        'Secondary':'bg-secondary' ,
+        'Success':'bg-success' ,
+        'Danger':'bg-danger' ,
+        'Warning':'bg-warning' ,
+        'Info':'bg-info' ,
+        'Dark':'bg-dark' 
+    };
+    const selectedPlacement = placementList[placement].split(' ');
+    const selectedType = typeList[type];
+    const toastPlacementExample = document.querySelector('.toast-placement-ex');
+    let toastPlacement;
+
+    // Dispose toast when open another
+    if (toastPlacement) {
+        if (toastPlacement && toastPlacement._element !== null) {
+            if (toastPlacementExample) {
+                toastPlacementExample.classList.remove(selectedType);
+                DOMTokenList.prototype.remove.apply(toastPlacementExample.classList, selectedPlacement);
+            }
+            toastPlacement.dispose();
+        }
+    }
+    $('.toast-placement-ex > .me-auto,.fw-semibold').text(titulo);
+    $('.toast-placement-ex > .toast-body').text(message);
+    toastPlacementExample.classList.add(selectedType);
+    DOMTokenList.prototype.add.apply(toastPlacementExample.classList, selectedPlacement);
+    toastPlacement = new bootstrap.Toast(toastPlacementExample);
+    toastPlacement.show();
+};

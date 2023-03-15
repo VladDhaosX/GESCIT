@@ -5,11 +5,9 @@
             <hr class="my-5" />
 
             <div class="card">
-                <div class="demo-inline-spacing" style="padding: 0px 50px;">
-                    <button type="button" class="btn rounded-pill btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#AddOrUpdateTransportModal">Agregar</button>
+                <div id="ActionsButtons" class="demo-inline-spacing" style="padding: 0px 50px;">
                 </div>
-                <div class="table-responsive text-nowrap" style="margin: 25px 50px;">
+                <div class="text-nowrap" style="margin: 25px 50px;">
                     <table id="TransportTable" class="table">
                     </table>
                 </div>
@@ -43,13 +41,11 @@
                 <div class="row g-2">
                     <div class="col mb-0">
                         <label for="TransportPlate2" class="form-label">Placa de Caja 1*</label>
-                        <input type="text" id="TransportPlate2" class="form-control"
-                            placeholder="Placa de Caja 1" />
+                        <input type="text" id="TransportPlate2" class="form-control" placeholder="Placa de Caja 1" />
                     </div>
                     <div class="col mb-0">
                         <label for="TransportPlate3" class="form-label">Placa de Caja 2*</label>
-                        <input type="text" id="TransportPlate3" class="form-control"
-                            placeholder="Placa de Caja 2" />
+                        <input type="text" id="TransportPlate3" class="form-control" placeholder="Placa de Caja 2" />
                     </div>
                 </div>
                 <div class="row" style="padding-top: 15px;">
@@ -63,8 +59,9 @@
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     Cerrar
                 </button>
-                <button type="button" class="btn btn-primary">Guardar</button>
+                <button id="AddOrUpdateTransportButton" type="button" class="btn btn-primary">Guardar</button>
             </div>
         </div>
     </div>
 </div>
+

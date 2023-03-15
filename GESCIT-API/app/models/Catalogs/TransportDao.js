@@ -2,6 +2,7 @@ const sql = require('mssql');
 const config = require('../../config/database');
 
 const addOrUpdateTransport = async (transport) => {
+    console.log("Dao:" + JSON.stringify(transport));
     try {
         let pool = await sql.connect(config);
         let result = await pool.request()
@@ -12,21 +13,22 @@ const addOrUpdateTransport = async (transport) => {
             .input('TransportPlate2', sql.VarChar(20), transport.TransportPlate2)
             .input('TransportPlate3', sql.VarChar(20), transport.TransportPlate3)
             .input('Capacity', sql.Int, transport.Capacity)
-            .input('StatusId', sql.Int, transport.StatusId)
             .output('Success', sql.Bit)
-            .output('Message', sql.VarChar(50))
+            .output('Message', sql.VarChar(sql.MAX))
             .execute('SpAddOrUpdateTransport');
 
         return {
             success: result.output.Success,
             message: result.output.Message,
-            data: result.recordset
+            data: result.recordset,
+            type: "db"
         };
     } catch (error) {
+        console.error("DaoError: " + error.message);
         return {
             success: false,
             message: error.message,
-            error: error,
+            type: "DaoError"
         };
     }
 };

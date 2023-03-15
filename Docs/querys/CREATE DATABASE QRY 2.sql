@@ -1,24 +1,4 @@
-	CREATE TABLE Transports (
-	  Id int IDENTITY(1,1) PRIMARY KEY,
-	  ClientId INT,
-	  TransportTypeId INT,
-	  LicensePlate1 varchar(10) NOT NULL,
-	  LicensePlate2 varchar(10) NOT NULL,
-	  LicensePlate3 varchar(10) NOT NULL,
-	  Capacity int NOT NULL,
-	  StatusId int NOT NULL
-	);
 
-	DROP TABLE Transports
-
-	CREATE TABLE TransportType (
-	  Id int IDENTITY(1,1) PRIMARY KEY,
-	  Type varchar(20) NOT NULL
-	);
-
-	INSERT INTO TransportType (Type)
-	VALUES ('Torton'), ('Trailer'), ('Flatbed'), ('Box Truck'), ('Full Truckload');
-	
 	CREATE TABLE TransportLine (
 	  Id int IDENTITY(1,1) PRIMARY KEY,
 	  ClientId INT,

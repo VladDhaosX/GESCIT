@@ -18,6 +18,7 @@
 --  ClientId INT
 --);
 
+
 GO
 
 ALTER PROCEDURE SpLoginUser

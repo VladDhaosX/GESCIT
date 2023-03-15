@@ -17,7 +17,7 @@ app.get('/Clients', (req, res) => {
 app.get('/Transports', (req, res) => {
     const data = {
         Page: './Catalogs/Transports',
-        Categoria: 'Catalogo',
+        Categoria: 'Catalogos',
         Modulo: 'Transportes',
         JSFile: '../js/Catalogs/Transports.js'
     };
