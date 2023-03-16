@@ -1,7 +1,44 @@
 const sql = require('mssql');
 const config = require('../../config/database');
 
-const login = async (AccountNum, name, mail, userName, userTypeId, password) => {
+const validateUser = async (username, password) => {
+  try {
+    let pool = await sql.connect(config);
+    let Id = 0;
+    let success = false;
+    let PrivacyNotice = 0;
+    let successMessage = "";
+    let errorMessage = "";
+
+    // Execute stored procedure to login user
+    let result = await pool.request()
+      .input('username', sql.VarChar(50), username)
+      .input('password', sql.VarChar(50), password)
+      .output('success', sql.Bit)
+      .output('Id', sql.Int)
+      .output('PrivacyNotice', sql.Int)
+      .output('successMessage', sql.VarChar(100))
+      .output('errorMessage', sql.VarChar(100))
+      .execute('SpValidateUser');
+    // Check for success or error message
+    if (result.output.successMessage) {
+      successMessage = result.output.successMessage;
+      Id = result.output.Id;
+      PrivacyNotice = result.output.PrivacyNotice;
+      success = result.output.success;
+    } else {
+      errorMessage = result.output.errorMessage;
+      success = result.output.success;
+    }
+
+    return { success, Id, PrivacyNotice, successMessage, errorMessage };
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const AddOrUpdateUser = async (AccountNum, name, mail, userName, userTypeId, password) => {
   try {
     let pool = await sql.connect(config);
     let Id = 0;
@@ -23,7 +60,7 @@ const login = async (AccountNum, name, mail, userName, userTypeId, password) => 
       .output('PrivacyNotice', sql.Int)
       .output('successMessage', sql.VarChar(100))
       .output('errorMessage', sql.VarChar(100))
-      .execute('SpLoginUser');
+      .execute('SpAddOrUpdateUser');
     // Check for success or error message
     if (result.output.successMessage) {
       successMessage = result.output.successMessage;
@@ -35,7 +72,7 @@ const login = async (AccountNum, name, mail, userName, userTypeId, password) => 
       success = result.output.success;
     }
 
-    return { success,Id,PrivacyNotice,successMessage,errorMessage };
+    return { success, Id, PrivacyNotice, successMessage, errorMessage };
 
   } catch (error) {
     console.error(error);
@@ -50,7 +87,7 @@ const UserPrivacyNotice = async (userId) => {
 
     // Execute stored procedure to login user
     let result = await pool.request()
-      .input('userId', sql.Int,userId)
+      .input('userId', sql.Int, userId)
       .output('successMessage', sql.VarChar(100))
       .execute('SpUserPrivacyNotice');
     // Check for success or error message
@@ -60,7 +97,7 @@ const UserPrivacyNotice = async (userId) => {
       errorMessage = result.output.errorMessage;
     }
 
-    return { successMessage,errorMessage };
+    return { successMessage, errorMessage };
 
   } catch (error) {
     console.error(error);
@@ -69,9 +106,10 @@ const UserPrivacyNotice = async (userId) => {
 
 const getRoles = async () => {
   try {
-    let pool = await sql.connect(config);
-    let categorias = await pool.request().query('SELECT * from Roles');
-    return categorias.recordsets;
+    const pool = await sql.connect(config);
+    const result = await pool.request()
+      .execute('SpGetRoles');
+    return result.recordset;
   } catch (error) {
     console.error(error);
   }
@@ -113,11 +151,13 @@ const getUserRole = async (userId) => {
   }
 };
 
+
 module.exports = {
-  login: login,
-  UserPrivacyNotice: UserPrivacyNotice,
-  getRoles: getRoles,
-  getUserCategories: getUserCategories,
-  getUserModules: getUserModules,
-  getUserRole: getUserRole
+  validateUser,
+  AddOrUpdateUser,
+  UserPrivacyNotice,
+  getRoles,
+  getUserCategories,
+  getUserModules,
+  getUserRole
 };

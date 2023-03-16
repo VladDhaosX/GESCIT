@@ -21,7 +21,8 @@
 
 GO
 
-ALTER PROCEDURE SpLoginUser
+
+CREATE PROCEDURE SpAddOrUpdateUser
 @AccountNum VARCHAR(50),
 @name VARCHAR(50),
 @mail VARCHAR(50),

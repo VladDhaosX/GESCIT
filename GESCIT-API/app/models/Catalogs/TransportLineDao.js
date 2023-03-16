@@ -7,8 +7,8 @@ const addOrUpdateTransportLine = async (transportLine) => {
         let result = await pool.request()
             .input('TransportLineId', sql.Int, transportLine.TransportLineId)
             .input('UserId', sql.Int, transportLine.UserId)
-            .input('NameLine', sql.VarChar(255), transportLine.NameLine)
-            .input('TransportLineTypeId', sql.Int, transportLine.TransportLineTypeId)
+            .input('Name', sql.VarChar(255), transportLine.Name)
+            .input('LineTypeId', sql.Int, transportLine.LineTypeId)
             .input('StatusId', sql.Int, transportLine.StatusId)
             .output('Success', sql.Bit)
             .output('Message', sql.VarChar(50))
@@ -28,11 +28,10 @@ const addOrUpdateTransportLine = async (transportLine) => {
     }
 };
 
-const getTransportLines = async (TransportLineId, UserId) => {
+const getTransportLines = async (UserId) => {
     try {
         let pool = await sql.connect(config);
         let result = await pool.request()
-            .input('TransportLineId', sql.Int, TransportLineId)
             .input('UserId', sql.Int, UserId)
             .execute('SpGetTransportLines');
 

@@ -6,8 +6,8 @@ ALTER PROCEDURE SpGetTransports
 AS
 BEGIN
 
-	DECLARE @ClientId INT;
-	SELECT @ClientId = ClientId FROM Users WHERE Id = @UserId;
+	DECLARE @AccountNum INT;
+	SELECT @AccountNum = AccountNum FROM Users WHERE Id = @UserId;
 
   IF @TransportId IS NULL OR @TransportId = 0
     SELECT 
@@ -22,7 +22,7 @@ BEGIN
       --, t.StatusId
     FROM Transports t
 	LEFT JOIN TransportType [type] ON [type].Id = t.TransportTypeId
-	WHERE ClientId = @ClientId;
+	WHERE AccountNum = @AccountNum;
   ELSE
     SELECT 
         t.Id
@@ -39,4 +39,5 @@ BEGIN
     WHERE t.Id = @TransportId;
 END;
 GO
+
 

@@ -24,7 +24,29 @@ app.get('/Transports', (req, res) => {
     res.render('views', data);
 });
 
+app.get('/Permissions', (req, res) => {
+    const data = {
+        Page: './Configuration/Permissions',
+        Categoria: 'Configuracion',
+        Modulo: 'Permisos',
+        JSFile: '../js/Configuration/Permissions.js'
+    };
+    res.render('views', data);
+});
 
+app.get('/TransportLines', (req, res) => {
+    const data = {
+        Page: './Catalogs/TransportLines',
+        Categoria: 'Catalogos',
+        Modulo: 'Lineas de Transporte',
+        JSFile: '../js/Catalogs/TransportLines.js'
+    };
+    res.render('views', data);
+});
+
+app.get('/', (req, res) => {
+    res.redirect('/Permissions');
+  });
 app.listen(3000, () => {
     console.log('La aplicación está escuchando en el puerto 3000');
 });

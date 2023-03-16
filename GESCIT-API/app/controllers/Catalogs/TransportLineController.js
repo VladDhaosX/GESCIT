@@ -2,8 +2,8 @@ const TransportLineDao = require('../../models/Catalogs/TransportLineDao');
 
 const addOrUpdateTransportLineHandler = async (req, res) => {
     try {
-        const { TransportLineId, UserId, NameLine, TransportLineTypeId, StatusId } = req.body;
-        const transportLine = { TransportLineId, UserId, NameLine, TransportLineTypeId, StatusId };
+        const { TransportLineId, UserId, Name, LineTypeId, StatusId } = req.body;
+        const transportLine = { TransportLineId, UserId, Name, LineTypeId, StatusId };
         const result = await TransportLineDao.addOrUpdateTransportLine(transportLine);
         res.json(result);
     } catch (error) {
@@ -13,8 +13,8 @@ const addOrUpdateTransportLineHandler = async (req, res) => {
 
 const getTransportLinesHandler = async (req, res) => {
 	try {
-        const { TransportLineId, UserId } = req.body;
-		const transportLines = await TransportLineDao.getTransportLines(TransportLineId, UserId );
+        const { UserId } = req.body;
+		const transportLines = await TransportLineDao.getTransportLines( UserId );
 		res.json(transportLines);
 	} catch (error) {
 		console.error(error);

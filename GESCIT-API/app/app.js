@@ -27,7 +27,7 @@ app.use('/GesCitApi/catalogs', catalogsRoutes);
 app.use('/GesCitApi/dates', datesRoutes);
 
 // Inicia el servidor
-app.get('/GesCitApi/', (req, res) => {
+app.get('/', (req, res) => {
   res.redirect('/GesCitApi/api-docs');
 });
 

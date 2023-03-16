@@ -1,18 +1,33 @@
 
 const LoginDao = require('../../models/Configuration/LoginDao');
 const ActiveDirectoryAuthController = require('./ActiveDirectoryAuthController');
-const request = require('request');
 
-const login = async (req, res) => {
+const validateUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const response = await LoginDao.validateUser(username, password);
+
+    if (response.success) return res.json(response)
+    else return await AddOrUpdateUser(req, res);
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error al realizar el login.2', info: error });
+  };
+};
+
+const AddOrUpdateUser = async (req, res) => {
   try {
     const { username, password } = req.body;
     let data;
+
     // const data = await ActiveDirectoryAuthController.authVclientes('gecit_p1', 'C0ntrolAccesos/2023');
     try {
+      userTypeId = 2;
       data = await ActiveDirectoryAuthController.authVclientes(username, password);
     } catch (error) {
       console.error(`Error al autenticar usuario con el controlador authVclientes: ${error}`);
       try {
+        userTypeId = 1;
         data = await ActiveDirectoryAuthController.authMercader(username, password);
       } catch (err) {
         console.error(`Error al autenticar usuario con el controlador authMercader: ${err}`);
@@ -20,8 +35,8 @@ const login = async (req, res) => {
       }
     }
 
-    if (!data){
-      res.status(500).json({ success: false, message: 'Usuario no autorizado ó contraseña incorrecta, favor de intentar de nuevo.'});
+    if (!data) {
+      res.status(500).json({ success: false, message: 'Usuario no autorizado ó contraseña incorrecta, favor de intentar de nuevo.' });
     }
 
     const { cn, sn, mail, memberOf, company } = data.user;
@@ -32,73 +47,12 @@ const login = async (req, res) => {
       res.status(500).json({ success: false, message: 'Error al realizar el login.1', info: "No existe en el grupo de GECIT" });
     }
 
-    let userTypeId = 2;
-    const response = await registerUser(company, cn, mail, username, userTypeId, password);
+    const response = await LoginDao.AddOrUpdateUser(company, cn, mail, username, userTypeId, password);
 
     res.json(response);
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al realizar el login.2', info: error });
   };
-};
-
-const registerUser = async (id, name, mail, userName, userTypeId, password) => {
-  return response = await LoginDao.login(id, name, mail, userName, userTypeId, password);
-};
-
-const authenticateVClient = async (userName, password) => {
-  const url = 'https://portalweb.almer.com.mx/ADConnect/api/authenticateCustomer';
-  const data = {
-    userName: userName,
-    password: password
-  };
-
-  console.log(data);
-
-  return new Promise((resolve, reject) => {
-    request.post({
-      url: url,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    }, (error, response, body) => {
-      if (error) {
-        reject(error);
-      } else if (response.statusCode !== 200) {
-        reject(new Error('Error en la solicitud de autenticación'));
-      } else {
-        resolve(JSON.parse(body));
-      };
-    });
-  });
-};
-
-const authenticateMercader = async (userName, password) => {
-  const url = 'https://portalweb.almer.com.mx/ADConnect/api/authenticate';
-  const data = {
-    userName: userName,
-    password: password
-  };
-
-  console.log(data);
-
-  return new Promise((resolve, reject) => {
-    request.post({
-      url: url,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    }, (error, response, body) => {
-      if (error) {
-        reject(error);
-      } else if (response.statusCode !== 200) {
-        reject(new Error('Error en la solicitud de autenticación'));
-      } else {
-        resolve(JSON.parse(body));
-      };
-    });
-  });
 };
 
 const UserPrivacyNotice = async (req, res) => {
@@ -114,11 +68,11 @@ const UserPrivacyNotice = async (req, res) => {
 
 const getRoles = async (req, res) => {
   try {
-    const categorias = await LoginDao.getRoles();
-    res.json(categorias[0]);
+    const response = await LoginDao.getRoles();
+    return res.json(response);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error al obtener los roles.' });
+    res.status(500).json({ success: false, message: 'Error al obtener los roles.', info: error });
   }
 };
 
@@ -146,10 +100,11 @@ const getUserData = async (req, res) => {
   }
 };
 
+
 module.exports = {
-  login: login,
-  UserPrivacyNotice: UserPrivacyNotice,
-  getRoles: getRoles,
-  getUserData: getUserData,
-  authenticateMercader: authenticateMercader
+  validateUser,
+  AddOrUpdateUser,
+  UserPrivacyNotice,
+  getRoles,
+  getUserData
 };

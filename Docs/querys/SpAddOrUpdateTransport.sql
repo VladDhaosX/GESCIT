@@ -12,7 +12,7 @@ AS
 BEGIN
 	BEGIN TRY
 	
-		DECLARE @ClientId INT,
+		DECLARE @AccountNum INT,
 				@StatusId INT = 1;
 
 		IF (@TransportTypeId IS NULL OR @TransportTypeId = 0)
@@ -44,13 +44,13 @@ BEGIN
 			RETURN
 		END
 
-		SELECT @ClientId = ClientId FROM Users WHERE Id = @UserId
+		SELECT @AccountNum = AccountNum FROM Users WHERE Id = @UserId
 
 		IF @TransportId IS NULL OR @TransportId = 0
 		BEGIN
 			-- Insertar nuevo registro
 			INSERT INTO Transports (
-				ClientId,
+				AccountNum,
 				TransportTypeId,
 				TransportPlate1,
 				TransportPlate2,
@@ -59,7 +59,7 @@ BEGIN
 				StatusId
 			)
 			VALUES (
-				@ClientId,
+				@AccountNum,
 				@TransportTypeId,
 				@TransportPlate1,
 				@TransportPlate2,

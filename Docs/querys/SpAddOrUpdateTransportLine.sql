@@ -1,36 +1,39 @@
 ALTER PROCEDURE SpAddOrUpdateTransportLine
 @TransportLineId INT,
 @UserId INT,
-@NameLine VARCHAR(50),
-@TransportLineTypeId INT,
+@Name VARCHAR(50),
+@LineTypeId INT,
 @StatusId INT,
 @Success BIT OUTPUT,
 @Message VARCHAR(50) OUTPUT
 AS
 BEGIN
 	BEGIN TRY
-		DECLARE @ClientId INT;
-		SELECT @ClientId = ClientId FROM Users WHERE Id = @UserId
+		DECLARE @AccountNum INT;
+		SELECT @AccountNum = AccountNum FROM Users WHERE Id = @UserId
 			IF @TransportLineId IS NULL OR @TransportLineId = 0
 			BEGIN
 				-- Insertar un nuevo registro
-				INSERT INTO TransportLines (ClientId, NameLine, TransportLineTypeId, StatusId)
-				VALUES (@ClientId, @NameLine, @TransportLineTypeId, @StatusId)
-		
+				INSERT INTO TransportLines (AccountNum, Name, LineTypeId, StatusId)
+				VALUES (@AccountNum, @Name, @LineTypeId, @StatusId)
+
+				SET @Success = 1
+				SET @Message = 'Se inserto el registro.'
+				RETURN
 			END
 			ELSE
 			BEGIN
 				-- Actualizar el registro
 				UPDATE TransportLines
-				SET ClientId = @ClientId,
-					NameLine = @NameLine,
-					TransportLineTypeId = @TransportLineTypeId,
+				SET AccountNum = @AccountNum,
+					Name = @Name,
+					LineTypeId = @LineTypeId,
 					StatusId = @StatusId
 				WHERE Id = @TransportLineId
-				SELECT 1 AS Ok
+				SET @Success = 1
+				SET @Message = 'Se actualizo el registro.'
+			RETURN
 			END
-			SET @Success = 1
-			SET @Message = 'Success'
 	END TRY
 	BEGIN CATCH
 		SET @Success = 0
