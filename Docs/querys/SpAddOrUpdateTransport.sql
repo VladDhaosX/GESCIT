@@ -6,14 +6,44 @@ ALTER PROCEDURE SpAddOrUpdateTransport
 @TransportPlate2 VARCHAR(10),
 @TransportPlate3 VARCHAR(10),
 @Capacity INT,
-@StatusId INT,
 @Success BIT OUTPUT,
-@Message VARCHAR(50) OUTPUT
+@Message VARCHAR(MAX) OUTPUT
 AS
 BEGIN
 	BEGIN TRY
 	
-		DECLARE @ClientId INT;
+		DECLARE @ClientId INT,
+				@StatusId INT = 1;
+
+		IF (@TransportTypeId IS NULL OR @TransportTypeId = 0)
+		BEGIN
+			SET @Success = 0
+			SET @Message = 'Falta especificar el tipo de transporte.'
+			RETURN
+		END
+
+		IF (LEN(LTRIM(RTRIM(@TransportPlate1))) = 0)
+		BEGIN
+			SET @Success = 0
+			SET @Message = 'Falta especificar la placa del transporte.'
+			RETURN
+		END
+
+		IF ((@TransportTypeId = 2 AND LEN(LTRIM(RTRIM(@TransportPlate2))) = 0) 
+			OR (@TransportTypeId = 5 AND LEN(LTRIM(RTRIM(@TransportPlate2))) = 0))
+		BEGIN
+			SET @Success = 0
+			SET @Message = 'Falta especificar la placa de la caja 1.'
+			RETURN
+		END
+		
+		IF (@TransportTypeId = 5 AND LEN(LTRIM(RTRIM(@TransportPlate3))) = 0 )
+		BEGIN
+			SET @Success = 0
+			SET @Message = 'Falta especificar la placa de la caja 2.'
+			RETURN
+		END
+
 		SELECT @ClientId = ClientId FROM Users WHERE Id = @UserId
 
 		IF @TransportId IS NULL OR @TransportId = 0
@@ -44,13 +74,13 @@ BEGIN
 			-- Actualizar registro existente
 			UPDATE Transports
 			SET
-				ClientId = @ClientId,
+				--ClientId = @ClientId,
 				TransportTypeId = @TransportTypeId,
 				TransportPlate1 = @TransportPlate1,
 				TransportPlate2 = @TransportPlate2,
 				TransportPlate3 = @TransportPlate3,
-				Capacity = @Capacity,
-				StatusId = @StatusId
+				Capacity = @Capacity
+				--StatusId = @StatusId
 			WHERE Id = @TransportId
 		SET @Message = 'Registro actualizado correctamente.'
 		END
@@ -64,7 +94,3 @@ BEGIN
 END
 
 GO
-
-SELECT * FROM Transports
-
-TRUNCATE TABLE Transports

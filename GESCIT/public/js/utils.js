@@ -51,7 +51,8 @@ const tooltipTrigger = async () => {
 };
 
 
-const ToastsNotification = async (titulo,message,type, placement) => {
+const ToastsNotification = async (titulo, message, type, placement) => {
+
     const placementList = {
         'Top left': 'top-0 start-0',
         'Top center': 'top-0 start-50 translate-middle-x',
@@ -64,33 +65,27 @@ const ToastsNotification = async (titulo,message,type, placement) => {
         'Bottom right': 'bottom-0 end-0'
     }
     const typeList = {
-        'Primary':'bg-primary' ,
-        'Secondary':'bg-secondary' ,
-        'Success':'bg-success' ,
-        'Danger':'bg-danger' ,
-        'Warning':'bg-warning' ,
-        'Info':'bg-info' ,
-        'Dark':'bg-dark' 
+        'Primary': 'bg-primary',
+        'Secondary': 'bg-secondary',
+        'Success': 'bg-success',
+        'Danger': 'bg-danger',
+        'Warning': 'bg-warning',
+        'Info': 'bg-info',
+        'Dark': 'bg-dark'
     };
-    const selectedPlacement = placementList[placement].split(' ');
-    const selectedType = typeList[type];
-    const toastPlacementExample = document.querySelector('.toast-placement-ex');
-    let toastPlacement;
 
-    // Dispose toast when open another
-    if (toastPlacement) {
-        if (toastPlacement && toastPlacement._element !== null) {
-            if (toastPlacementExample) {
-                toastPlacementExample.classList.remove(selectedType);
-                DOMTokenList.prototype.remove.apply(toastPlacementExample.classList, selectedPlacement);
-            }
-            toastPlacement.dispose();
-        }
-    }
+    const selectedPlacement = placementList[placement];
+    const selectedType = typeList[type];
+
+    const toastPlacementExample = $('#toastNotification');
+    toastPlacementExample.removeClass();
+    toastPlacementExample.addClass('bs-toast toast toast-placement-ex m-2');
+    toastPlacementExample.addClass(selectedPlacement);
+    toastPlacementExample.addClass(selectedType);
+
     $('.toast-placement-ex > .me-auto,.fw-semibold').text(titulo);
     $('.toast-placement-ex > .toast-body').text(message);
-    toastPlacementExample.classList.add(selectedType);
-    DOMTokenList.prototype.add.apply(toastPlacementExample.classList, selectedPlacement);
-    toastPlacement = new bootstrap.Toast(toastPlacementExample);
+
+    const toastPlacement = new bootstrap.Toast(toastPlacementExample);
     toastPlacement.show();
 };

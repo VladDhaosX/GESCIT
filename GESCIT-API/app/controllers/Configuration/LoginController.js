@@ -1,38 +1,48 @@
 
 const LoginDao = require('../../models/Configuration/LoginDao');
+const ActiveDirectoryAuthController = require('./ActiveDirectoryAuthController');
 const request = require('request');
 
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    let data = await authenticateVClient(username, password);
-    let response;
-    let userTypeId;
+    let data;
+    // const data = await ActiveDirectoryAuthController.authVclientes('gecit_p1', 'C0ntrolAccesos/2023');
+    try {
+      data = await ActiveDirectoryAuthController.authVclientes(username, password);
+    } catch (error) {
+      console.error(`Error al autenticar usuario con el controlador authVclientes: ${error}`);
+      try {
+        data = await ActiveDirectoryAuthController.authMercader(username, password);
+      } catch (err) {
+        console.error(`Error al autenticar usuario con el controlador authMercader: ${err}`);
+        return res.status(500).json({ success: false, message: 'Error al realizar el login', info: 'No se pudo autenticar al usuario' });
+      }
+    }
 
-    if (data.success) {
-      let { id, name, mail, userName } = data.data;
-      userTypeId = 2;
-      response = await registerUser(id, name, mail, userName, userTypeId, password);
-    } else {
-      userTypeId = 1;
-      data = await authenticateMercader(username, password);
-      if (data.success) {
-        let { id, name, mail, userName } = data.data;
-        response = await registerUser(id, name, mail, userName, userTypeId, password);
-      } else {
-        res.status(500).json({ success: false, message: data.message });
-      };
-    };
+    if (!data){
+      res.status(500).json({ success: false, message: 'Usuario no autorizado ó contraseña incorrecta, favor de intentar de nuevo.'});
+    }
+
+    const { cn, sn, mail, memberOf, company } = data.user;
+
+    const Group = /CN=GECIT/;
+
+    if (!Group.test(memberOf)) {
+      res.status(500).json({ success: false, message: 'Error al realizar el login.1', info: "No existe en el grupo de GECIT" });
+    }
+
+    let userTypeId = 2;
+    const response = await registerUser(company, cn, mail, username, userTypeId, password);
 
     res.json(response);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error al realizar el login.' });
+    res.status(500).json({ success: false, message: 'Error al realizar el login.2', info: error });
   };
 };
 
-const registerUser = async (id, name, mail, userName, userTypeId,password) => {
-  return response = await LoginDao.login(id, name, mail, userName, userTypeId,password);
+const registerUser = async (id, name, mail, userName, userTypeId, password) => {
+  return response = await LoginDao.login(id, name, mail, userName, userTypeId, password);
 };
 
 const authenticateVClient = async (userName, password) => {

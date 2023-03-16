@@ -1,7 +1,7 @@
 const sql = require('mssql');
 const config = require('../../config/database');
 
-const login = async (ActiveDirectoryId, name, mail, userName, userTypeId, password) => {
+const login = async (AccountNum, name, mail, userName, userTypeId, password) => {
   try {
     let pool = await sql.connect(config);
     let Id = 0;
@@ -12,7 +12,7 @@ const login = async (ActiveDirectoryId, name, mail, userName, userTypeId, passwo
 
     // Execute stored procedure to login user
     let result = await pool.request()
-      .input('ActiveDirectoryId', sql.VarChar(50), ActiveDirectoryId)
+      .input('AccountNum', sql.VarChar(50), AccountNum)
       .input('name', sql.VarChar(50), name)
       .input('mail', sql.VarChar(50), mail)
       .input('userName', sql.VarChar(50), userName)

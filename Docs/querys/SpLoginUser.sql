@@ -7,7 +7,7 @@
 
 --CREATE TABLE Users (
 --  Id INT IDENTITY(1,1) PRIMARY KEY,
---  ActiveDirectoryId uniqueidentifier,
+--  AccountNum NVARCHAR(50),
 --  name VARCHAR(50),
 --  mail VARCHAR(50),
 --  userName VARCHAR(50),
@@ -22,7 +22,7 @@
 GO
 
 ALTER PROCEDURE SpLoginUser
-@ActiveDirectoryId VARCHAR(50),
+@AccountNum VARCHAR(50),
 @name VARCHAR(50),
 @mail VARCHAR(50),
 @userName VARCHAR(50),
@@ -38,29 +38,30 @@ BEGIN
 	SET NOCOUNT ON;
 
 	DECLARE @RolId INT;
-	IF @userTypeId = 1 SET @RolId = 0 ELSE IF @userTypeId = 2 SET @RolId = 4;
+	IF @userTypeId = 1 SET @RolId = 1 ELSE IF @userTypeId = 2 SET @RolId = 4;
 
 	BEGIN TRY
-		IF EXISTS(SELECT * FROM Users WHERE ActiveDirectoryId = @ActiveDirectoryId)
+		IF EXISTS(SELECT 1 FROM Users WHERE userName = @userName AND password = @password)
 		BEGIN
 			UPDATE Users SET
+			AccountNum = @AccountNum,
 			name = @name,
 			mail = @mail,
 			userName = @userName,
 			userTypeId = @userTypeId,
 			password = @password,
 			RolId = @RolId
-			WHERE ActiveDirectoryId = @ActiveDirectoryId;
+			WHERE userName = @userName AND password = @password;
 			
 			SET @success = 1;
-			SET @Id = (SELECT Id FROM Users WHERE ActiveDirectoryId = @ActiveDirectoryId);
-			SET @PrivacyNotice = (SELECT PrivacyNotice FROM Users WHERE ActiveDirectoryId = @ActiveDirectoryId);
+			SET @Id = (SELECT Id FROM Users WHERE userName = @userName AND password = @password);
+			SET @PrivacyNotice = (SELECT PrivacyNotice FROM Users WHERE Id = @Id);
 			SET @successMessage = 'El registro se actualizó correctamente.';
 		END
 		ELSE
 		BEGIN
-			INSERT INTO Users (ActiveDirectoryId, name, mail, userName, userTypeId, password, RolId)
-			VALUES (@ActiveDirectoryId, @name, @mail, @userName, @userTypeId, @password,@RolId);
+			INSERT INTO Users (AccountNum, name, mail, userName, userTypeId, password, RolId)
+			VALUES (@AccountNum, @name, @mail, @userName, @userTypeId, @password,@RolId);
 	  
 			SET @Id = SCOPE_IDENTITY();
 			SET @success = 1;
