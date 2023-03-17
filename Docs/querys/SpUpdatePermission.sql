@@ -1,5 +1,5 @@
 
-ALTER PROCEDURE SpUpdatePermission
+CREATE PROCEDURE SpUpdatePermission
 @Permissions_UserId INT,
 @RolId INT,
 @success BIT OUTPUT,
