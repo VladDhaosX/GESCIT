@@ -22,31 +22,36 @@ router.get('/getTransportLineTypes', TransportLineController.getTransportLineTyp
 
 router.get('/getTransportLineDocuments', TransportLineController.getTransportLineDocumentsHandler);
 
-// router.post('/addOrUpdateLineDocument', TransportLineController.AddOrUpdateLineDocument);
-
 // <--- DRIVERS ROUTES ---> 
 router.post('/addOrUpdateDriver', DriversController.addOrUpdateDriverHandler);
 
 router.get('/GetDrivers', DriversController.GetDrivers);
 
 const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ limits: { fileSize: 1024 * 1024 * 5 } });
 
-// <--- DOCUMENTS ROUTES ---> 
-router.post('/addOrUpdateLineDocument', upload.single('LineDocumentFile'), async (req, res) => {
-    try {
-        console.log(req.file);
-        // const { userId, TransportLineId } = req.body;
-        // const LineDocumentFile = req.files['LineDocumentFile'].buffer.toString('base64');
+router.post('/upload', upload.single('image'), async (req, res, next) => {
+    // Maneja la imagen recibida
+    console.log(req.file);
 
-        // const response = await TransportLineDao.AddOrUpdateLineDocuments(userId, TransportLineId, LineDocumentFile);
-        // console.log(LineDocumentFile);
-        res.json('1');
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error, message: error.message });
-    }
+    // Obtén el contenido del archivo directamente del búfer
+    const fileData = req.file.buffer;
+
+    // Guarda el archivo en la base de datos usando tu función de DAO de SQL
+    const response = await TransportLineDao.AddOrUpdateLineDocuments(fileData);
+    console.log(response);
 });
+
+router.get('/download', async function(req, res) {
+    const response = await TransportLineDao.GetFileById(1);
+    const DocumentBinary = response.DocumentBinary;
+    
+    const fileName = "nombre_del_archivo"; // Coloca el nombre y la extensión del archivo aquí
+    
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    
+    res.send(DocumentBinary);
+  });
 
 module.exports = router;

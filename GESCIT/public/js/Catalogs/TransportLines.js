@@ -55,12 +55,12 @@ const fetchs = {
     AddOrUpdateLineDocument: async (TransportLineDocument) => {
         try {
             let formData = new FormData();
-            formData.append('userId', TransportLineDocument.userId);
-            formData.append('TransportLineId', TransportLineDocument.TransportLineId);
-            formData.append('LineDocumentFile', TransportLineDocument.LineDocumentFile);
+            // formData.append('userId', TransportLineDocument.userId);
+            // formData.append('TransportLineId', TransportLineDocument.TransportLineId);
+            formData.append('image', TransportLineDocument.LineDocumentFile);
 
             const response = await $.ajax({
-                url: 'http://localhost:8090/GescitApi/catalogs/AddOrUpdateLineDocument',
+                url: 'http://localhost:8090/GescitApi/catalogs/upload',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -92,6 +92,9 @@ const initModule = {
             });
             $('#AddOrUpdateLineDocumentButton').click(function () {
                 initModule.AddOrUpdateLineDocumentButton()
+            });
+            $('#AddOrUpdateLineDocumentButton2').click(function () {
+                initModule.AddOrUpdateLineDocumentButton2()
             });
 
         } catch (error) {
@@ -222,6 +225,7 @@ const initModule = {
 
             const response = await fetchs.AddOrUpdateLineDocument(TransportLineDocument);
 
+
             console.log(response);
 
             // let toastType = "Primary";
@@ -240,36 +244,31 @@ const initModule = {
             console.error(error);
         }
     },
-    AddOrUpdateTransportLineButton: async () => {
-        try {
-            const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
-            const TransportLineId = sessionStorage.getItem("TransportLineId");
-            const TransportLineTypeId = $('#TransportLineTypeSelect').val();
-            const Name = $('#LineName').val();
-
-            const TransportLine = {
-                userId,
-                TransportLineId,
-                TransportLineTypeId,
-                Name
-            };
-
-            let toastType = "Primary";
-            let toastPlacement = "Top right";
-
-            const response = await fetchs.AddOrUpdateTransportLine(TransportLine);
-            if (response.success) {
-                $('#AddOrUpdateTransportLineModal').modal('hide');
-            } else {
-                toastType = "Danger";
-                toastPlacement = "Middle center";
-            };
-
-            await ToastsNotification("TransportLinees", response.message, toastType, toastPlacement);
-            await initModule.TransportLinesDataTable(false);
-
-        } catch (error) {
-            console.error(error);
-        }
+    AddOrUpdateLineDocumentButton2: async () => {
+        await $.ajax({
+            url: 'http://localhost:8090/GescitApi/catalogs/download',
+            method: 'GET',
+            xhrFields: {
+                responseType: 'blob' // Indica que la respuesta es un archivo binario
+            },
+            success: function(data) {
+                // Crear un objeto URL a partir de los datos recibidos:
+                var url = URL.createObjectURL(data);
+                
+                // Crear un enlace de descarga en el navegador:
+                var link = document.createElement('a');
+                link.href = url;
+                link.download = "nombre-del-archivo.pdf"; 
+                
+                // Hacer clic en el enlace para descargar el archivo:
+                link.click();
+                
+                // Liberar el objeto URL:
+                URL.revokeObjectURL(url);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
     },
 }

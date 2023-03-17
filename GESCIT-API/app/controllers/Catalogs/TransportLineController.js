@@ -41,23 +41,9 @@ const getTransportLineDocumentsHandler = async (req, res) => {
 	}
 };
 
-const AddOrUpdateLineDocument = async (req, res) => {
-	try {
-        const { userId, TransportLineId } = req.body;
-        const LineDocumentFile = req.file.buffer;
-
-		const response = await TransportLineDao.AddOrUpdateLineDocuments(userId, TransportLineId, LineDocumentFile);
-		res.json(response);
-	} catch (error) {
-		console.error(error);
-        res.status(500).json({ error: error, message: error.message});
-	}
-};
-
 module.exports = {
     addOrUpdateTransportLineHandler,
     getTransportLinesHandler,
     getTransportLineTypesHandler,
-    getTransportLineDocumentsHandler,
-    AddOrUpdateLineDocument
+    getTransportLineDocumentsHandler
 };
