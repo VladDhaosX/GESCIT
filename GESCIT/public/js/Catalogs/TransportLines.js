@@ -60,7 +60,7 @@ const fetchs = {
             formData.append('LineDocumentFile', TransportLineDocument.LineDocumentFile);
 
             const response = await $.ajax({
-                url: 'http://localhost:8090/GescitApi/AddOrUpdateLineDocument',
+                url: 'http://localhost:8090/GescitApi/catalogs/AddOrUpdateLineDocument',
                 type: 'POST',
                 data: formData,
                 processData: false,

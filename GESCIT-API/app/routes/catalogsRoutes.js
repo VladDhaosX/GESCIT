@@ -29,4 +29,24 @@ router.post('/addOrUpdateDriver', DriversController.addOrUpdateDriverHandler);
 
 router.get('/GetDrivers', DriversController.GetDrivers);
 
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+// <--- DOCUMENTS ROUTES ---> 
+router.post('/addOrUpdateLineDocument', upload.single('LineDocumentFile'), async (req, res) => {
+    try {
+        console.log(req.file);
+        // const { userId, TransportLineId } = req.body;
+        // const LineDocumentFile = req.files['LineDocumentFile'].buffer.toString('base64');
+
+        // const response = await TransportLineDao.AddOrUpdateLineDocuments(userId, TransportLineId, LineDocumentFile);
+        // console.log(LineDocumentFile);
+        res.json('1');
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error, message: error.message });
+    }
+});
+
 module.exports = router;
