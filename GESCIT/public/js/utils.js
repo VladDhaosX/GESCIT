@@ -50,42 +50,44 @@ const tooltipTrigger = async () => {
     });
 };
 
-
 const ToastsNotification = async (titulo, message, type, placement) => {
+    try {
+        const placementList = {
+            'Top left': 'top-0 start-0',
+            'Top center': 'top-0 start-50 translate-middle-x',
+            'Top right': 'top-0 end-0',
+            'Middle left': 'top-50 start-0 translate-middle-y',
+            'Middle center': 'top-50 start-50 translate-middle',
+            'Middle right': 'top-50 end-0 translate-middle-y',
+            'Bottom left': 'bottom-0 start-0',
+            'Bottom center': 'bottom-0 start-50 translate-middle-x',
+            'Bottom right': 'bottom-0 end-0'
+        }
+        const typeList = {
+            'Primary': 'bg-primary',
+            'Secondary': 'bg-secondary',
+            'Success': 'bg-success',
+            'Danger': 'bg-danger',
+            'Warning': 'bg-warning',
+            'Info': 'bg-info',
+            'Dark': 'bg-dark'
+        };
 
-    const placementList = {
-        'Top left': 'top-0 start-0',
-        'Top center': 'top-0 start-50 translate-middle-x',
-        'Top right': 'top-0 end-0',
-        'Middle left': 'top-50 start-0 translate-middle-y',
-        'Middle center': 'top-50 start-50 translate-middle',
-        'Middle right': 'top-50 end-0 translate-middle-y',
-        'Bottom left': 'bottom-0 start-0',
-        'Bottom center': 'bottom-0 start-50 translate-middle-x',
-        'Bottom right': 'bottom-0 end-0'
+        const selectedPlacement = placementList[placement];
+        const selectedType = typeList[type];
+
+        const toastPlacementExample = $('#toastNotification');
+        toastPlacementExample.removeClass();
+        toastPlacementExample.addClass('bs-toast toast toast-placement-ex m-2');
+        toastPlacementExample.addClass(selectedPlacement);
+        toastPlacementExample.addClass(selectedType);
+
+        $('.toast-placement-ex > .me-auto,.fw-semibold').text(titulo);
+        $('.toast-placement-ex > .toast-body').text(message);
+
+        const toastPlacement = new bootstrap.Toast(toastPlacementExample);
+        toastPlacement.show();
+    } catch (error) {
+        console.error(error);
     }
-    const typeList = {
-        'Primary': 'bg-primary',
-        'Secondary': 'bg-secondary',
-        'Success': 'bg-success',
-        'Danger': 'bg-danger',
-        'Warning': 'bg-warning',
-        'Info': 'bg-info',
-        'Dark': 'bg-dark'
-    };
-
-    const selectedPlacement = placementList[placement];
-    const selectedType = typeList[type];
-
-    const toastPlacementExample = $('#toastNotification');
-    toastPlacementExample.removeClass();
-    toastPlacementExample.addClass('bs-toast toast toast-placement-ex m-2');
-    toastPlacementExample.addClass(selectedPlacement);
-    toastPlacementExample.addClass(selectedType);
-
-    $('.toast-placement-ex > .me-auto,.fw-semibold').text(titulo);
-    $('.toast-placement-ex > .toast-body').text(message);
-
-    const toastPlacement = new bootstrap.Toast(toastPlacementExample);
-    toastPlacement.show();
 };

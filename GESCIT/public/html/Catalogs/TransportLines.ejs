@@ -24,7 +24,7 @@
             </div>
             <div class="modal-body">
                 <div class="nav-align-top mb-4">
-                    <ul class="nav nav-tabs" role="tablist">
+                    <ul id="DocumentsModalNavs" class="nav nav-tabs" role="tablist">
                         <li class="nav-item">
                             <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
                                 data-bs-target="#navsInfoModal" aria-controls="navs-top-home" aria-selected="true">
@@ -32,7 +32,7 @@
                             </button>
                         </li>
                         <li class="nav-item">
-                            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                            <button id="DocumentsNavButton" type="button" class="nav-link" role="tab" data-bs-toggle="tab"
                                 data-bs-target="#navsDocsModal" aria-controls="navs-top-profile" aria-selected="false">
                                 Documentos
                             </button>
@@ -71,24 +71,24 @@
                                         data-bs-placement="top">
                                         <span class="tf-icons bx bx-plus"></span>
                                     </button>
-                                    <button id="AddOrUpdateLineDocumentButton2" type="button" title="Guardar Documento"
-                                        class="btn rounded-pill btn-icon btn-outline-primary" data-bs-toggle="tooltip"
-                                        data-bs-placement="top">
-                                        <span class="tf-icons bx bx-plus"></span>
-                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <table id="TransportLineDocuments" class="table">
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                Cerrar
-            </button>
-            <button id="AddOrUpdateTransportLineButton" type="button" class="btn btn-primary">Guardar</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+                <button id="AddOrUpdateTransportLineButton" type="button" class="btn btn-primary">Guardar</button>
+            </div>
         </div>
     </div>
-</div>
 </div>

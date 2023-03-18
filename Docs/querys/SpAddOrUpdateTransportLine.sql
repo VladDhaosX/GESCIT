@@ -1,10 +1,11 @@
 ALTER PROCEDURE SpAddOrUpdateTransportLine
-@TransportLineId INT,
+@TransportLineId INT OUTPUT,
+@TemporalDocumentId INT OUTPUT,
 @UserId INT,
 @Name VARCHAR(50),
 @LineTypeId INT,
 @Success BIT OUTPUT,
-@Message VARCHAR(50) OUTPUT
+@Message VARCHAR(100) OUTPUT
 AS
 BEGIN
 	BEGIN TRY
@@ -27,9 +28,22 @@ BEGIN
 
 		IF @TransportLineId IS NULL OR @TransportLineId = 0
 		BEGIN
+
+			IF NOT EXISTS(SELECT 1 FROM DocumentFiles WHERE DocumentId = 1 AND TemporalDocumentId = @TemporalDocumentId)
+			BEGIN
+				SET @Success = 0
+				SET @Message = 'Es necesario subir el documento de Acta Constitutiva.'
+				RETURN
+			END
+
 			-- Insertar un nuevo registro
 			INSERT INTO TransportLines (AccountNum, Name, LineTypeId, StatusId)
 			VALUES (@AccountNum, @Name, @LineTypeId, 1)
+
+			SET @TransportLineId = SCOPE_IDENTITY();
+
+			UPDATE DocumentFiles SET ModuleId = @TransportLineId, TemporalDocumentId = NULL WHERE TemporalDocumentId = @TemporalDocumentId
+			SET @TemporalDocumentId = NULL;
 
 			SET @Success = 1
 			SET @Message = 'Se inserto el registro.'
@@ -37,6 +51,14 @@ BEGIN
 		END
 		ELSE
 		BEGIN
+
+			IF NOT EXISTS(SELECT 1 FROM DocumentFiles WHERE DocumentId = 1 AND ModuleId = @TransportLineId)
+			BEGIN
+				SET @Success = 0
+				SET @Message = 'Es necesario subir el documento de Acta Constitutiva.'
+				RETURN
+			END
+
 			-- Actualizar el registro
 			UPDATE TransportLines
 			SET AccountNum = @AccountNum,
@@ -54,5 +76,3 @@ BEGIN
 	END CATCH
 END
 
-
-GO
