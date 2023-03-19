@@ -5,7 +5,11 @@ const PermissionsController = require('../controllers/Configuration/PermissionsC
 
 router.post('/login', LoginController.validateUser);
 
-router.post('/UserPrivacyNotice', LoginController.UserPrivacyNotice);
+router.post('/ResetPassowrd', LoginController.ResetPassowrdHandler);
+
+router.post('/ChangePassword', LoginController.ChangePasswordHandler);
+
+router.post('/UserPrivacyNotice', LoginController.UserPrivacyNoticeHandler);
 
 router.get('/GetRoles', LoginController.getRoles);
 

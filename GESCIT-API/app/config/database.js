@@ -19,7 +19,7 @@ const sql = require('mssql');
     await sql.connect(config);
     console.log('Conectado a la base de datos');
   } catch (err) {
-    console.log('Error al conectar a la base de datos:', err);
+    console.log('Error al conectar a la base de datos:', err.message);
   }
 })();
 

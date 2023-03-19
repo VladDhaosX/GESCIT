@@ -1,52 +1,80 @@
-const ActiveDirectory = require('activedirectory2');
-
-const authMercader = async (username, password) => {
-  const config = {
-    url: 'LDAP://mercader.com',
-    baseDN: 'DC=mercader,DC=com',
-    username: `mercader\\${username}`,
-    password: password,
-    attributes: {
-      user: ['cn', 'sn', 'givenname', 'mail', 'memberOf', 'company']
-    }
-  };
-
-  const ad = new ActiveDirectory(config);
-
-  return new Promise((resolve, reject) => {
-    ad.findUser(username, (err, user) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve(user);
-    });
-  });
-};
-
-const authVclientes = async (username, password) => {
-  const config = {
-    url: 'LDAP://100.100.100.196',
-    baseDN: 'DC=clientes,DC=mercader,DC=com',
-    username: `vclientes\\${username}`,
-    password: password,
-    attributes: {
-      user: ['cn', 'sn', 'givenname', 'mail', 'memberOf', 'company']
-    }
-  };
-
-  const ad = new ActiveDirectory(config);
-
-  return new Promise((resolve, reject) => {
-    ad.findUser(username, (err, user) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve({ err, user });
-    });
-  });
-};
+const request = require('request');
 
 module.exports = {
-  authMercader,
-  authVclientes
+  authMercader: async (username, password) => {
+    const options = {
+      url: 'https://portalweb.almer.com.mx/ADConnect/api/authenticate',
+      method: 'POST',
+      json: true,
+      body: {
+        userName: username,
+        password: password
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      request(options, function (err, res, body) {
+        if (err) {
+          return reject(err);
+        }
+
+        if (res.statusCode !== 200) {
+          return reject(new Error(`La autenticación falló con el código de estado: ${res.statusCode}`));
+        }
+
+        return resolve(body);
+      });
+    });
+  },
+  authVCliente: async (username, password) => {
+    const options = {
+      url: 'https://portalweb.almer.com.mx/ADConnect/api/authenticateCustomer',
+      method: 'POST',
+      json: true,
+      body: {
+        userName: username,
+        password: password
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      request(options, function (err, res, body) {
+        if (err) {
+          return reject(err);
+        }
+
+        if (res.statusCode !== 200) {
+          return reject(new Error(`La autenticación falló con el código de estado: ${res.statusCode}`));
+        }
+
+        return resolve(body);
+      });
+    });
+  },
+  changePasswordClient: async (username, NewPassword,OldPassword) => {
+    const options = {
+      url: 'https://portalweb.almer.com.mx/ADConnect/api/changePasswordClientesPC',
+      method: 'POST',
+      json: true,
+      body: {
+        userName: username,
+        oldPassword: OldPassword,
+        newPassword: NewPassword
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      request(options, function (err, res, body) {
+        if (err) {
+          return reject(err);
+        }
+
+        if (res.statusCode !== 200) {
+          return reject(new Error(`La autenticación falló con el código de estado: ${res.statusCode}`));
+        }
+
+        return resolve(body);
+      });
+    });
+  }
 };

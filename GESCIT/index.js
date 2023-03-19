@@ -44,6 +44,13 @@ app.get('/TransportLines', (req, res) => {
     res.render('views', data);
 });
 
+app.get('/login', (req, res) => {
+    const data = {
+        JSFile: '../js/Configuration/login.js'
+    };
+    res.render('login', data);
+});
+
 app.get('/', (req, res) => {
     res.redirect('/Permissions');
   });

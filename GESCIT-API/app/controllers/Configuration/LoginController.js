@@ -1,110 +1,133 @@
 
 const LoginDao = require('../../models/Configuration/LoginDao');
-const ActiveDirectoryAuthController = require('./ActiveDirectoryAuthController');
-
-const validateUser = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    const response = await LoginDao.validateUser(username, password);
-
-    if (response.success) return res.json(response)
-    else return await AddOrUpdateUser(req, res);
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Error al realizar el login.2', info: error });
-  };
-};
-
-const AddOrUpdateUser = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    let data;
-
-    // const data = await ActiveDirectoryAuthController.authVclientes('gecit_p1', 'C0ntrolAccesos/2023');
-    try {
-      userTypeId = 2;
-      data = await ActiveDirectoryAuthController.authVclientes(username, password);
-    } catch (error) {
-      console.error(`Error al autenticar usuario con el controlador authVclientes: ${error}`);
-      try {
-        userTypeId = 1;
-        data = await ActiveDirectoryAuthController.authMercader(username, password);
-      } catch (err) {
-        console.error(`Error al autenticar usuario con el controlador authMercader: ${err}`);
-        return res.status(500).json({ success: false, message: 'Error al realizar el login', info: 'No se pudo autenticar al usuario' });
-      }
-    }
-
-    if (!data) {
-      res.status(500).json({ success: false, message: 'Usuario no autorizado ó contraseña incorrecta, favor de intentar de nuevo.' });
-    }
-
-    const { cn, sn, mail, memberOf, company } = data.user;
-
-    const Group = /CN=GECIT/;
-
-    if (!Group.test(memberOf)) {
-      res.status(500).json({ success: false, message: 'Error al realizar el login.1', info: "No existe en el grupo de GECIT" });
-    }
-
-    const response = await LoginDao.AddOrUpdateUser(company, cn, mail, username, userTypeId, password);
-
-    res.json(response);
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Error al realizar el login.2', info: error });
-  };
-};
-
-const UserPrivacyNotice = async (req, res) => {
-  try {
-    const { userId } = req.body;
-    const response = await LoginDao.UserPrivacyNotice(userId);
-    res.json(response);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error al realizar el proceso.' });
-  }
-};
-
-const getRoles = async (req, res) => {
-  try {
-    const response = await LoginDao.getRoles();
-    return res.json(response);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error al obtener los roles.', info: error });
-  }
-};
-
-const getUserData = async (req, res) => {
-  try {
-    const { userId } = req.body;
-    const userRole = await LoginDao.getUserRole(userId);
-    const userCategories = await LoginDao.getUserCategories(userId);
-    const userModules = await LoginDao.getUserModules(userId);
-
-    const response = {
-      userRol: {
-        Id: userRole[0].Id,
-        Key: userRole[0].Key,
-        Name: userRole[0].Name,
-        Description: userRole[0].Description
-      },
-      userCategories: userCategories,
-      userModules: userModules
-    };
-
-    res.json(response);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
+const ADController = require('./ActiveDirectoryAuthController');
+const MailController = require('./MailController');
+const CryptoController = require('./CryptoController');
 
 module.exports = {
-  validateUser,
-  AddOrUpdateUser,
-  UserPrivacyNotice,
-  getRoles,
-  getUserData
+  async validateUser(req, res) {
+    try {
+      const { username, password } = req.body;
+
+      let ADresponse = await ADController.authVCliente(username, password);
+      if (ADresponse.success) {
+        let { id, name, mail, userName, company } = ADresponse.data;
+        const response = await LoginDao.AddOrUpdateUser(company, name, mail, userName, 2, password);
+        if (response) {
+          res.json(response);
+        } else {
+          res.json({ success: response.success, message: response.message });
+        };
+      }
+      else {
+        ADresponse = await ADController.authMercader(username, password);
+        if (ADresponse.success) {
+          let { id, name, mail, userName, company } = ADresponse.data;
+          const response = await LoginDao.AddOrUpdateUser(company, name, mail, userName, 1, password);
+          if (response) {
+            res.json(response);
+          } else {
+            res.json({ success: response.success, message: response.message });
+          };
+        } else {
+          res.json({ success: ADresponse.success, message: ADresponse.message });
+        };
+      };
+    } catch (error) {
+      res.status(500).json({ success: false, message: 'Error al realizar el login.', info: error.message });
+    };
+  },
+
+  UserPrivacyNoticeHandler: async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const response = await LoginDao.UserPrivacyNotice(userId);
+      res.json(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error al realizar el proceso.', info: error.message });
+    }
+  },
+
+  getRoles: async (req, res) => {
+    try {
+      const response = await LoginDao.getRoles();
+      return res.json(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Error al obtener los roles.', info: error });
+    }
+  },
+
+  getUserData: async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const userRole = await LoginDao.getUserRole(userId);
+      const userCategories = await LoginDao.getUserCategories(userId);
+      const userModules = await LoginDao.getUserModules(userId);
+
+      const response = {
+        userRol: {
+          Id: userRole[0].Id,
+          Key: userRole[0].Key,
+          Name: userRole[0].Name,
+          Description: userRole[0].Description
+        },
+        userCategories: userCategories,
+        userModules: userModules
+      };
+
+      res.json(response);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error al realizar el proceso.', info: error.message });
+    }
+  },
+
+  ResetPassowrdHandler: async (req, res) => {
+    try {
+      const { userResetPassword, emailResetPassword } = req.body;
+      const MailExists = await LoginDao.ValidateUserEmail(userResetPassword, emailResetPassword);
+
+      if (MailExists) {
+        const token = await CryptoController.generateToken();
+        const insertTokenResponse = await LoginDao.insertPasswordResetToken(userResetPassword, emailResetPassword, token);
+        if (insertTokenResponse.success) {
+          const mailResponse = await MailController.SendResetPassowordEmail(userResetPassword, emailResetPassword, token);
+          if (mailResponse.success) {
+            res.json({ success: false, message: 'El correo no existe.' });
+          };
+          res.json({ success: true, message: 'Se ha enviado un correo de recuperacion de contraseña.' });
+
+        }
+      } else {
+        res.json({ success: false, message: 'El correo no existe.' });
+      };
+    } catch (error) {
+      res.status(500).json({ message: 'Error al realizar el proceso.', info: error.message });
+    }
+  },
+  ChangePasswordHandler: async (req, res) => {
+    try {
+      const { token, user, email, NewPassword, ConfirmedNewPassword } = req.body;
+      let response = await LoginDao.ValidateChangePassword( user, email,token, NewPassword, ConfirmedNewPassword);
+      if (response.success) {
+        const OldPassword = response.OldPassword;
+        const ADresponse = await ADController.changePasswordClient(user, NewPassword, OldPassword);
+        if (ADresponse.success) {
+          response = await LoginDao.UpdateNewPassword( user, email,token, NewPassword);
+          res.json({ success: true, message: response.message });
+        } else {
+          res.json({ success: false, message: response.message });
+        }
+      } else {
+        res.json({ success: false, message: response.message });
+      };
+
+      // res.json(response);
+    } catch (error) {
+      res.status(500).json({ message: 'Error al realizar el proceso.', info: error.message });
+    }
+  },
+
 };
