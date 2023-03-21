@@ -1,0 +1,110 @@
+<div class="content-wrapper">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <%- include('../Utils/tittle') %>
+            <hr class="my-5" />
+
+            <div class="card">
+                <div id="ActionsButtons" class="demo-inline-spacing" style="padding: 0px 50px;">
+                </div>
+                <div class="text-nowrap" style="margin: 25px 50px;">
+                    <table id="DriversTable" class="table">
+                    </table>
+                </div>
+            </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="AddOrUpdateDriverModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="nav-align-top mb-4">
+                    <ul id="DocumentsModalNavs" class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                                data-bs-target="#navsInfoModal" aria-controls="navs-top-home" aria-selected="true">
+                                Chofer
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button id="DocumentsNavButton" type="button" class="nav-link" role="tab"
+                                data-bs-toggle="tab" data-bs-target="#navsDocsModal" aria-controls="navs-top-profile"
+                                aria-selected="false">
+                                Documentos
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="navsInfoModal" role="tabpanel">
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="FirstName" class="form-label">Nombre*</label>
+                                    <input type="text" id="FirstName" class="form-control" placeholder="Nombre" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="FirstName" class="form-label">Apellido Paterno*</label>
+                                    <input type="text" id="LastName" class="form-control" placeholder="Nombre" />
+                                </div>
+                                <div class="col mb-3">
+                                    <label for="LastName" class="form-label">Apellido Materno*</label>
+                                    <input type="text" id="SecondLastName" class="form-control"
+                                        placeholder="Apellido" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="PhoneNumber" class="form-label">Número telefónico*</label>
+                                    <input type="text" id="PhoneNumber" class="form-control"
+                                        placeholder="Número telefónico" />
+                                </div>
+                                <div class="col mb-3">
+                                    <label for="Birthdate" class="form-label">Fecha de nacimiento</label>
+                                    <input type="date" id="Birthdate" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="navsDocsModal" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="DocumentDriverSelect" class="form-label">Tipo de Documento</label>
+                                    <select id="DocumentDriverSelect" class="form-select">
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="formFile" class="form-label">Documento</label>
+                                    <input class="form-control" type="file" id="DriverDocument" />
+                                </div>
+                                <div class="col-md-2 mb-3" style="padding-top: 30px;">
+                                    <button id="AddOrUpdateDriverDocumentButton" type="button" title="Guardar Documento"
+                                        class="btn rounded-pill btn-icon btn-outline-primary" data-bs-toggle="tooltip"
+                                        data-bs-placement="top">
+                                        <span class="tf-icons bx bx-plus"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <table id="DriverDocuments" class="table">
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+                <button id="AddOrUpdateDriverButton" type="button" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

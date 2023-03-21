@@ -109,6 +109,19 @@ module.exports = {
     }
   },
 
+  getUserData: async (userId) => {
+    try {
+      let pool = await sql.connect(config);
+      let result = await pool
+        .request()
+        .input("userId", sql.Int, userId)
+        .execute("SpGetUserData");
+      return result.recordset;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
   ValidateUserEmail: async (user, email) => {
     try {
       let pool = await sql.connect(config);
@@ -147,7 +160,6 @@ module.exports = {
 
   ValidateChangePassword: async (user, email, token, NewPassword, ConfirmedNewPassword) => {
     try {
-      console.log(user,email,token,NewPassword,ConfirmedNewPassword);
       const pool = await sql.connect(config);
       const result = await pool
         .request()

@@ -65,6 +65,7 @@ module.exports = {
       const userRole = await LoginDao.getUserRole(userId);
       const userCategories = await LoginDao.getUserCategories(userId);
       const userModules = await LoginDao.getUserModules(userId);
+      const userData = await LoginDao.getUserData(userId);
 
       const response = {
         userRol: {
@@ -74,7 +75,8 @@ module.exports = {
           Description: userRole[0].Description
         },
         userCategories: userCategories,
-        userModules: userModules
+        userModules: userModules,
+        userData: userData
       };
 
       res.json(response);
@@ -110,15 +112,17 @@ module.exports = {
   ChangePasswordHandler: async (req, res) => {
     try {
       const { token, user, email, NewPassword, ConfirmedNewPassword } = req.body;
-      let response = await LoginDao.ValidateChangePassword( user, email,token, NewPassword, ConfirmedNewPassword);
+      let response = await LoginDao.ValidateChangePassword(user, email, token, NewPassword, ConfirmedNewPassword);
+      console.log(response);
       if (response.success) {
         const OldPassword = response.OldPassword;
         const ADresponse = await ADController.changePasswordClient(user, NewPassword, OldPassword);
+        console.log(ADresponse);
         if (ADresponse.success) {
-          response = await LoginDao.UpdateNewPassword( user, email,token, NewPassword);
+          response = await LoginDao.UpdateNewPassword(user, email, token, NewPassword);
           res.json({ success: true, message: response.message });
         } else {
-          res.json({ success: false, message: response.message });
+          res.json({ success: false, message: ADresponse.message });
         }
       } else {
         res.json({ success: false, message: response.message });

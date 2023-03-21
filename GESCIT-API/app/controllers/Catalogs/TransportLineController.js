@@ -53,7 +53,6 @@ module.exports = {
 				TemporalDocumentId = TemporalDocumentId === 'null' ? 0 : TemporalDocumentId;
 
 				const response = await TransportLineDao.AddOrUpdateLineDocuments(fileContent, userId, TemporalDocumentId, DocumentId, TransportLineId, fieldname, originalname, mimetype, size);
-				console.log(response);
 				res.json(response);
 			} else {
 				res.json({ success: false, message: "Es necesario asignar un archivo." });

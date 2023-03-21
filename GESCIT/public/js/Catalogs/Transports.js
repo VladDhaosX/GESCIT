@@ -10,6 +10,13 @@ const fetchs = {
     GetTransports: async (userId) => {
         try {
             const response = await $.ajax({
+                async: true,
+                beforeSend: function () {
+                    $.blockUI({ message: null });
+                },
+                complete: function () {
+                    $.unblockUI();
+                },
                 url: 'http://localhost:8090/GescitApi/catalogs/getTransports', type: 'POST', data: {
                     userId
                 }, // Enviar userId en el cuerpo de la solicitud
@@ -18,19 +25,36 @@ const fetchs = {
             return response.success ? response.data : console.log(response.message);
         } catch (error) {
             console.error(error);
+            $.unblockUI();
         }
     },
     GetTransportType: async () => {
         try {
-            const response = await $.ajax({ url: 'http://localhost:8090/GescitApi/catalogs/getTransportType', type: 'GET', dataType: 'json' });
+            const response = await $.ajax({
+                async: true,
+                beforeSend: function () {
+                    $.blockUI({ message: null });
+                },
+                complete: function () {
+                    $.unblockUI();
+                }, url: 'http://localhost:8090/GescitApi/catalogs/getTransportType', type: 'GET', dataType: 'json'
+            });
             return response.success ? response.data : console.log(response.message);
         } catch (error) {
             console.error(error);
+            $.unblockUI();
         }
     },
     AddOrUpdateTransport: async (Transport) => {
         try {
             const response = await $.ajax({
+                async: true,
+                beforeSend: function () {
+                    $.blockUI({ message: null });
+                },
+                complete: function () {
+                    $.unblockUI();
+                },
                 url: 'http://localhost:8090/GescitApi/catalogs/addOrUpdateTransport', type: 'POST', data: {
                     Transport
                 }, // Enviar Transport en el cuerpo de la solicitud
@@ -39,6 +63,7 @@ const fetchs = {
             return response;
         } catch (error) {
             console.error(error);
+            $.unblockUI();
         }
     }
 }
@@ -82,8 +107,9 @@ const initModule = {
         try {
             if ($.fn.DataTable.isDataTable('#TransportTable')) {
                 $('#TransportTable').DataTable().destroy();
-              }
-              
+                $('#TransportTable').empty();
+            }
+
             const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
             const data = await fetchs.GetTransports(userId);
             if (data.length > 0) {
@@ -155,7 +181,7 @@ const initModule = {
                 const TransportObj = JSON.parse(Transport);
 
                 sessionStorage.setItem("TransportId", TransportObj.Id);
-                $('#TransportTypeSelect').val(TransportObj.TransportTypeId);
+                $('#TransportTypeSelect').val(TransportObj.TransportTypeId).trigger('change');
                 $('#TransportPlate1').val(TransportObj["Placa de Transporte"]);
                 $('#TransportPlate2').val(TransportObj["Placa de Caja #1"]);
                 $('#TransportPlate3').val(TransportObj["Placa de Caja #2"]);
@@ -196,6 +222,7 @@ const initModule = {
             const response = await fetchs.AddOrUpdateTransport(Transport);
             const toastType = response.success ? "Primary" : "Danger";
             const toastPlacement = response.success ? "Top right" : "Middle center";
+            if (response.success) $('#AddOrUpdateTransportModal').modal('hide');
 
             await ToastsNotification("Transportes", response.message, toastType, toastPlacement);
             await initModule.TransportsDataTable(false);

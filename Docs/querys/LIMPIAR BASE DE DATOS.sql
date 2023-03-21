@@ -1,0 +1,14 @@
+
+TRUNCATE TABLE Dates
+TRUNCATE TABLE DocumentFiles
+TRUNCATE TABLE Drivers
+TRUNCATE TABLE [PasswordRestTokens]
+TRUNCATE TABLE TemporalDocuments
+TRUNCATE TABLE TransportLines
+TRUNCATE TABLE Transports
+TRUNCATE TABLE TransportSchedule
+TRUNCATE TABLE Users
+
+GO
+
+

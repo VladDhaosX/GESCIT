@@ -1,0 +1,105 @@
+<div class="content-wrapper">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <%- include('../Utils/tittle') %>
+            <hr class="my-5" />
+
+            <div class="card">
+                <div id="ActionsButtons" class="demo-inline-spacing" style="padding: 0px 50px;">
+                </div>
+                <div class="text-nowrap table-responsive" style="margin: 25px 50px;">
+                    <table id="DatesTable" class="table responsive">
+                    </table>
+                </div>
+            </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="ModalDates" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalDatesTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="tab-pane fade show active" id="navsInfoModal" role="tabpanel">
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="SheduleTimesSelect" class="form-label">Horarios*</label>
+                            <select id="SheduleTimesSelect" class="form-select">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="OperationsSelect" class="form-label">Operaciones*</label>
+                            <select id="OperationsSelect" class="form-select">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="ProductsSelect" class="form-label">Producto*</label>
+                            <select id="ProductsSelect" class="form-select">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="TransportLineTypeSelect" class="form-label">Lineas de Transporte*</label>
+                            <select id="TransportLineTypeSelect" class="form-select">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="TransportsSelect" class="form-label">Transportes*</label>
+                            <select id="TransportsSelect" class="form-select">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="TransportPlate1" class="form-label">Placa de Transporte*</label>
+                            <input type="text" id="TransportPlate1" class="form-control"
+                                placeholder="Placa de Transporte" />
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col mb-0">
+                            <label for="TransportPlate2" class="form-label">Placa de Caja 1*</label>
+                            <input type="text" id="TransportPlate2" class="form-control"
+                                placeholder="Placa de Caja 1" />
+                        </div>
+                        <div class="col mb-0">
+                            <label for="TransportPlate3" class="form-label">Placa de Caja 2*</label>
+                            <input type="text" id="TransportPlate3" class="form-control"
+                                placeholder="Placa de Caja 2" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="DriversSelect" class="form-label">Choferes*</label>
+                            <select id="DriversSelect" class="form-select">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="txtVolume" class="form-label">Volumen*</label>
+                            <input type="text" id="txtVolume" class="form-control" placeholder="Nombre" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+                <button id="btnNewDate" type="button" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

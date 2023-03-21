@@ -19,7 +19,6 @@ const getTransports = async (req, res) => {
     let { transportId,userId } = req.body;
     transportId = transportId === undefined ? 0 : transportId = transportId;
     userId = userId === undefined ? 0 : userId;
-    console.log(transportId, userId);
     const response = await TransportDao.getTransports(transportId,userId);
     res.json(response);
   } catch (error) {

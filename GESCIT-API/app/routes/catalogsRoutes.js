@@ -33,7 +33,17 @@ router.post('/DeleteDocumentById',TransportLineController.DeleteDocumentByIdHand
 // <--- DRIVERS ROUTES ---> 
 router.post('/addOrUpdateDriver', DriversController.addOrUpdateDriverHandler);
 
-router.get('/GetDrivers', DriversController.GetDrivers);
+router.post('/GetDrivers', DriversController.GetDriversHandler);
+
+router.get('/GetDriversDocuments', DriversController.GetDriversDocumentsHandler);
+
+router.post('/AddOrUpdateDriverDocument', upload.single('image'), DriversController.AddOrUpdateDriverDocumentHandler);
+
+router.post('/GetDriverDocument',DriversController.GetDriverDocumentsHandler);
+
+router.post('/GetDriverDocumentById',DriversController.GetDriverDocumentByIdHandler);
+
+router.post('/DeleteDocumentById',DriversController.DeleteDocumentByIdHandler);
 
 
 module.exports = router;

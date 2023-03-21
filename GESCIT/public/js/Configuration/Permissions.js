@@ -10,6 +10,13 @@ const fetchs = {
     GetPermissions: async (userId) => {
         try {
             const response = await $.ajax({
+                async: true,
+                beforeSend: function () {
+                    $.blockUI({ message: null });
+                },
+                complete: function () {
+                    $.unblockUI();
+                },
                 url: 'http://localhost:8090/GescitApi/configuration/getPermissions',
                 type: 'GET',
                 dataType: 'json'
@@ -17,19 +24,35 @@ const fetchs = {
             return response.success ? response.data : console.log(response.message);
         } catch (error) {
             console.error(error);
+            $.unblockUI();
         }
     },
     GetRoles: async () => {
         try {
-            const response = await $.ajax({ url: 'http://localhost:8090/GescitApi/configuration/GetRoles', type: 'GET', dataType: 'json' });
+            const response = await $.ajax({
+                async: true,
+                beforeSend: function () {
+                    $.blockUI({ message: null });
+                },
+                complete: function () {
+                    $.unblockUI();
+                }, url: 'http://localhost:8090/GescitApi/configuration/GetRoles', type: 'GET', dataType: 'json' });
             return response;
         } catch (error) {
             console.error(error);
+            $.unblockUI();
         }
     },
     UpdatePermission: async (permissionUserId, RolId) => {
         try {
             const response = await $.ajax({
+                async: true,
+                beforeSend: function () {
+                    $.blockUI({ message: null });
+                },
+                complete: function () {
+                    $.unblockUI();
+                },
                 url: 'http://localhost:8090/GescitApi/configuration/UpdatePermission', 
                 type: 'POST', 
                 data: {
@@ -41,6 +64,7 @@ const fetchs = {
             return response;
         } catch (error) {
             console.error(error);
+            $.unblockUI();
         }
     }
 }

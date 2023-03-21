@@ -1,12 +1,10 @@
 
 $(document).ready(async function () {
-
-    sessionStorage.setItem("TransportLineId", 0);
+    sessionStorage.setItem("DriverId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
 
     await initModule.initButtons();
-    await initModule.TransportLinesDataTable(true);
-    await initModule.FillSelectTransportLineType();
+    await initModule.DriversDataTable(true);
     await initModule.FillSelectDocumentLine();
     await tooltipTrigger();
 
@@ -14,7 +12,7 @@ $(document).ready(async function () {
 
 
 const fetchs = {
-    GetTransportLines: async (userId) => {
+    GetDrivers: async (UserId) => {
         try {
             const response = await $.ajax({
                 async: true,
@@ -24,18 +22,17 @@ const fetchs = {
                 complete: function () {
                     $.unblockUI();
                 },
-                url: 'http://localhost:8090/GescitApi/catalogs/getTransportLines', type: 'POST', data: {
-                    userId
+                url: 'http://localhost:8090/GescitApi/catalogs/GetDrivers', type: 'POST', data: {
+                    UserId
                 }, // Enviar userId en el cuerpo de la solicitud
                 dataType: 'json'
             });
             return response.success ? response.data : console.log(response.message);
         } catch (error) {
             console.error(error);
-            $.unblockUI();
         }
     },
-    GetTransportLineType: async () => {
+    GetDriversDocuments: async () => {
         try {
             const response = await $.ajax({
                 async: true,
@@ -44,32 +41,13 @@ const fetchs = {
                 },
                 complete: function () {
                     $.unblockUI();
-                }, url: 'http://localhost:8090/GescitApi/catalogs/getTransportLineTypes', type: 'GET', dataType: 'json'
-            });
+                }, url: 'http://localhost:8090/GescitApi/catalogs/GetDriversDocuments', type: 'GET', dataType: 'json' });
             return response.success ? response.data : console.log(response.message);
         } catch (error) {
             console.error(error);
-            $.unblockUI();
         }
     },
-    GetTransportLineDocuments: async () => {
-        try {
-            const response = await $.ajax({
-                async: true,
-                beforeSend: function () {
-                    $.blockUI({ message: null });
-                },
-                complete: function () {
-                    $.unblockUI();
-                }, url: 'http://localhost:8090/GescitApi/catalogs/getTransportLineDocuments', type: 'GET', dataType: 'json'
-            });
-            return response.success ? response.data : console.log(response.message);
-        } catch (error) {
-            console.error(error);
-            $.unblockUI();
-        }
-    },
-    AddOrUpdateTransportLine: async (TransportLine) => {
+    AddOrUpdateDriver: async (Driver) => {
         try {
             const response = await $.ajax({
                 async: true,
@@ -79,20 +57,19 @@ const fetchs = {
                 complete: function () {
                     $.unblockUI();
                 },
-                url: 'http://localhost:8090/GescitApi/catalogs/addOrUpdateTransportLine',
+                url: 'http://localhost:8090/GescitApi/catalogs/addOrUpdateDriver',
                 type: 'POST',
                 data: {
-                    TransportLine
-                }, // Enviar TransportLine en el cuerpo de la solicitud
+                    Driver
+                },
                 dataType: 'json'
             });
             return response;
         } catch (error) {
             console.error(error);
-            $.unblockUI();
         }
     },
-    GetLineDocument: async (TransportLineId, TemporalDocumentId) => {
+    GetDriverDocument: async (DriverId, TemporalDocumentId) => {
         try {
             const response = await $.ajax({
                 async: true,
@@ -102,35 +79,34 @@ const fetchs = {
                 complete: function () {
                     $.unblockUI();
                 },
-                url: 'http://localhost:8090/GescitApi/catalogs/GetLineDocument', type: 'POST', data: {
-                    TransportLineId, TemporalDocumentId
+                url: 'http://localhost:8090/GescitApi/catalogs/GetDriverDocument', type: 'POST', data: {
+                    DriverId, TemporalDocumentId
                 }, // Enviar userId en el cuerpo de la solicitud
                 dataType: 'json'
             });
             return response.success ? response.data : console.log(response.message);
         } catch (error) {
             console.error(error);
-            $.unblockUI();
         }
     },
-    AddOrUpdateLineDocument: async (TransportLineDocument) => {
+    AddOrUpdateDriverDocument: async (DriverDocument) => {
         try {
             let formData = new FormData();
 
-            formData.append('userId', TransportLineDocument.userId);
-            formData.append('TemporalDocumentId', TransportLineDocument.TemporalDocumentId);
-            formData.append('TransportLineId', TransportLineDocument.TransportLineId);
-            formData.append('image', TransportLineDocument.LineDocumentFile);
-            formData.append('DocumentId', TransportLineDocument.DocumentId);
+            formData.append('userId', DriverDocument.userId);
+            formData.append('TemporalDocumentId', DriverDocument.TemporalDocumentId);
+            formData.append('DriverId', DriverDocument.DriverId);
+            formData.append('image', DriverDocument.DriverDocumentFile);
+            formData.append('DocumentId', DriverDocument.DocumentId);
 
             const response = await $.ajax({
                 beforeSend: async function (xhr) {
-                    await $.blockUI({ message: null });
+                    await $.blockUI({ message: null }); 
                 },
                 complete: async function () {
                     await $.unblockUI();
                 },
-                url: 'http://localhost:8090/GescitApi/catalogs/AddOrUpdateLineDocument',
+                url: 'http://localhost:8090/GescitApi/catalogs/AddOrUpdateDriverDocument',
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -142,16 +118,16 @@ const fetchs = {
             $.unblockUI();
         }
     },
-    GetLineDocumentById: (DocumentId) => {
+    GetDriverDocumentById: (DocumentId) => {
         try {
             $.ajax({
                 beforeSend: async function (xhr) {
-                    await $.blockUI({ message: null });
+                    await $.blockUI({ message: null }); 
                 },
                 complete: async function () {
                     await $.unblockUI();
                 },
-                url: 'http://localhost:8090/GescitApi/catalogs/GetLineDocumentById',
+                url: 'http://localhost:8090/GescitApi/catalogs/GetDriverDocumentById',
                 type: 'POST',
                 data: {
                     DocumentId
@@ -181,7 +157,7 @@ const fetchs = {
         try {
             return await $.ajax({
                 beforeSend: async function (xhr) {
-                    await $.blockUI({ message: null });
+                    await $.blockUI({ message: null }); 
                 },
                 complete: async function () {
                     await $.unblockUI();
@@ -204,40 +180,40 @@ const initModule = {
     initButtons: async () => {
         try {
             $('#ActionsButtons').append(`
-                <button id="AddOrUpdateTransportLineModalButton" type="button" title="Registrar" 
+                <button id="AddOrUpdateDriverModalButton" type="button" title="Registrar" 
                     class="btn rounded-pill btn-icon btn-outline-primary" 
                     data-bs-toggle="tooltip" data-bs-placement="top">
                     <span class="tf-icons bx bx-plus"></span>
                 </button>
             `);
 
-            $('#AddOrUpdateTransportLineModalButton').click(async function () {
-                await initModule.AddOrUpdateTransportLineModal();
+            $('#AddOrUpdateDriverModalButton').click(async function () {
+                await initModule.AddOrUpdateDriverModal();
             });
-            $('#AddOrUpdateTransportLineButton').click(async function () {
-                await initModule.AddOrUpdateTransportLineButton()
+            $('#AddOrUpdateDriverButton').click(async function () {
+                await initModule.AddOrUpdateDriverButton()
             });
-            $('#AddOrUpdateLineDocumentButton').click(async function () {
-                await initModule.AddOrUpdateLineDocumentButton()
+            $('#AddOrUpdateDriverDocumentButton').click(async function () {
+                await initModule.AddOrUpdateDriverDocumentButton()
             });
             $('#DocumentsNavButton').on('shown.bs.tab', async function (e) {
-                let TransportLineId = sessionStorage.getItem("TransportLineId");
+                let DriverId = sessionStorage.getItem("DriverId");
                 let TemporalDocumentId = sessionStorage.getItem("TemporalDocumentId");
-                await initModule.TransportLineDocumentsDataTable(TransportLineId, TemporalDocumentId);
+                await initModule.DriverDocumentsDataTable(DriverId, TemporalDocumentId);
             });
 
         } catch (error) {
             console.error(error);
         }
     },
-    TransportLinesDataTable: async () => {
+    DriversDataTable: async () => {
         try {
-            if ($.fn.DataTable.isDataTable('#TransportLineTable')) {
-                $('#TransportLineTable').DataTable().destroy();
+            if ($.fn.DataTable.isDataTable('#DriversTable')) {
+                $('#DriversTable').DataTable().destroy();
             }
 
             const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
-            const data = await fetchs.GetTransportLines(userId);
+            const data = await fetchs.GetDrivers(userId);
             if (data.length > 0) {
                 // Crea el arreglo de objetos para las columnas del DataTable
                 const columns = [
@@ -249,12 +225,12 @@ const initModule = {
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary" 
                                         type="button" 
-                                        id="AddOrUpdateTransportLineTableButton"
+                                        id="AddOrUpdateDriversTableButton"
                                         data='${JSON.stringify(row)}'
                                         title='Editar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='initModule.AddOrUpdateTransportLineModal(this);'
+                                        onclick='initModule.AddOrUpdateDriverModal(this);'
                                     >
                                         <span class="tf-icons bx bx-edit-alt"></span>
                                     </button>
@@ -270,7 +246,7 @@ const initModule = {
                         }
                     }))
                 ];
-                $('#TransportLineTable').DataTable({
+                $('#DriversTable').DataTable({
                     data: data,
                     columns: columns,
                     language: {
@@ -282,27 +258,9 @@ const initModule = {
             console.error(error);
         }
     },
-    FillSelectTransportLineType: async () => {
-        try {
-            const data = await fetchs.GetTransportLineType();
-
-            var $options = $();
-            const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-            $options = $options.add($SeleccionaUnaOpcion);
-            data.forEach(function (value) {
-                const $option = $('<option>').attr('value', value.Id).text(value.Type);
-                $options = $options.add($option);
-            });
-
-            $('#TransportLineTypeSelect').empty();
-            $('#TransportLineTypeSelect').append($options);
-        } catch (error) {
-            console.error(error);
-        }
-    },
     FillSelectDocumentLine: async () => {
         try {
-            const data = await fetchs.GetTransportLineDocuments();
+            const data = await fetchs.GetDriversDocuments();
 
             var $options = $();
             const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
@@ -312,119 +270,139 @@ const initModule = {
                 $options = $options.add($option);
             });
 
-            $('#DocumentLineSelect').empty();
-            $('#DocumentLineSelect').append($options);
+            $('#DocumentDriverSelect').empty();
+            $('#DocumentDriverSelect').append($options);
         } catch (error) {
             console.error(error);
         }
     },
-    AddOrUpdateTransportLineModal: async (e) => {
+    AddOrUpdateDriverModal: async (e) => {
         try {
-            let TransportLineId = 0;
+            let DriverId = 0;
             let TemporalDocumentId = 0;
             if (e) {
-                const TransportLine = $(e).attr('data');
-                const TransportLineObj = JSON.parse(TransportLine);
+                const Driver = $(e).attr('data');
+                const DriverObj = JSON.parse(Driver);
 
-                TransportLineId = TransportLineObj.Id;
-                sessionStorage.setItem("TransportLineId", TransportLineId);
+                DriverId = DriverObj.Id;
+                sessionStorage.setItem("DriverId", DriverId);
 
-                $('#TransportLineTypeSelect').val(TransportLineObj.LineTypeId);
-                $('#LineName').val(TransportLineObj['Linea de Transporte']);
+                $('#FirstName').val(DriverObj.Nombre);
+                $('#LastName').val(DriverObj.Apellido);
+                $('#SecondLastName').val(DriverObj['Apellido materno']);
+                $('#PhoneNumber').val(DriverObj.Telefono);
+                const dateString = DriverObj['Fecha de Nacimiento']; // "19/03/2023"
+                const dateComponents = dateString.split('/'); // ["19", "03", "2023"]
+                const formattedDate = `${dateComponents[2]}-${dateComponents[1]}-${dateComponents[0]}`; // "2023-03-19"
+
+                $('#Birthdate').val(formattedDate);
+
             } else {
-                sessionStorage.setItem("TransportLineId", TransportLineId);
+                sessionStorage.setItem("DriverId", DriverId);
                 sessionStorage.setItem("TemporalDocumentId", TemporalDocumentId);
 
-                $('#TransportLineTypeSelect').val(0);
-                $('#LineName').val("");
+                $('#FirstName').val("");
+                $('#LastName').val("");
+                $('#SecondLastName').val("");
+                $('#PhoneNumber').val("");
+                $('#Birthdate').val("");
             };
-            $('#DocumentLineSelect').val(0);
-            $('#LineDocument').val("");
-            $('#AddOrUpdateTransportLineModal').modal('show');
+            $('#DocumentDriverSelect').val(0);
+            $('#DriverDocument').val("");
+            $('#AddOrUpdateDriverModal').modal('show');
             $('#DocumentsModalNavs button:first').tab('show');
         } catch (error) {
             console.error(error);
         }
     },
-    AddOrUpdateTransportLineButton: async () => {
+    AddOrUpdateDriverButton: async () => {
         try {
-            let TransportLineId = sessionStorage.getItem("TransportLineId");
+            let DriverId = sessionStorage.getItem("DriverId");
             let TemporalDocumentId = sessionStorage.getItem("TemporalDocumentId");
-            const userId = sessionStorage.getItem("userId");
-            const LineName = $('#LineName').val();
-            const TransportLineTypeSelect = $('#TransportLineTypeSelect').val();
+            const UserId = sessionStorage.getItem("userId");
+            const FirstName = $('#FirstName').val();
+            const LastName = $('#LastName').val();
+            const SecondLastName = $('#SecondLastName').val();
+            const PhoneNumber = $('#PhoneNumber').val();
+            const Birthdate = $('#Birthdate').val();
 
-            const TransportLine = {
-                TransportLineId: TransportLineId,
-                TemporalDocumentId: TemporalDocumentId,
-                userId: userId,
-                Name: LineName,
-                TransportLineTypeId: TransportLineTypeSelect,
+            if (!Birthdate) {
+                return await ToastsNotification("Choferes", "Es necesario seleccionar una fecha de nacimiento.", 'Danger', 'Middle center');
             };
 
-            const response = await fetchs.AddOrUpdateTransportLine(TransportLine);
+            const Driver = {
+                DriverId: DriverId,
+                TemporalDocumentId: TemporalDocumentId,
+                UserId: UserId,
+                FirstName: FirstName,
+                LastName: LastName,
+                SecondLastName: SecondLastName,
+                PhoneNumber: PhoneNumber,
+                Birthdate: Birthdate
+            };
+
+            const response = await fetchs.AddOrUpdateDriver(Driver);
             let toastType = 'Primary';
             let toastPlacement = 'Top right';
 
             if (response.success) {
-                TransportLineId = response.TransportLineId;
-                TemporalDocumentId = response.TemporalDocumentId;
-                sessionStorage.setItem("TransportLineId", TransportLineId);
-                initModule.TransportLinesDataTable();
-                $('#AddOrUpdateTransportLineModal').modal('hide');
+                DriverId = response.DriverId;
+                sessionStorage.setItem("DriverId", DriverId);
+                initModule.DriversDataTable();
+                $('#AddOrUpdateDriverModal').modal('hide');
             } else {
                 toastType = 'Danger';
                 toastPlacement = 'Middle center';
             };
 
-            await ToastsNotification("Lineas de Transporte", response.message, toastType, toastPlacement);
+            await ToastsNotification("Choferes", response.message, toastType, toastPlacement);
 
         } catch (error) {
             console.error(error);
         }
     },
-    AddOrUpdateLineDocumentButton: async () => {
+    AddOrUpdateDriverDocumentButton: async () => {
         try {
-            const TransportLineId = sessionStorage.getItem("TransportLineId");
-            const LineDocument = $('#LineDocument')[0];
-            const LineDocumentFile = LineDocument.files[0];
+            const DriverId = sessionStorage.getItem("DriverId");
+            const DriverDocumentInput = $('#DriverDocument')[0];
+            const DriverDocumentFile = DriverDocumentInput.files[0];
 
-            const TransportLineDocument = {
+            const DriverDocument = {
                 userId: sessionStorage.getItem('userId'),
                 TemporalDocumentId: sessionStorage.getItem('TemporalDocumentId'),
-                TransportLineId: TransportLineId,
-                LineDocumentFile: LineDocumentFile,
-                DocumentId: $('#DocumentLineSelect').val()
+                DriverId: DriverId,
+                DriverDocumentFile: DriverDocumentFile,
+                DocumentId: $('#DocumentDriverSelect').val()
             };
 
-            const response = await fetchs.AddOrUpdateLineDocument(TransportLineDocument);
+            const response = await fetchs.AddOrUpdateDriverDocument(DriverDocument);
 
             if (response.success) {
-                await ToastsNotification("Lineas de Transporte", "Se subio el archivo con exito.", "Primary", "Top right");
+                await ToastsNotification("Chofer", "Se subio el archivo con exito.", "Primary", "Top right");
             } else {
-                await ToastsNotification("Lineas de Transporte", response.message, "Danger", "Middle center");
+                await ToastsNotification("Chofer", response.message, "Danger", "Middle center");
             };
 
             TemporalDocumentId = response.TemporalDocumentId;
 
             sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
 
-            initModule.TransportLineDocumentsDataTable(TransportLineId, TemporalDocumentId);
+            initModule.DriverDocumentsDataTable(DriverId, TemporalDocumentId);
 
         } catch (error) {
             console.error(error);
         }
     },
-    GetLineDocumentButton: async () => {
+    GetDriverDocumentButton: async () => {
     },
-    TransportLineDocumentsDataTable: async (TransportLineId, TemporalDocumentId) => {
+    DriverDocumentsDataTable: async (DriverId, TemporalDocumentId) => {
         try {
-            if ($.fn.DataTable.isDataTable('#TransportLineDocuments')) {
-                $('#TransportLineDocuments').DataTable().destroy();
-                $('#TransportLineDocuments').html('');
+            if ($.fn.DataTable.isDataTable('#DriverDocuments')) {
+                $('#DriverDocuments').DataTable().destroy();
+                $('#DriverDocuments').html('');
             };
 
-            const data = await fetchs.GetLineDocument(TransportLineId, TemporalDocumentId);
+            const data = await fetchs.GetDriverDocument(DriverId, TemporalDocumentId);
             if (data.length > 0) {
                 // Crea el arreglo de objetos para las columnas del DataTable
                 const columns = [
@@ -436,19 +414,19 @@ const initModule = {
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary" 
                                         type="button" 
-                                        id="DonwloadLineDocument"
+                                        id="DonwloadDriverDocument"
                                         data='${JSON.stringify(row)}'
                                         title='Descargar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='initModule.DonwloadLineDocument(this);'
+                                        onclick='initModule.DonwloadDriverDocument(this);'
                                     >
                                         <span class="tf-icons bx bxs-download"></span>
                                     </button>
                                     <button
                                         class="btn rounded-pill btn-icon btn-outline-danger" 
                                         type="button" 
-                                        id="AddOrUpdateTransportLineTableButton"
+                                        id="AddOrUpdateDriversTableButton"
                                         data='${JSON.stringify(row)}'
                                         title='Eliminar'
                                         data-bs-toggle="tooltip"
@@ -466,7 +444,7 @@ const initModule = {
                         visible: !propName.includes('Id')
                     }))
                 ];
-                $('#TransportLineDocuments').DataTable({
+                $('#DriverDocuments').DataTable({
                     data: data,
                     columns: columns,
                     language: {
@@ -478,18 +456,18 @@ const initModule = {
             console.error(error);
         };
     },
-    DonwloadLineDocument: async (e) => {
+    DonwloadDriverDocument: async (e) => {
         if (e) {
             const data = $(e).attr('data');
             const dataObj = JSON.parse(data);
             const DocumentId = dataObj.Id;
 
-            fetchs.GetLineDocumentById(DocumentId);
+            fetchs.GetDriverDocumentById(DocumentId);
         }
     },
     DeleteDocument: async (e) => {
         try {
-            const TransportLineId = sessionStorage.getItem('TransportLineId');
+            const DriverId = sessionStorage.getItem('DriverId');
             const TemporalDocumentId = sessionStorage.getItem('TemporalDocumentId');
             let data = $(e).attr('data');
             let dataObj = JSON.parse(data);
@@ -500,13 +478,13 @@ const initModule = {
             let toastPlacement = 'Top right';
 
             if (response.success) {
-                initModule.TransportLineDocumentsDataTable(TransportLineId, TemporalDocumentId);
+                initModule.DriverDocumentsDataTable(DriverId, TemporalDocumentId);
             } else {
                 toastType = 'Danger';
                 toastPlacement = 'Middle center';
             };
 
-            await ToastsNotification("Lineas de Transporte", response.message, toastType, toastPlacement);
+            await ToastsNotification("Chofer", response.message, toastType, toastPlacement);
 
         } catch (error) {
             console.error(error);

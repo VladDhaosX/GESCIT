@@ -16,10 +16,10 @@
     }
 
     .img-center {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 20px;
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        padding: 20px !important;
     }
 
     .text-center {
@@ -103,7 +103,7 @@
                                         </div>
                                         <div class="col-12 mb-3">
                                             <button id="modal-recuperar" class="btn btn-block btn-orange">
-                                                Recuperar contraseña
+                                                Restablecer contraseña
                                             </button>
                                         </div>
                                         <div class="col-12 mb-3">
@@ -154,8 +154,8 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="ChangePasswordModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-            aria-hidden="true">
+        <div class="modal fade" id="ChangePasswordModal" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="img-center" style="align-items: center;">
@@ -181,21 +181,23 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="PrivacyNoticeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-            aria-hidden="true">
+        <div class="modal fade" id="PrivacyNoticeModal" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
-                    <div class="img-center" style="align-items: center;">
-                        <img src="../assets/ALMER/logo.png" style="height:66px;" />
-                    </div>
                     <div class="modal-header">
-                        <h5 class="text-center" id="exampleModalLongTitle">Aviso de Privacidad</h5>
+                        <h5 class="modal-title" id="exampleModalLongTitle">Aviso de Privacidad</h5>
+                        <button id="NotAcepptPrivacyNoticeButton" type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Close" title="No acepto" data-bs-toggle="tooltip"
+                            data-bs-placement="top"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body text-center" style="padding-top: 50px;">
+                        <img src="../assets/ALMER/logo.png" style="height:66px;" />
                         <iframe id="pdf-iframe" width="100%" height="600"></iframe>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" id="PrivacyNoticeModalButton" class="btn btn-block btn-orange">Acepto</button>
+                        <button type="button" id="PrivacyNoticeModalButton"
+                            class="btn btn-block btn-orange">Acepto</button>
                     </div>
                 </div>
             </div>
@@ -208,6 +210,8 @@
         <!-- Menú inferior -->
         <%- include('Utils/footer') %>
             <%- include('Utils/toast') %>
+                <!-- Jquery BlockUI JS -->
+                <script src="../js/jquery.blockUI.js"> </script>
                 <script async defer src="../js/utils.js"></script>
                 <script async defer src="<%= JSFile %>"></script>
     </footer>
