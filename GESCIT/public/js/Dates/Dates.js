@@ -1,3 +1,5 @@
+const UrlApi = window.__env.UrlApi;
+
 $(document).ready(async function () {
     initPage();
 });
@@ -299,7 +301,7 @@ const initDatesDataTable = async () => {
                 columns: columns,
                 "order": [],
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: './Gescit/public/js/datatable-esp.json'
                 }
             });
         }
@@ -321,7 +323,7 @@ const GetSheduleTimes = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: 'http://localhost:8090/GescitApi/dates/GetSheduleTimes', type: 'POST', data: {
+            url: `${UrlApi}/GescitApi/dates/GetSheduleTimes`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -343,7 +345,7 @@ const GetOperationTypes = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: 'http://localhost:8090/GescitApi/dates/GetOperationTypes', type: 'POST', data: {
+            url: `${UrlApi}/GescitApi/dates/GetOperationTypes`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -365,7 +367,7 @@ const GetProducts = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: 'http://localhost:8090/GescitApi/dates/GetProducts', type: 'POST', data: {
+            url: `${UrlApi}/GescitApi/dates/GetProducts`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -387,7 +389,7 @@ const GetTransportLines = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: 'http://localhost:8090/GescitApi/dates/GetTransportLines', type: 'POST', data: {
+            url: `${UrlApi}/GescitApi/dates/GetTransportLines`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -409,7 +411,7 @@ const GetTransports = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: 'http://localhost:8090/GescitApi/dates/GetTransports', type: 'POST', data: {
+            url: `${UrlApi}/GescitApi/dates/GetTransports`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -431,7 +433,7 @@ const GetDrivers = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: 'http://localhost:8090/GescitApi/dates/GetDrivers', type: 'POST', data: {
+            url: `${UrlApi}/GescitApi/dates/GetDrivers`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -453,7 +455,7 @@ const GetDates = async (userId, StartDate, EndDate) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: 'http://localhost:8090/GescitApi/dates/GetDates', type: 'POST', data: {
+            url: `${UrlApi}/GescitApi/dates/GetDates`, type: 'POST', data: {
                 userId,
                 StartDate,
                 EndDate
@@ -478,7 +480,7 @@ const addOrUpdateDates = async (date) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: 'http://localhost:8090/GescitApi/dates/addOrUpdateDates', type: 'POST', data: {
+            url: `${UrlApi}/GescitApi/dates/addOrUpdateDates`, type: 'POST', data: {
                 date
             },
             dataType: 'json'

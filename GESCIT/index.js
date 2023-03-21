@@ -2,77 +2,102 @@ const express = require('express');
 const app = express();
 const path = require('path');
 
+const env = process.env.env || 'LOCAL';
+const config = require('./config/env')[env];
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'public', 'html'));
-app.use(express.static(__dirname + '/public'));
 
-app.get('/Clients', (req, res) => {
-    console.log('Se accedió a la ruta /views');
+// Definir ruta para archivos estáticos
+app.use(config.BasePath + '/', express.static(__dirname + '/public'));
+
+app.get(config.BasePath + '/Clients', (req, res) => {
     const data = {
-        Page: './Catalogs/Clients'
+        Page: './Catalogs/Clients',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
     };
     res.render('views', data);
 });
 
-app.get('/Transports', (req, res) => {
+app.get(config.BasePath + '/Transports', (req, res) => {
     const data = {
         Page: './Catalogs/Transports',
         Categoria: 'Catalogos',
         Modulo: 'Transportes',
-        JSFile: '../js/Catalogs/Transports.js'
+        JSFile: './js/Catalogs/Transports.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
+
     };
     res.render('views', data);
 });
 
-app.get('/Permissions', (req, res) => {
+app.get(config.BasePath + '/Permissions', (req, res) => {
     const data = {
         Page: './Configuration/Permissions',
         Categoria: 'Configuracion',
         Modulo: 'Permisos',
-        JSFile: '../js/Configuration/Permissions.js'
+        JSFile: './js/Configuration/Permissions.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
+
     };
     res.render('views', data);
 });
 
-app.get('/TransportLines', (req, res) => {
+app.get(config.BasePath + '/TransportLines', (req, res) => {
     const data = {
         Page: './Catalogs/TransportLines',
         Categoria: 'Catalogos',
         Modulo: 'Lineas de Transporte',
-        JSFile: '../js/Catalogs/TransportLines.js'
+        JSFile: './js/Catalogs/TransportLines.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
+
     };
     res.render('views', data);
 });
 
-app.get('/Drivers', (req, res) => {
+app.get(config.BasePath + '/Drivers', (req, res) => {
     const data = {
         Page: './Catalogs/Drivers',
         Categoria: 'Catalogos',
         Modulo: 'Choferes',
-        JSFile: '../js/Catalogs/Drivers.js'
+        JSFile: './js/Catalogs/Drivers.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
+
     };
     res.render('views', data);
 });
 
-app.get('/login', (req, res) => {
+app.get(config.BasePath + '/login', (req, res) => {
     const data = {
-        JSFile: '../js/Configuration/login.js'
+        JSFile: './js/Configuration/login.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
+
     };
     res.render('login', data);
 });
-app.get('/Dates', (req, res) => {
+
+app.get(config.BasePath + '/Dates', (req, res) => {
     const data = {
         Page: './Dates/Dates',
         Categoria: 'Gestor',
         Modulo: 'Citas',
-        JSFile: '../js/Dates/Dates.js'
+        JSFile: './js/Dates/Dates.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
     };
     res.render('views', data);
 });
 
-app.get('/', (req, res) => {
-    res.redirect('/Dates');
+app.get(config.BasePath + '/', (req, res) => {
+    res.redirect(config.BasePath + '/login');
 });
-app.listen(3000, () => {
+
+app.listen(process.env.PORT || 3000, () => {
     console.log('La aplicación está escuchando en el puerto 3000');
 });

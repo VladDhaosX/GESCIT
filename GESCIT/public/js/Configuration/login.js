@@ -1,3 +1,17 @@
+const UrlApi = window.__env.UrlApi;
+
+$(document).ready(async function () {
+    sessionStorage.clear();
+    let loginAttempts = localStorage.getItem('loginAttempts');
+    let blockedUntil = localStorage.getItem('blockedUntil');
+
+    if (!loginAttempts) localStorage.setItem('loginAttempts', 0);
+    if (!blockedUntil) localStorage.setItem('blockedUntil', null);
+
+    PageHasToken();
+    await tooltipTrigger();
+});
+
 const fetchAcepptPrivacyNotice = async (userId) => {
     try {
         const response = await $.ajax({
@@ -8,10 +22,10 @@ const fetchAcepptPrivacyNotice = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: "http://localhost:8090/GesCitApi/configuration/UserPrivacyNotice",
-            type: "POST",
+            url: `${UrlApi}/GesCitApi/configuration/UserPrivacyNotice`,
+            type: `POST`,
             data: { userId },
-            dataType: "json"
+            dataType: `json`
         });
         return response;
     } catch (error) {
@@ -29,10 +43,10 @@ const fetchLogin = async (username, password) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: "http://localhost:8090/GesCitApi/configuration/login",
-            type: "POST",
+            url: `${UrlApi}/GesCitApi/configuration/login`,
+            type: `POST`,
             data: { username, password },
-            dataType: "json",
+            dataType: `json`,
         });
     } catch (error) {
         $.unblockUI();
@@ -50,10 +64,10 @@ const fetchResetPassword = async (userResetPassword, emailResetPassword) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: "http://localhost:8090/GesCitApi/configuration/ResetPassowrd",
-            type: "POST",
+            url: `${UrlApi}/GesCitApi/configuration/ResetPassowrd`,
+            type: `POST`,
             data: { userResetPassword, emailResetPassword },
-            dataType: "json",
+            dataType: `json`,
         });
         return response;
     } catch (error) {
@@ -72,10 +86,10 @@ const fetchChangePassword = async (token, user, email, NewPassword, ConfirmedNew
             complete: function () {
                 $.unblockUI();
             },
-            url: "http://localhost:8090/GesCitApi/configuration/ChangePassword",
-            type: "POST",
+            url: `${UrlApi}/GesCitApi/configuration/ChangePassword`,
+            type: `POST`,
             data: { token, user, email, NewPassword, ConfirmedNewPassword },
-            dataType: "json",
+            dataType: `json`,
         });
         return response;
     } catch (error) {
@@ -95,18 +109,18 @@ const login = async () => {
     };
 
     sessionStorage.removeItem('userId');
-    const username = $("#user").val();
-    const password = $("#password").val();
+    const username = $(`#user`).val();
+    const password = $(`#password`).val();
     let toastType = 'Danger';
     let toastPlacement = 'Middle center';
 
     if (username == '') {
-        await ToastsNotification("Login", "Es necesario el nombre de usuario", toastType, toastPlacement);
+        await ToastsNotification(`Login`, `Es necesario el nombre de usuario`, toastType, toastPlacement);
         return;
     }
 
     if (password == '') {
-        await ToastsNotification("Login", "Es necesario una contraseña", toastType, toastPlacement);
+        await ToastsNotification(`Login`, `Es necesario una contraseña`, toastType, toastPlacement);
         return;
     }
 
@@ -118,20 +132,20 @@ const login = async () => {
             toastType = 'Primary';
             toastPlacement = 'Top right';
             setTimeout(() => {
-                window.location.href = "Dates";
+                window.location.href = `Dates`;
             }, 2500);
         } else {
             PrivacyNoticeModal();
         };
-        await ToastsNotification("Login", message, toastType, toastPlacement);
+        await ToastsNotification(`Login`, message, toastType, toastPlacement);
     } else {
         blockLogin();
     };
 };
 
 const ResetPassowrd = async () => {
-    const userResetPassword = $("#userResetPassword").val();
-    const emailResetPassword = $("#emailResetPassword").val();
+    const userResetPassword = $(`#userResetPassword`).val();
+    const emailResetPassword = $(`#emailResetPassword`).val();
     const response = await fetchResetPassword(userResetPassword, emailResetPassword);
     let toastType = 'Primary';
     let toastPlacement = 'Top right';
@@ -139,7 +153,7 @@ const ResetPassowrd = async () => {
         toastType = 'Danger';
         toastPlacement = 'Middle center';
     };
-    await ToastsNotification("Login", response.message, toastType, toastPlacement);
+    await ToastsNotification(`Login`, response.message, toastType, toastPlacement);
 };
 
 const PageHasToken = () => {
@@ -159,27 +173,27 @@ const ChangePassword = async () => {
     const token = urlParams.get('token');
     const user = urlParams.get('user');
     const email = urlParams.get('email');
-    const NewPassword = $("#NewPassword").val();
-    const ConfirmedNewPassword = $("#ConfirmedNewPassword").val();
+    const NewPassword = $(`#NewPassword`).val();
+    const ConfirmedNewPassword = $(`#ConfirmedNewPassword`).val();
     const response = await fetchChangePassword(token, user, email, NewPassword, ConfirmedNewPassword);
 
     let toastType = 'Primary';
     let toastPlacement = 'Top right';
     if (response.success) {
         setTimeout(() => {
-            window.location.href = "/login";
+            window.location.href = `/login`;
         }, 2500);
     } else {
         toastType = 'Danger';
         toastPlacement = 'Middle center';
     };
-    await ToastsNotification("Login", response.message, toastType, toastPlacement);
+    await ToastsNotification(`Login`, response.message, toastType, toastPlacement);
 
 };
 
 const PrivacyNoticeModal = () => {
     $('#PrivacyNoticeModal').modal('show');
-    var pdfUrl = 'https://portalesdemo.almer.com.mx/Gecit/assets/ALMER/AVISO%20DE%20PRIVACIDAD.pdf';
+    var pdfUrl = `https://portalesdemo.almer.com.mx/Gescit/public/assets/ALMER/AVISO%20DE%20PRIVACIDAD.pdf`;
     $('#pdf-iframe').attr('src', 'https://docs.google.com/viewerng/viewer?url=' + encodeURIComponent(pdfUrl) + '&embedded=true');
 
     var count = 0;
@@ -210,7 +224,7 @@ const AcepptPrivacyNotice = async () => {
 };
 
 const NotAcepptPrivacyNotice = async () => {
-    window.location.href = "Permissions";
+    window.location.href = `Permissions`;
 };
 
 const blockLogin = async () => {
@@ -232,48 +246,36 @@ const ErrorLoginNotification = async () => {
     let blockedUntil = localStorage.getItem('blockedUntil');
     const remainingTime = Math.round((blockedUntil - Date.now()) / 1000);
     let message = loginAttempts < 3 ? `${loginAttempts} de 3 intentos fallidos.` : ` Favor de esperar ${remainingTime} segundos, ha excedido los tres intentos permitidos`;
-    await ToastsNotification("Login", message, 'Danger', 'Middle center');
+    await ToastsNotification(`Login`, message, 'Danger', 'Middle center');
 };
 
 
-$("#btn-login").click(async function () {
+$(`#btn-login`).click(async function () {
     await login();
 });
 
-$("#modal-recuperar").click(async function () {
+$(`#modal-recuperar`).click(async function () {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     if (urlParams.has('token')) {
-        $("#ChangePasswordModal").modal("show");
+        $(`#ChangePasswordModal`).modal(`show`);
     } else {
-        $("#modal-recup").modal("show");
+        $(`#modal-recup`).modal(`show`);
     };
 });
 
-$("#btn-recuperar").click(async function () {
+$(`#btn-recuperar`).click(async function () {
     await ResetPassowrd();
 });
 
-$("#ChangePasswordButton").click(async function () {
+$(`#ChangePasswordButton`).click(async function () {
     await ChangePassword();
 });
 
-$("#PrivacyNoticeModalButton").click(async function () {
+$(`#PrivacyNoticeModalButton`).click(async function () {
     await AcepptPrivacyNotice();
 });
 
-$("#NotAcepptPrivacyNoticeButton").click(async function () {
+$(`#NotAcepptPrivacyNoticeButton`).click(async function () {
     await NotAcepptPrivacyNotice();
-});
-
-$(document).ready(async function () {
-    let loginAttempts = localStorage.getItem('loginAttempts');
-    let blockedUntil = localStorage.getItem('blockedUntil');
-
-    if (!loginAttempts) localStorage.setItem('loginAttempts', 0);
-    if (!blockedUntil) localStorage.setItem('blockedUntil', null);
-
-    PageHasToken();
-    await tooltipTrigger();
-
 });

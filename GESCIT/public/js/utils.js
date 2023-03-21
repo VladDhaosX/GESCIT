@@ -1,18 +1,13 @@
-$(document).ready(async () => {
-    sessionStorage.setItem('userId', 1);
-    await createMenu();
-    // await ToastsNotification("titulo","mensaje","Danger","Middle center"); <- Prueba de Notificacion
-    // await ToastsNotification("titulo","mensaje","Danger","Top right"); <- Prueba de Notificacion
-});
-
+const UtilUrlApi = window.__env.UrlApi;
+const pathname = window.location.pathname;
 
 const fetchUserData = async () => {
     try {
         const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
         const response = await $.ajax({
-            url: 'http://localhost:8090/GescitApi/configuration/GetUserData',
+            url: `${UtilUrlApi}/GescitApi/configuration/GetUserData`,
             type: 'POST',
-            data: { userId }, // Enviar userId en el cuerpo de la solicitud
+            data: { userId },
             dataType: 'json'
         });
         return response;
@@ -28,7 +23,7 @@ const createMenu = async () => {
 
     const userRol = userData.userRol.Name;
     const userName = userData.userData[0].Name;
-    console.log(userName);
+    $menu.empty();
     $('#txtUserName').text(userName);
     $('#txtUserRol').text(userRol);
 
@@ -97,3 +92,9 @@ const ToastsNotification = async (titulo, message, type, placement) => {
         console.error(error);
     }
 };
+
+if (pathname !== '/login') {
+    const userId = sessionStorage.getItem('userId');
+    if (!userId) window.location.href = './login';
+    createMenu();
+}
