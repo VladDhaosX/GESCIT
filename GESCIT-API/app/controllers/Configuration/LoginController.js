@@ -9,21 +9,12 @@ module.exports = {
     try {
       const { username, password } = req.body;
 
-      let ADresponse = await ADController.authVCliente(username, password);
-      if (ADresponse.success) {
-        let { id, name, mail, userName, company } = ADresponse.data;
-        const response = await LoginDao.AddOrUpdateUser(company, name, mail, userName, 2, password);
-        if (response) {
-          res.json(response);
-        } else {
-          res.json({ success: response.success, message: response.message });
-        };
-      }
-      else {
-        ADresponse = await ADController.authMercader(username, password);
+      const isMemberOfVClientesGroup = await ADController.isMemberOfVClientesGroup(username);
+      if (isMemberOfVClientesGroup.success) {
+        const ADresponse = await ADController.authVCliente(username, password);
         if (ADresponse.success) {
-          let { id, name, mail, userName, company } = ADresponse.data;
-          const response = await LoginDao.AddOrUpdateUser(company, name, mail, userName, 1, password);
+          const { name, mail, userName, company } = ADresponse.data;
+          const response = await LoginDao.AddOrUpdateUser(company, name, mail, userName, 2, password);
           if (response) {
             res.json(response);
           } else {
@@ -32,7 +23,50 @@ module.exports = {
         } else {
           res.json({ success: ADresponse.success, message: ADresponse.message });
         };
+      } else {
+        const isMemberOfMercaderGroup = await ADController.isMemberOfMercaderGroup(username);
+        if (isMemberOfMercaderGroup.success) {
+          const ADresponse = await ADController.authMercader(username, password);
+          if (ADresponse.success) {
+            const { name, mail, userName, company } = ADresponse.data;
+            const response = await LoginDao.AddOrUpdateUser(company, name, mail, userName, 1, password);
+            if (response) {
+              res.json(response);
+            } else {
+              res.json({ success: response.success, message: response.message });
+            };
+          } else {
+            res.json({ success: ADresponse.success, message: ADresponse.message });
+          };
+        } else {
+          res.json({ success: isMemberOfMercaderGroup.success, message: isMemberOfMercaderGroup.message });
+        };
       };
+
+      // let ADresponse = await ADController.authVCliente(username, password);
+      // if (ADresponse.success) {
+      //   let { id, name, mail, userName, company } = ADresponse.data;
+      //   const response = await LoginDao.AddOrUpdateUser(company, name, mail, userName, 2, password);
+      //   if (response) {
+      //     res.json(response);
+      //   } else {
+      //     res.json({ success: response.success, message: response.message });
+      //   };
+      // }
+      // else {
+      //   ADresponse = await ADController.authMercader(username, password);
+      //   if (ADresponse.success) {
+      //     let { id, name, mail, userName, company } = ADresponse.data;
+      //     const response = await LoginDao.AddOrUpdateUser(company, name, mail, userName, 1, password);
+      //     if (response) {
+      //       res.json(response);
+      //     } else {
+      //       res.json({ success: response.success, message: response.message });
+      //     };
+      //   } else {
+      //     res.json({ success: ADresponse.success, message: ADresponse.message });
+      //   };
+      // };
     } catch (error) {
       res.status(500).json({ success: false, message: 'Error al realizar el login.', info: error.message });
     };
@@ -109,6 +143,7 @@ module.exports = {
       res.status(500).json({ message: 'Error al realizar el proceso.', info: error.message });
     }
   },
+
   ChangePasswordHandler: async (req, res) => {
     try {
       const { token, user, email, NewPassword, ConfirmedNewPassword } = req.body;

@@ -1,9 +1,10 @@
 const request = require('request');
+const group = 'GECIT';
 
 module.exports = {
   authMercader: async (username, password) => {
     const options = {
-      url: 'https://portalweb.almer.com.mx/ADConnect/api/authenticate',
+      url: 'https://portalweb.almer.com.mx/ADConnectDev/api/authenticate',
       method: 'POST',
       json: true,
       body: {
@@ -28,7 +29,7 @@ module.exports = {
   },
   authVCliente: async (username, password) => {
     const options = {
-      url: 'https://portalweb.almer.com.mx/ADConnect/api/authenticateCustomer',
+      url: 'https://portalweb.almer.com.mx/ADConnectDev/api/authenticateCustomerPC',
       method: 'POST',
       json: true,
       body: {
@@ -51,9 +52,9 @@ module.exports = {
       });
     });
   },
-  changePasswordClient: async (username, NewPassword,OldPassword) => {
+  changePasswordClient: async (username, NewPassword, OldPassword) => {
     const options = {
-      url: 'https://portalweb.almer.com.mx/ADConnect/api/changePasswordClientesPC',
+      url: 'https://portalweb.almer.com.mx/ADConnectDev/api/changePasswordClientesPC',
       method: 'POST',
       json: true,
       body: {
@@ -76,5 +77,55 @@ module.exports = {
         return resolve(body);
       });
     });
-  }
+  },
+  isMemberOfVClientesGroup: async (username) => {
+    const options = {
+      url: 'https://portalweb.almer.com.mx/ADConnectDev/api/isMemberOfVClientesGroup',
+      method: 'POST',
+      json: true,
+      body: {
+        userName: username,
+        group: group
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      request(options, function (err, res, body) {
+        if (err) {
+          return reject(err);
+        }
+
+        if (res.statusCode !== 200) {
+          return reject(new Error(`La autenticación falló con el código de estado: ${res.statusCode}`));
+        }
+
+        return resolve(body);
+      });
+    });
+  },
+  isMemberOfMercaderGroup: async (username) => {
+    const options = {
+      url: 'https://portalweb.almer.com.mx/ADConnectDev/api/isMemberOfMercaderGroup',
+      method: 'POST',
+      json: true,
+      body: {
+        userName: username,
+        group: group
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      request(options, function (err, res, body) {
+        if (err) {
+          return reject(err);
+        }
+
+        if (res.statusCode !== 200) {
+          return reject(new Error(`La autenticación falló con el código de estado: ${res.statusCode}`));
+        }
+
+        return resolve(body);
+      });
+    });
+  },
 };
