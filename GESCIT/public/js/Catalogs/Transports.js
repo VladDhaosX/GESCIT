@@ -1,9 +1,9 @@
 const UrlApi = window.__env.UrlApi;
 
 $(document).ready(async function () {
-    await initModule.initButtons();
-    await initModule.TransportsDataTable(true);
-    await initModule.FillSelectTransportType();
+    await initButtons();
+    await TransportsDataTable(true);
+    await FillSelectTransportType();
 
     await tooltipTrigger();
 });
@@ -18,7 +18,7 @@ const GetTransports = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/catalogs/getTransports`, type: 'POST', data: {
+            url: `${UrlApi}/catalogs/getTransports`, type: 'POST', data: {
                 userId
             }, // Enviar userId en el cuerpo de la solicitud
             dataType: 'json'
@@ -38,7 +38,7 @@ const GetTransportType = async () => {
             },
             complete: function () {
                 $.unblockUI();
-            }, url: `${UrlApi}/GescitApi/catalogs/getTransportType`, type: 'GET', dataType: 'json'
+            }, url: `${UrlApi}/catalogs/getTransportType`, type: 'GET', dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
@@ -56,7 +56,7 @@ const AddOrUpdateTransport = async (Transport) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/catalogs/addOrUpdateTransport`, type: 'POST', data: {
+            url: `${UrlApi}/catalogs/addOrUpdateTransport`, type: 'POST', data: {
                 Transport
             }, // Enviar Transport en el cuerpo de la solicitud
             dataType: 'json'
@@ -80,10 +80,10 @@ const initButtons = async () => {
             `);
 
         $('#AddOrUpdateTransportModalButton').click(function () {
-            initModule.AddOrUpdateTransportModal();
+            AddOrUpdateTransportModal();
         });
         $('#AddOrUpdateTransportButton').click(function () {
-            initModule.AddOrUpdateTransportButton()
+            AddOrUpdateTransportButton()
         });
 
         $('#TransportPlate2 , #TransportPlate3').parent().hide();
@@ -95,6 +95,8 @@ const initButtons = async () => {
                 $('#TransportPlate2').parent().show();
             } else if (TransportTypeId == 5) {
                 $('#TransportPlate2 , #TransportPlate3').parent().show();
+            } else {
+                $('#TransportPlate2 , #TransportPlate3').parent().hide();
             };
         });
         // hide();
@@ -111,7 +113,7 @@ const TransportsDataTable = async () => {
         }
 
         const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
-        const data = await fetchs.GetTransports(userId);
+        const data = await GetTransports(userId);
         if (data.length > 0) {
             // Crea el arreglo de objetos para las columnas del DataTable
             const columns = [
@@ -128,7 +130,7 @@ const TransportsDataTable = async () => {
                                         title='Editar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='initModule.AddOrUpdateTransportModal(this);'
+                                        onclick='AddOrUpdateTransportModal(this);'
                                     >
                                         <span class="tf-icons bx bx-edit-alt"></span>
                                     </button>
@@ -138,18 +140,18 @@ const TransportsDataTable = async () => {
                 ...Object.keys(data[0]).map(propName => ({
                     title: propName,
                     data: propName,
-                    visible: !propName.includes('Id'),
-                    render: function (data) {
-                        return propName === "Capacidad" ? data + " Toneladas" : data
-                    }
+                    visible: !propName.includes('Id')
                 }))
             ];
             $('#TransportTable').DataTable({
                 data: data,
                 columns: columns,
                 language: {
-                    url: './Gescit/public/js/datatable-esp.json'
-                }
+                    url: './js/datatable-esp.json'
+                },
+                "columnDefs": [
+                  { "type": "html", "targets": 5 }
+                ]
             });
         }
     } catch (error) {
@@ -158,11 +160,11 @@ const TransportsDataTable = async () => {
 };
 const FillSelectTransportType = async () => {
     try {
-        const data = await fetchs.GetTransportType();
+        const data = await GetTransportType();
 
         var $options = $();
-        const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-        $options = $options.add($SeleccionaUnaOpcion);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.Type);
             $options = $options.add($option);
@@ -194,6 +196,7 @@ const AddOrUpdateTransportModal = async (e) => {
             $('#TransportPlate3').val("");
             $('#Capacity').val("");
         };
+        $('#TransportTypeSelect').trigger('change');
         $('#AddOrUpdateTransportModal').modal('show');
     } catch (error) {
         console.error(error);
@@ -219,13 +222,13 @@ const AddOrUpdateTransportButton = async () => {
             Capacity
         };
 
-        const response = await fetchs.AddOrUpdateTransport(Transport);
+        const response = await AddOrUpdateTransport(Transport);
         const toastType = response.success ? "Primary" : "Danger";
         const toastPlacement = response.success ? "Top right" : "Middle center";
         if (response.success) $('#AddOrUpdateTransportModal').modal('hide');
 
         await ToastsNotification("Transportes", response.message, toastType, toastPlacement);
-        await initModule.TransportsDataTable(false);
+        await TransportsDataTable(false);
 
     } catch (error) {
         console.error(error);

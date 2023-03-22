@@ -18,7 +18,7 @@ const GetPermissions = async () => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/configuration/getPermissions`,
+            url: `${UrlApi}/configuration/getPermissions`,
             type: 'GET',
             dataType: 'json'
         });
@@ -37,7 +37,7 @@ const GetRoles = async () => {
             },
             complete: function () {
                 $.unblockUI();
-            }, url: `${UrlApi}/GescitApi/configuration/GetRoles`, type: 'GET', dataType: 'json'
+            }, url: `${UrlApi}/configuration/GetRoles`, type: 'GET', dataType: 'json'
         });
         return response;
     } catch (error) {
@@ -55,7 +55,7 @@ const UpdatePermission = async (permissionUserId, RolId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/configuration/UpdatePermission`,
+            url: `${UrlApi}/configuration/UpdatePermission`,
             type: 'POST',
             data: {
                 permissionUserId,
@@ -124,7 +124,7 @@ const PermissionsDataTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './Gescit/public/js/datatable-esp.json'
+                    url: './js/datatable-esp.json'
                 }
             });
         }
@@ -136,8 +136,8 @@ const FillSelectRol = async () => {
     try {
         const data = await GetRoles();
         let $options = $();
-        const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-        $options = $options.add($SeleccionaUnaOpcion);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.Rol);
             $options = $options.add($option);

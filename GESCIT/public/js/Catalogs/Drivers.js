@@ -4,9 +4,9 @@ $(document).ready(async function () {
     sessionStorage.setItem("DriverId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
 
-    await initModule.initButtons();
-    await initModule.DriversDataTable(true);
-    await initModule.FillSelectDocumentLine();
+    await initButtons();
+    await DriversDataTable(true);
+    await FillSelectDocumentLine();
     await tooltipTrigger();
 
 });
@@ -22,7 +22,7 @@ const GetDrivers = async (UserId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/catalogs/GetDrivers'`, type: 'POST', data: {
+            url: `${UrlApi}/catalogs/GetDrivers`, type: 'POST', data: {
                 UserId
             }, 
             dataType: 'json'
@@ -42,7 +42,7 @@ const GetDriversDocuments = async () => {
             },
             complete: function () {
                 $.unblockUI();
-            }, url: `${UrlApi}/GescitApi/catalogs/GetDriversDocuments`, type: 'GET', dataType: 'json'
+            }, url: `${UrlApi}/catalogs/GetDriversDocuments`, type: 'GET', dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
@@ -60,7 +60,7 @@ const AddOrUpdateDriver = async (Driver) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/catalogs/addOrUpdateDriver`,
+            url: `${UrlApi}/catalogs/addOrUpdateDriver`,
             type: 'POST',
             data: {
                 Driver
@@ -82,7 +82,7 @@ const GetDriverDocument = async (DriverId, TemporalDocumentId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/catalogs/GetDriverDocument`, type: 'POST', data: {
+            url: `${UrlApi}/catalogs/GetDriverDocument`, type: 'POST', data: {
                 DriverId, TemporalDocumentId
             }, // Enviar userId en el cuerpo de la solicitud
             dataType: 'json'
@@ -109,7 +109,7 @@ const AddOrUpdateDriverDocument = async (DriverDocument) => {
             complete: async function () {
                 await $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/catalogs/AddOrUpdateDriverDocument`,
+            url: `${UrlApi}/catalogs/AddOrUpdateDriverDocument`,
             type: 'POST',
             data: formData,
             processData: false,
@@ -130,7 +130,7 @@ const GetDriverDocumentById = (DocumentId) => {
             complete: async function () {
                 await $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/catalogs/GetDriverDocumentById`,
+            url: `${UrlApi}/catalogs/GetDriverDocumentById`,
             type: 'POST',
             data: {
                 DocumentId
@@ -165,7 +165,7 @@ const DeleteDocumentById = async (DocumentId) => {
             complete: async function () {
                 await $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/catalogs/DeleteDocumentById`,
+            url: `${UrlApi}/catalogs/DeleteDocumentById`,
             type: 'POST',
             data: {
                 DocumentId
@@ -190,18 +190,29 @@ const initButtons = async () => {
             `);
 
         $('#AddOrUpdateDriverModalButton').click(async function () {
-            await initModule.AddOrUpdateDriverModal();
+            await AddOrUpdateDriverModal();
         });
         $('#AddOrUpdateDriverButton').click(async function () {
-            await initModule.AddOrUpdateDriverButton()
+            await AddOrUpdateDriverButton()
         });
         $('#AddOrUpdateDriverDocumentButton').click(async function () {
-            await initModule.AddOrUpdateDriverDocumentButton()
+            await AddOrUpdateDriverDocumentButton()
         });
         $('#DocumentsNavButton').on('shown.bs.tab', async function (e) {
             let DriverId = sessionStorage.getItem("DriverId");
             let TemporalDocumentId = sessionStorage.getItem("TemporalDocumentId");
-            await initModule.DriverDocumentsDataTable(DriverId, TemporalDocumentId);
+            await DriverDocumentsDataTable(DriverId, TemporalDocumentId);
+        });
+
+        $('#DriverDocument').on('change', function () {
+            const LineDocument = $(this)[0];
+            const LineDocumentFile = LineDocument.files[0];
+
+            if (LineDocumentFile) {
+                $('#DriverDocument').attr('style', '');
+            } else {
+                $('#DriverDocument').attr('style', 'color: transparent');
+            }
         });
 
     } catch (error) {
@@ -216,7 +227,7 @@ const DriversDataTable = async () => {
         }
 
         const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
-        const data = await fetchs.GetDrivers(userId);
+        const data = await GetDrivers(userId);
         if (data.length > 0) {
             // Crea el arreglo de objetos para las columnas del DataTable
             const columns = [
@@ -233,7 +244,7 @@ const DriversDataTable = async () => {
                                         title='Editar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='initModule.AddOrUpdateDriverModal(this);'
+                                        onclick='AddOrUpdateDriverModal(this);'
                                     >
                                         <span class="tf-icons bx bx-edit-alt"></span>
                                     </button>
@@ -253,7 +264,7 @@ const DriversDataTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './Gescit/public/js/datatable-esp.json'
+                    url: './js/datatable-esp.json'
                 }
             });
         }
@@ -264,11 +275,11 @@ const DriversDataTable = async () => {
 
 const FillSelectDocumentLine = async () => {
     try {
-        const data = await fetchs.GetDriversDocuments();
+        const data = await GetDriversDocuments();
 
         var $options = $();
-        const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-        $options = $options.add($SeleccionaUnaOpcion);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.Name);
             $options = $options.add($option);
@@ -296,11 +307,6 @@ const AddOrUpdateDriverModal = async (e) => {
             $('#LastName').val(DriverObj.Apellido);
             $('#SecondLastName').val(DriverObj['Apellido materno']);
             $('#PhoneNumber').val(DriverObj.Telefono);
-            const dateString = DriverObj['Fecha de Nacimiento']; // "19/03/2023"
-            const dateComponents = dateString.split('/'); // ["19", "03", "2023"]
-            const formattedDate = `${dateComponents[2]}-${dateComponents[1]}-${dateComponents[0]}`; // "2023-03-19"
-
-            $('#Birthdate').val(formattedDate);
 
         } else {
             sessionStorage.setItem("DriverId", DriverId);
@@ -310,7 +316,6 @@ const AddOrUpdateDriverModal = async (e) => {
             $('#LastName').val("");
             $('#SecondLastName').val("");
             $('#PhoneNumber').val("");
-            $('#Birthdate').val("");
         };
         $('#DocumentDriverSelect').val(0);
         $('#DriverDocument').val("");
@@ -330,11 +335,6 @@ const AddOrUpdateDriverButton = async () => {
         const LastName = $('#LastName').val();
         const SecondLastName = $('#SecondLastName').val();
         const PhoneNumber = $('#PhoneNumber').val();
-        const Birthdate = $('#Birthdate').val();
-
-        if (!Birthdate) {
-            return await ToastsNotification("Choferes", "Es necesario seleccionar una fecha de nacimiento.", 'Danger', 'Middle center');
-        };
 
         const Driver = {
             DriverId: DriverId,
@@ -343,18 +343,17 @@ const AddOrUpdateDriverButton = async () => {
             FirstName: FirstName,
             LastName: LastName,
             SecondLastName: SecondLastName,
-            PhoneNumber: PhoneNumber,
-            Birthdate: Birthdate
+            PhoneNumber: PhoneNumber
         };
 
-        const response = await fetchs.AddOrUpdateDriver(Driver);
+        const response = await AddOrUpdateDriver(Driver);
         let toastType = 'Primary';
         let toastPlacement = 'Top right';
 
         if (response.success) {
             DriverId = response.DriverId;
             sessionStorage.setItem("DriverId", DriverId);
-            initModule.DriversDataTable();
+            DriversDataTable();
             $('#AddOrUpdateDriverModal').modal('hide');
         } else {
             toastType = 'Danger';
@@ -382,7 +381,7 @@ const AddOrUpdateDriverDocumentButton = async () => {
             DocumentId: $('#DocumentDriverSelect').val()
         };
 
-        const response = await fetchs.AddOrUpdateDriverDocument(DriverDocument);
+        const response = await AddOrUpdateDriverDocument(DriverDocument);
 
         if (response.success) {
             await ToastsNotification("Chofer", "Se subio el archivo con exito.", "Primary", "Top right");
@@ -394,7 +393,7 @@ const AddOrUpdateDriverDocumentButton = async () => {
 
         sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
 
-        initModule.DriverDocumentsDataTable(DriverId, TemporalDocumentId);
+        DriverDocumentsDataTable(DriverId, TemporalDocumentId);
 
     } catch (error) {
         console.error(error);
@@ -411,7 +410,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
             $('#DriverDocuments').html('');
         };
 
-        const data = await fetchs.GetDriverDocument(DriverId, TemporalDocumentId);
+        const data = await GetDriverDocument(DriverId, TemporalDocumentId);
         if (data.length > 0) {
             // Crea el arreglo de objetos para las columnas del DataTable
             const columns = [
@@ -428,7 +427,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                                         title='Descargar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='initModule.DonwloadDriverDocument(this);'
+                                        onclick='DonwloadDriverDocument(this);'
                                     >
                                         <span class="tf-icons bx bxs-download"></span>
                                     </button>
@@ -440,7 +439,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                                         title='Eliminar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='initModule.DeleteDocument(this);'
+                                        onclick='DeleteDocument(this);'
                                     >
                                         <span class="tf-icons bx bx-trash"></span>
                                     </button>
@@ -457,7 +456,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './Gescit/public/js/datatable-esp.json'
+                    url: './js/datatable-esp.json'
                 }
             });
         }
@@ -472,7 +471,7 @@ const DonwloadDriverDocument = async (e) => {
         const dataObj = JSON.parse(data);
         const DocumentId = dataObj.Id;
 
-        fetchs.GetDriverDocumentById(DocumentId);
+        GetDriverDocumentById(DocumentId);
     }
 };
 
@@ -484,12 +483,12 @@ const DeleteDocument = async (e) => {
         let dataObj = JSON.parse(data);
         let DocumentId = dataObj.Id;
 
-        const response = await fetchs.DeleteDocumentById(DocumentId);
+        const response = await DeleteDocumentById(DocumentId);
         let toastType = 'Primary';
         let toastPlacement = 'Top right';
 
         if (response.success) {
-            initModule.DriverDocumentsDataTable(DriverId, TemporalDocumentId);
+            DriverDocumentsDataTable(DriverId, TemporalDocumentId);
         } else {
             toastType = 'Danger';
             toastPlacement = 'Middle center';

@@ -92,8 +92,8 @@ const FillSelectSheduleTimes = async () => {
         const data = await GetSheduleTimes(userId);
 
         var $options = $();
-        const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-        $options = $options.add($SeleccionaUnaOpcion);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
             $options = $options.add($option);
@@ -112,8 +112,8 @@ const FillSelectOperationTimes = async () => {
         const data = await GetOperationTypes(userId);
 
         var $options = $();
-        const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-        $options = $options.add($SeleccionaUnaOpcion);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.Name);
             $options = $options.add($option);
@@ -132,8 +132,8 @@ const FillSelectProducts = async () => {
         const data = await GetProducts(userId);
 
         var $options = $();
-        const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-        $options = $options.add($SeleccionaUnaOpcion);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.Name);
             $options = $options.add($option);
@@ -152,10 +152,10 @@ const FillSelectTransportLines = async () => {
         const data = await GetTransportLines(userId);
 
         var $options = $();
-        const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-        $options = $options.add($SeleccionaUnaOpcion);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
-            const $option = $('<option>').attr('value', value.Id).text(value['Linea de Transporte']);
+            const $option = $('<option>').attr('value', value.Id).text(value['Línea de Transporte']);
             $options = $options.add($option);
         });
 
@@ -172,8 +172,8 @@ const FillSelectTransports = async () => {
         const data = await GetTransports(userId);
 
         var $options = $();
-        const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-        $options = $options.add($SeleccionaUnaOpcion);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value['Tipo de Transporte'] + ' ' + value['Placa de Transporte']).attr('data', JSON.stringify(value));
             $options = $options.add($option);
@@ -192,8 +192,8 @@ const FillSelectDrivers = async () => {
         const data = await GetDrivers(userId);
 
         var $options = $();
-        const $SeleccionaUnaOpcion = $('<option>').attr('value', 0).text("Selecciona una opcion");
-        $options = $options.add($SeleccionaUnaOpcion);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.Nombre + ' ' + value.Apellido + ' ' + value['Apellido materno']);
             $options = $options.add($option);
@@ -301,7 +301,7 @@ const initDatesDataTable = async () => {
                 columns: columns,
                 "order": [],
                 language: {
-                    url: './Gescit/public/js/datatable-esp.json'
+                    url: './js/datatable-esp.json'
                 }
             });
         }
@@ -323,7 +323,7 @@ const GetSheduleTimes = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/dates/GetSheduleTimes`, type: 'POST', data: {
+            url: `${UrlApi}/dates/GetSheduleTimes`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -345,7 +345,7 @@ const GetOperationTypes = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/dates/GetOperationTypes`, type: 'POST', data: {
+            url: `${UrlApi}/dates/GetOperationTypes`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -367,7 +367,7 @@ const GetProducts = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/dates/GetProducts`, type: 'POST', data: {
+            url: `${UrlApi}/dates/GetProducts`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -389,7 +389,7 @@ const GetTransportLines = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/dates/GetTransportLines`, type: 'POST', data: {
+            url: `${UrlApi}/dates/GetTransportLines`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -411,7 +411,7 @@ const GetTransports = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/dates/GetTransports`, type: 'POST', data: {
+            url: `${UrlApi}/dates/GetTransports`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -433,7 +433,7 @@ const GetDrivers = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/dates/GetDrivers`, type: 'POST', data: {
+            url: `${UrlApi}/dates/GetDrivers`, type: 'POST', data: {
                 userId
             },
             dataType: 'json'
@@ -455,7 +455,7 @@ const GetDates = async (userId, StartDate, EndDate) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/dates/GetDates`, type: 'POST', data: {
+            url: `${UrlApi}/dates/GetDates`, type: 'POST', data: {
                 userId,
                 StartDate,
                 EndDate
@@ -480,7 +480,7 @@ const addOrUpdateDates = async (date) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GescitApi/dates/addOrUpdateDates`, type: 'POST', data: {
+            url: `${UrlApi}/dates/addOrUpdateDates`, type: 'POST', data: {
                 date
             },
             dataType: 'json'

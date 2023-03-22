@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
-    data-assets-path="assets/" data-template="vertical-menu-template-free">
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-assets-path="assets/"
+    data-template="vertical-menu-template-free">
 
 <head>
     <%- include('Utils/head') %>
@@ -100,11 +100,11 @@
                                                 Ingresar
                                             </button>
                                         </div>
-                                        <div class="col-12 mb-3" style="text-align: center;">
+                                        <!-- <div class="col-12 mb-3" style="text-align: center;">
                                             <a id="modal-recuperar" href="javascript:void(0);">
                                                 Restablecer contraseña
                                             </a>
-                                        </div>
+                                        </div> -->
                                         <!-- <div class="col-12 mb-3">
                                             <a href="assets/ALMER/AVISO DE PRIVACIDAD.pdf"
                                                 target="_blank">
@@ -209,19 +209,20 @@
     <footer>
         <!-- Menú inferior -->
         <%- include('Utils/footer') %>
-        <%- include('Utils/toast') %>
-        
-        <script async defer >
-            window.__env = {
-                UrlApi: '<%= UrlApi %>'
-            };
-        </script>
+            <%- include('Utils/toast') %>
 
-        <!-- Jquery BlockUI JS -->
-        <script src="./js/jquery.blockUI.js"> </script>
-        
-        <script async defer src="./js/utils.js"></script>
-        <script async defer src="<%= JSFile %>"></script>
+                <script async defer>
+                    window.__env = {
+                        UrlApi: '<%= UrlApi %>',
+                        BasePath: '<%= BasePath %>',
+                    };
+                </script>
+
+                <!-- Jquery BlockUI JS -->
+                <script src="./js/jquery.blockUI.js"> </script>
+
+                <script async defer src="./js/utils.js"></script>
+                <script async defer src="<%= JSFile %>"></script>
     </footer>
 </body>
 

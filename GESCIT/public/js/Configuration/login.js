@@ -22,7 +22,7 @@ const fetchAcepptPrivacyNotice = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GesCitApi/configuration/UserPrivacyNotice`,
+            url: `${UrlApi}/configuration/UserPrivacyNotice`,
             type: `POST`,
             data: { userId },
             dataType: `json`
@@ -43,7 +43,7 @@ const fetchLogin = async (username, password) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GesCitApi/configuration/login`,
+            url: `${UrlApi}/configuration/login`,
             type: `POST`,
             data: { username, password },
             dataType: `json`,
@@ -64,7 +64,7 @@ const fetchResetPassword = async (userResetPassword, emailResetPassword) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GesCitApi/configuration/ResetPassowrd`,
+            url: `${UrlApi}/configuration/ResetPassowrd`,
             type: `POST`,
             data: { userResetPassword, emailResetPassword },
             dataType: `json`,
@@ -86,7 +86,7 @@ const fetchChangePassword = async (token, user, email, NewPassword, ConfirmedNew
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/GesCitApi/configuration/ChangePassword`,
+            url: `${UrlApi}/configuration/ChangePassword`,
             type: `POST`,
             data: { token, user, email, NewPassword, ConfirmedNewPassword },
             dataType: `json`,
@@ -99,14 +99,14 @@ const fetchChangePassword = async (token, user, email, NewPassword, ConfirmedNew
 };
 
 const login = async () => {
-    let blockedUntil = localStorage.getItem('blockedUntil');
-    if (blockedUntil && Date.now() < blockedUntil) {
-        ErrorLoginNotification();
-        return;
-    } else if (blockedUntil && Date.now() > blockedUntil) {
-        localStorage.setItem('loginAttempts', 0);
-        localStorage.setItem('blockedUntil', null);
-    };
+    // let blockedUntil = localStorage.getItem('blockedUntil');
+    // if (blockedUntil && Date.now() < blockedUntil) {
+    //     ErrorLoginNotification();
+    //     return;
+    // } else if (blockedUntil && Date.now() > blockedUntil) {
+    //     localStorage.setItem('loginAttempts', 0);
+    //     localStorage.setItem('blockedUntil', null);
+    // };
 
     sessionStorage.removeItem('userId');
     const username = $(`#user`).val();
@@ -126,7 +126,6 @@ const login = async () => {
 
     const response = await fetchLogin(username, password);
     if (response.success) {
-        let message = response.message;
         sessionStorage.setItem('userId', response.Id);
         if (response.PrivacyNotice == 1) {
             toastType = 'Primary';
@@ -137,9 +136,10 @@ const login = async () => {
         } else {
             PrivacyNoticeModal();
         };
-        await ToastsNotification(`Login`, message, toastType, toastPlacement);
+        await ToastsNotification(`Login`, response.message, toastType, toastPlacement);
     } else {
-        blockLogin();
+        // blockLogin();
+        await ToastsNotification(`Login`, response.message, toastType, toastPlacement);
     };
 };
 

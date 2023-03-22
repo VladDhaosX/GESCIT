@@ -1,0 +1,7 @@
+DEV
+{
+  BasePath: '/GecitDev',
+  publicPath: '/GecitDev/public',
+  urlApi: 'https://portalesdemo.almer.com.mx/GescitApiDev'
+}
+La aplicación está escuchando en el puerto 3000

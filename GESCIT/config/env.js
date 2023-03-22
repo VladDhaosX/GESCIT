@@ -2,12 +2,12 @@ module.exports = {
     PROD: {
       BasePath: '/Gescit',
       publicPath: '/Gescit/public',
-      urlApi: 'https://portalesdemo.almer.com.mx'
+      urlApi: 'https://portalesdemo.almer.com.mx/GecitApi'
     },
     DEV: {
-      BasePath: '/GescitDev',
-      publicPath: '/GescitDev/public',
-      urlApi: 'https://portalesdemo.almer.com.mx'
+      BasePath: '/GecitDev',
+      publicPath: '/GecitDev/public',
+      urlApi: 'https://portalesdemo.almer.com.mx/GecitApiDev'
     },
     LOCAL: {
       BasePath: '',

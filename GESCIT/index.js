@@ -3,7 +3,9 @@ const app = express();
 const path = require('path');
 
 const env = process.env.env || 'LOCAL';
+console.log(env);
 const config = require('./config/env')[env];
+console.log(config);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'public', 'html'));
@@ -23,7 +25,7 @@ app.get(config.BasePath + '/Clients', (req, res) => {
 app.get(config.BasePath + '/Transports', (req, res) => {
     const data = {
         Page: './Catalogs/Transports',
-        Categoria: 'Catalogos',
+        Categoria: 'Catálogos',
         Modulo: 'Transportes',
         JSFile: './js/Catalogs/Transports.js',
         BasePath: config.BasePath,
@@ -49,8 +51,8 @@ app.get(config.BasePath + '/Permissions', (req, res) => {
 app.get(config.BasePath + '/TransportLines', (req, res) => {
     const data = {
         Page: './Catalogs/TransportLines',
-        Categoria: 'Catalogos',
-        Modulo: 'Lineas de Transporte',
+        Categoria: 'Catálogos',
+        Modulo: 'Líneas de Transporte',
         JSFile: './js/Catalogs/TransportLines.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
@@ -62,7 +64,7 @@ app.get(config.BasePath + '/TransportLines', (req, res) => {
 app.get(config.BasePath + '/Drivers', (req, res) => {
     const data = {
         Page: './Catalogs/Drivers',
-        Categoria: 'Catalogos',
+        Categoria: 'Catálogos',
         Modulo: 'Choferes',
         JSFile: './js/Catalogs/Drivers.js',
         BasePath: config.BasePath,
