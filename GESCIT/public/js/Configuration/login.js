@@ -133,10 +133,10 @@ const login = async () => {
             setTimeout(() => {
                 window.location.href = `Dates`;
             }, 2500);
+            await ToastsNotification(`Login`, response.message, toastType, toastPlacement);
         } else {
             PrivacyNoticeModal();
         };
-        await ToastsNotification(`Login`, response.message, toastType, toastPlacement);
     } else {
         // blockLogin();
         await ToastsNotification(`Login`, response.message, toastType, toastPlacement);
@@ -224,7 +224,7 @@ const AcepptPrivacyNotice = async () => {
 };
 
 const NotAcepptPrivacyNotice = async () => {
-    window.location.href = `Permissions`;
+    await ToastsNotification(`Aviso de Privacidad`, "Es necesario aceptar el aviso de privacidad", "Danger", "Middle center");
 };
 
 const blockLogin = async () => {

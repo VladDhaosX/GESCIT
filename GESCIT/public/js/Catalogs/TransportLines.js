@@ -203,7 +203,7 @@ const DeleteDocumentById = async (DocumentId) => {
 const initButtons = async () => {
     try {
         $('#ActionsButtons').append(`
-                <button id="AddOrUpdateTransportLineModalButton" type="button" title="Registrar" 
+                <button id="AddOrUpdateTransportLineModalButton" type="button" title="Registrar Linea de Transporte" 
                     class="btn rounded-pill btn-icon btn-outline-primary" 
                     data-bs-toggle="tooltip" data-bs-placement="top">
                     <span class="tf-icons bx bx-plus"></span>

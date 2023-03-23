@@ -72,7 +72,7 @@ const AddOrUpdateTransport = async (Transport) => {
 const initButtons = async () => {
     try {
         $('#ActionsButtons').append(`
-                <button id="AddOrUpdateTransportModalButton" type="button" title="Registrar transporte" 
+                <button id="AddOrUpdateTransportModalButton" type="button" title="Registrar Transporte" 
                     class="btn rounded-pill btn-icon btn-outline-primary" 
                     data-bs-toggle="tooltip" data-bs-placement="top">
                     <span class="tf-icons bx bx-plus"></span>
