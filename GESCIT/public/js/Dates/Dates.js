@@ -61,11 +61,26 @@ const initPage = async () => {
         await initDatesDataTable();
     });
 
+    $('#TransportTypeSelect').change(async function (e) { 
+        const TransportTypeId = $(this).val();
+        await FillSelectTransports(TransportTypeId);
+
+        $('#TransportPlate1 , TransportPlate2 , #TransportPlate3').val("");
+        $('#TransportPlate2 , #TransportPlate3').val("").parent().hide();
+
+        if (TransportTypeId == 2) {
+            $('#TransportPlate2').val("").parent().show();
+        } else if (TransportTypeId == 5) {
+            $('#TransportPlate2 , #TransportPlate3').val("").parent().show();
+        };
+    });
+
     await FillSelectSheduleTimes();
     await FillSelectOperationTimes();
     await FillSelectProducts();
     await FillSelectTransportLines();
     await FillSelectTransports();
+    await FillSelectTransportType();
     await FillSelectDrivers();
 
     await initDatesDataTable();
@@ -168,10 +183,29 @@ const FillSelectTransportLines = async () => {
     }
 };
 
-const FillSelectTransports = async () => {
+const FillSelectTransportType = async () => {
+    try {
+        const data = await GetTransportType();
+
+        var $options = $();
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
+        data.forEach(function (value) {
+            const $option = $('<option>').attr('value', value.Id).text(value.Type).attr('data', JSON.stringify(value));
+            $options = $options.add($option);
+        });
+
+        $('#TransportTypeSelect').empty();
+        $('#TransportTypeSelect').append($options).trigger('change');
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const FillSelectTransports = async (TransportTypeId) => {
     try {
         const userId = sessionStorage.getItem('userId');
-        const data = await GetTransports(userId);
+        const data = await GetTransports(userId,TransportTypeId);
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -217,6 +251,7 @@ const newDate = async () => {
         const productId = $('#ProductsSelect').val();
         const transportLineId = $('#TransportLineTypeSelect').val();
         const transportId = $('#TransportsSelect').val();
+        const transportTypeId = $('#TransportTypeSelect').val();
         const TransportPlate = $('#TransportPlate1').val();
         const TransportPlate2 = $('#TransportPlate2').val();
         const TransportPlate3 = $('#TransportPlate3').val();
@@ -231,6 +266,7 @@ const newDate = async () => {
             productId,
             transportLineId,
             transportId,
+            transportTypeId,
             TransportPlate,
             TransportPlate2,
             TransportPlate3,
@@ -292,10 +328,7 @@ const initDatesDataTable = async () => {
                 ...Object.keys(data[0]).map(propName => ({
                     title: propName,
                     data: propName,
-                    visible: !propName.includes('Id'),
-                    render: function (data) {
-                        return propName === "Volumen" ? data + " Toneladas" : data
-                    }
+                    visible: !propName.includes('Id')
                 }))
             ];
             $('#DatesTable').DataTable({
@@ -304,7 +337,10 @@ const initDatesDataTable = async () => {
                 "order": [],
                 language: {
                     url: './js/datatable-esp.json'
-                }
+                },
+                "columnDefs": [
+                  { "type": "num", "targets": 11 }
+                ]
             });
         }
     } catch (error) {
@@ -403,7 +439,7 @@ const GetTransportLines = async (userId) => {
     }
 };
 
-const GetTransports = async (userId) => {
+const GetTransports = async (userId,TransportTypeId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -413,9 +449,30 @@ const GetTransports = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/GetTransports`, type: 'POST', data: {
-                userId
+            url: `${UrlApi}/dates/GetTransportsByType`, type: 'POST', data: {
+                userId,TransportTypeId
             },
+            dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
+
+const GetTransportType = async () => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/dates/GetTransportType`, 
+            type: 'GET',
             dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
@@ -470,7 +527,6 @@ const GetDates = async (userId, StartDate, EndDate) => {
         $.unblockUI();
     }
 };
-
 
 const addOrUpdateDates = async (date) => {
     try {

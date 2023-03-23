@@ -2,8 +2,6 @@ const UtilUrlApi = window.__env.UrlApi;
 const BasePath = window.__env.BasePath;
 const pathname = window.location.pathname;
 
-console.log(UtilUrlApi);
-
 const fetchUserData = async () => {
     try {
         const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión

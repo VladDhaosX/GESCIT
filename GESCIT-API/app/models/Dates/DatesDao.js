@@ -14,6 +14,7 @@ module.exports = {
                 .input('ProductId', sql.Int, appointment.productId)
                 .input('TransportLineId', sql.Int, appointment.transportLineId)
                 .input('TransportId', sql.Int, appointment.transportId)
+                .input('TransportTypeId', sql.Int, appointment.transportTypeId)
                 .input('TransportPlate', sql.VarChar(50), appointment.TransportPlate)
                 .input('TransportPlate2', sql.VarChar(50), appointment.TransportPlate2)
                 .input('TransportPlate3', sql.VarChar(50), appointment.TransportPlate3)
@@ -168,6 +169,28 @@ module.exports = {
                 .input('StartDate', sql.VarChar(sql.MAX), StartDate)
                 .input('EndDate', sql.VarChar(sql.MAX), EndDate)
                 .execute('SpGetDates');
+
+            return {
+                "success": true,
+                "message": "Citas obtenidas correctamente.",
+                "data": result.recordset,
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los Choferes.",
+                "info": error.message
+            }
+        }
+    },
+    GetTransportsByType: async (UserId,TransportTypeId) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('UserId', sql.Int, UserId)
+                .input('TransportTypeId', sql.Int, TransportTypeId)
+                .execute('GetTransportsByType');
 
             return {
                 "success": true,

@@ -150,7 +150,7 @@ const TransportsDataTable = async () => {
                     url: './js/datatable-esp.json'
                 },
                 "columnDefs": [
-                  { "type": "html", "targets": 5 }
+                  { "type": "num", "targets": 5 }
                 ]
             });
         }

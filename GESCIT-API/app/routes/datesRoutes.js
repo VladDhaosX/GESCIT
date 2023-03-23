@@ -20,6 +20,8 @@ router.post('/GetDrivers', DatesController.GetDrivers);
 
 router.post('/GetDates', DatesController.GetDates);
 
-router.get('/GetTransportType', DatesController.GetTransportType);
+router.get('/GetTransportType', DatesController.GetTransportTypes);
+
+router.post('/GetTransportsByType', DatesController.GetTransportsByType);
 
 module.exports = router;
