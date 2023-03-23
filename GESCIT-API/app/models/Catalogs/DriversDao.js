@@ -13,7 +13,6 @@ module.exports = {
             request.input('LastName', sql.VarChar(255), driver.LastName);
             request.input('SecondLastName', sql.VarChar(255), driver.SecondLastName);
             request.input('PhoneNumber', sql.VarChar(20), driver.PhoneNumber);
-            request.input('Birthdate', sql.Date, driver.Birthdate);
             request.output('Success', sql.Bit);
             request.output('Message', sql.VarChar(100));
             const result = await request.execute('SpAddOrUpdateDriver');

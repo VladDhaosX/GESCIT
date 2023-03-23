@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger/swagger');
+require('dotenv').config();
 
 const configurationRoutes = require('./routes/configurationRoutes');
 const datesRoutes = require('./routes/datesRoutes');
@@ -19,16 +20,18 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('tiny'));
 
-app.use('/GesCitApi/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+const urlApi = process.env.urlApi;
 
-app.use('/GesCitApi/configuration', configurationRoutes);
+app.use(`${urlApi}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/GesCitApi/catalogs', catalogsRoutes);
+app.use(`${urlApi}/configuration`, configurationRoutes);
 
-app.use('/GesCitApi/dates', datesRoutes);
+app.use(`${urlApi}/catalogs`, catalogsRoutes);
 
-app.get('/', (req, res) => {
-  res.redirect('/GesCitApi/api-docs');
+app.use(`${urlApi}/dates`, datesRoutes);
+
+app.get(`/`, (req, res) => {
+  res.redirect(`${urlApi}/api-docs`);
 });
 
 module.exports = app;

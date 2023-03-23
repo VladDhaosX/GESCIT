@@ -187,7 +187,7 @@ const AddOrUpdateTransportModal = async (e) => {
             $('#TransportPlate1').val(TransportObj["Placa de Transporte"]);
             $('#TransportPlate2').val(TransportObj["Placa de Caja #1"]);
             $('#TransportPlate3').val(TransportObj["Placa de Caja #2"]);
-            $('#Capacity').val(TransportObj["Capacidad"]);
+            $('#Capacity').val(TransportObj["Capacidad en Toneladas"]);
         } else {
             sessionStorage.setItem("TransportId", 0);
             $('#TransportTypeSelect').val(0);

@@ -14,8 +14,12 @@ router.post('/GetTransportLines', DatesController.GetTransportLines);
 
 router.post('/GetTransports', DatesController.GetTransports);
 
+router.post('/GetTransports', DatesController.GetTransports);
+
 router.post('/GetDrivers', DatesController.GetDrivers);
 
 router.post('/GetDates', DatesController.GetDates);
+
+router.get('/GetTransportType', DatesController.GetTransportType);
 
 module.exports = router;

@@ -34,24 +34,26 @@ const initPage = async () => {
 
     $('#TransportPlate2 , #TransportPlate3').parent().hide();
     $('#TransportsSelect').change(function () {
+        $('#TransportPlate2 , #TransportPlate3').parent().hide();
         const select = $(this);
         const data = select.find(':selected').attr('data');
-        const dataObj = JSON.parse(data);
+        if (data) {
+            const dataObj = JSON.parse(data);
 
-        const TransportTypeId = dataObj.TransportTypeId;
-        const TransportPlate = dataObj['Placa de Transporte'];
-        const TransportPlate2 = dataObj['Placa de Caja #1'];
-        const TransportPlate3 = dataObj['Placa de Caja #2'];
+            const TransportTypeId = dataObj.TransportTypeId;
+            const TransportPlate = dataObj['Placa de Transporte'];
+            const TransportPlate2 = dataObj['Placa de Caja #1'];
+            const TransportPlate3 = dataObj['Placa de Caja #2'];
 
-        $('#TransportPlate1').val(TransportPlate);
-        $('#TransportPlate2').val(TransportPlate2);
-        $('#TransportPlate3').val(TransportPlate3);
+            $('#TransportPlate1').val(TransportPlate);
+            $('#TransportPlate2').val(TransportPlate2);
+            $('#TransportPlate3').val(TransportPlate3);
 
-        $('#TransportPlate2 , #TransportPlate3').parent().hide();
-        if (TransportTypeId == 2) {
-            $('#TransportPlate2').parent().show();
-        } else if (TransportTypeId == 5) {
-            $('#TransportPlate2 , #TransportPlate3').parent().show();
+            if (TransportTypeId == 2) {
+                $('#TransportPlate2').parent().show();
+            } else if (TransportTypeId == 5) {
+                $('#TransportPlate2 , #TransportPlate3').parent().show();
+            };
         };
     });
 
@@ -75,7 +77,7 @@ const newDateModal = () => {
     $('#OperationsSelect').val(0);
     $('#ProductsSelect').val(0);
     $('#TransportLineTypeSelect').val(0);
-    $('#TransportsSelect').val(0);
+    $('#TransportsSelect').val(0).trigger('change');
     $('#TransportPlate1').val('');
     $('#TransportPlate2').val('');
     $('#TransportPlate3').val('');
@@ -180,7 +182,7 @@ const FillSelectTransports = async () => {
         });
 
         $('#TransportsSelect').empty();
-        $('#TransportsSelect').append($options);
+        $('#TransportsSelect').append($options).trigger('change');
     } catch (error) {
         console.error(error);
     }

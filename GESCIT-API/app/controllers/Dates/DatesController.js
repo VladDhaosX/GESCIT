@@ -1,4 +1,5 @@
 const DatesDao = require('../../models/Dates/DatesDao');
+const TransportDao = require('../../models/Catalogs/TransportDao');
 
 module.exports = {
     addOrUpdateDate: async (req, res) => {
@@ -80,5 +81,13 @@ module.exports = {
             console.error(error);
             res.status(500).json({ message: 'Error al obtener las citas.' });
         }
-    }
+    },
+    GetTransportType: async (req, res) => {
+      try {
+        const response = await TransportDao.getTransportType();
+        res.json(response);
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
+    },
 };

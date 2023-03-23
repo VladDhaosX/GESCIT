@@ -122,7 +122,6 @@ module.exports = {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('TransportId', sql.Int, 0)
                 .input('UserId', sql.Int, userId)
                 .execute('SpGetTransports');
 

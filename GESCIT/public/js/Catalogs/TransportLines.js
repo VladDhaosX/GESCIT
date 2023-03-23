@@ -413,6 +413,7 @@ const AddOrUpdateLineDocumentButton = async () => {
 
         if (response.success) {
             await ToastsNotification("Líneas de Transporte", "Se subio el archivo con exito.", "Primary", "Top right");
+            $('#LineDocument').val("").trigger('change');
         } else {
             await ToastsNotification("Líneas de Transporte", response.message, "Danger", "Middle center");
         };

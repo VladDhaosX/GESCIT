@@ -3,14 +3,11 @@ const app = express();
 const path = require('path');
 
 const env = process.env.env || 'LOCAL';
-console.log(env);
 const config = require('./config/env')[env];
-console.log(config);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'public', 'html'));
 
-// Definir ruta para archivos estáticos
 app.use(config.BasePath + '/', express.static(__dirname + '/public'));
 
 app.get(config.BasePath + '/Clients', (req, res) => {

@@ -24,7 +24,7 @@ const GetDrivers = async (UserId) => {
             },
             url: `${UrlApi}/catalogs/GetDrivers`, type: 'POST', data: {
                 UserId
-            }, 
+            },
             dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
@@ -182,12 +182,12 @@ const DeleteDocumentById = async (DocumentId) => {
 const initButtons = async () => {
     try {
         $('#ActionsButtons').append(`
-                <button id="AddOrUpdateDriverModalButton" type="button" title="Registrar" 
-                    class="btn rounded-pill btn-icon btn-outline-primary" 
-                    data-bs-toggle="tooltip" data-bs-placement="top">
-                    <span class="tf-icons bx bx-plus"></span>
-                </button>
-            `);
+            <button id="AddOrUpdateDriverModalButton" type="button" title="Registrar Chofer" 
+                class="btn rounded-pill btn-icon btn-outline-primary" 
+                data-bs-toggle="tooltip" data-bs-placement="top">
+                <span class="tf-icons bx bx-plus"></span>
+            </button>
+        `);
 
         $('#AddOrUpdateDriverModalButton').click(async function () {
             await AddOrUpdateDriverModal();
@@ -198,7 +198,7 @@ const initButtons = async () => {
         $('#AddOrUpdateDriverDocumentButton').click(async function () {
             await AddOrUpdateDriverDocumentButton()
         });
-        $('#DocumentsNavButton').on('shown.bs.tab', async function (e) {
+        $('#DocumentsNavButton').on('shown.bs.tab', async function () {
             let DriverId = sessionStorage.getItem("DriverId");
             let TemporalDocumentId = sessionStorage.getItem("TemporalDocumentId");
             await DriverDocumentsDataTable(DriverId, TemporalDocumentId);
@@ -385,6 +385,7 @@ const AddOrUpdateDriverDocumentButton = async () => {
 
         if (response.success) {
             await ToastsNotification("Chofer", "Se subio el archivo con exito.", "Primary", "Top right");
+            $('#DriverDocument').val("").trigger('change');
         } else {
             await ToastsNotification("Chofer", response.message, "Danger", "Middle center");
         };

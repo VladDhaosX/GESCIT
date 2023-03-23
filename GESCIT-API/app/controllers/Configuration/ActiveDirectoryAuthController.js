@@ -29,7 +29,7 @@ module.exports = {
   },
   authVCliente: async (username, password) => {
     const options = {
-      url: 'https://portalweb.almer.com.mx/ADConnectDev/api/authenticateCustomerPC',
+      url: 'https://portalweb.almer.com.mx/ADConnectDev/api/authenticateVClientes',
       method: 'POST',
       json: true,
       body: {

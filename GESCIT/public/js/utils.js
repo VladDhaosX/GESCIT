@@ -85,9 +85,9 @@ const ToastsNotification = async (titulo, message, type, placement) => {
         toastPlacementExample.addClass('bs-toast toast toast-placement-ex m-2');
         toastPlacementExample.addClass(selectedPlacement);
         toastPlacementExample.addClass(selectedType);
-
-        $('.toast-placement-ex > .me-auto,.fw-semibold').text(titulo);
-        $('.toast-placement-ex > .toast-body').text(message);
+        console.log(titulo);
+        $('#toastTitle').text(titulo);
+        $('#toastMessage').text(message);
 
         const toastPlacement = new bootstrap.Toast(toastPlacementExample);
         toastPlacement.show();

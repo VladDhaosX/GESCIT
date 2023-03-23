@@ -193,7 +193,7 @@ const ChangePassword = async () => {
 
 const PrivacyNoticeModal = () => {
     $('#PrivacyNoticeModal').modal('show');
-    var pdfUrl = `https://portalesdemo.almer.com.mx/Gescit/public/assets/ALMER/AVISO%20DE%20PRIVACIDAD.pdf`;
+    var pdfUrl = `https://portalesdemo.almer.com.mx/Gecit/assets/ALMER/AVISO%20DE%20PRIVACIDAD.pdf`;
     $('#pdf-iframe').attr('src', 'https://docs.google.com/viewerng/viewer?url=' + encodeURIComponent(pdfUrl) + '&embedded=true');
 
     var count = 0;
