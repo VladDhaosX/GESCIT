@@ -13,6 +13,8 @@ router.post('/getTransports', TransportController.getTransports);
 
 router.get('/getTransportType', TransportController.getTransportType);
 
+router.get('/getTransportDocumentType', TransportController.getTransportDocumentType);
+
 // <--- TRANSPORT LINES ROUTES ---> 
 router.get('/getTransportLineTypes', TransportLineController.getTransportLineTypesHandler);
 

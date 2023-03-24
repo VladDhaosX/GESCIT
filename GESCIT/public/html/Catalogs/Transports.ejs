@@ -17,52 +17,104 @@
 
 <!-- Modal -->
 <div class="modal fade" id="AddOrUpdateTransportModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Transporte</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="mb-3">
-                        <label for="TransportTypeSelect" class="form-label">Tipo de Transporte*</label>
-                        <select id="TransportTypeSelect" class="form-select">
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col mb-3">
-                        <label for="TransportPlate1" class="form-label">Placa de Transporte*</label>
-                        <input type="text" id="TransportPlate1" class="form-control"
-                            placeholder="Placa de Transporte" />
-                    </div>
-                </div>
-                <div class="row g-2">
-                    <div class="col mb-0">
-                        <label for="TransportPlate2" class="form-label">Placa de Caja 1*</label>
-                        <input type="text" id="TransportPlate2" class="form-control" placeholder="Placa de Caja 1" />
-                    </div>
-                    <div class="col mb-0">
-                        <label for="TransportPlate3" class="form-label">Placa de Caja 2*</label>
-                        <input type="text" id="TransportPlate3" class="form-control" placeholder="Placa de Caja 2" />
-                    </div>
-                </div>
-                <div class="row" style="padding-top: 15px;">
-                    <div class="col mb-3">
-                        <label for="Capacity" class="form-label">Capacidad *</label>
-                        <input type="number" id="Capacity" class="form-control" placeholder="Capacidad" />
-                        <div id="defaultFormControlHelp" class="form-text">
-                            <label for="defaultFormControlHelp" style="padding-left: 88%;">Toneladas</label>
+                <div class="nav-align-top mb-4">
+                    <ul id="DocumentsModalNavs" class="nav nav-pills  nav-fill" role="tablist">
+                        <li class="nav-item">
+                            <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                                data-bs-target="#navsInfoModal" aria-controls="navs-top-home" aria-selected="true">
+                                Transporte
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button id="DocumentsNavButton" type="button" class="nav-link" role="tab"
+                                data-bs-toggle="tab" data-bs-target="#navsDocsModal" aria-controls="navs-top-profile"
+                                aria-selected="false">
+                                Documentos
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="navsInfoModal" role="tabpanel">
+                            <div class="row">
+                                <div class="mb-3">
+                                    <label for="TransportTypeSelect" class="form-label">Tipo de Transporte*</label>
+                                    <select id="TransportTypeSelect" class="form-select">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="TransportPlate1" class="form-label">Placa de Transporte*</label>
+                                    <input type="text" id="TransportPlate1" class="form-control"
+                                        placeholder="Placa de Transporte" />
+                                </div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col mb-0">
+                                    <label for="TransportPlate2" class="form-label">Placa de Caja 1*</label>
+                                    <input type="text" id="TransportPlate2" class="form-control"
+                                        placeholder="Placa de Caja 1" />
+                                </div>
+                                <div class="col mb-0">
+                                    <label for="TransportPlate3" class="form-label">Placa de Caja 2*</label>
+                                    <input type="text" id="TransportPlate3" class="form-control"
+                                        placeholder="Placa de Caja 2" />
+                                </div>
+                            </div>
+                            <div class="row" style="padding-top: 15px;">
+                                <div class="col mb-3">
+                                    <label for="Capacity" class="form-label">Capacidad *</label>
+                                    <input type="number" id="Capacity" class="form-control" placeholder="Capacidad" />
+                                    <div id="defaultFormControlHelp" class="form-text">
+                                        <label for="defaultFormControlHelp" style="padding-left: 88%;">Toneladas</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="navsDocsModal" role="tabpanel">
+                            <div class="row">
+                                <div class="mb-3">
+                                    <label for="TransportDocumentSelect" class="form-label">Tipo de Documento</label>
+                                    <select id="TransportDocumentSelect" class="form-select">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="TransportDocument" class="form-label">Documento</label>
+                                    <input class="form-control" type="file" id="TransportDocument"
+                                        style="color: transparent" />
+                                </div>
+                                <div class="col-md-2 mb-3" style="padding-top: 30px;">
+                                    <button id="AddOrUpdateTransportDocumentButton" type="button" title="Guardar Documento"
+                                        class="btn rounded-pill btn-icon btn-outline-primary" data-bs-toggle="tooltip"
+                                        data-bs-placement="top">
+                                        <span class="tf-icons bx bx-plus"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <table id="TransportLineDocuments" class="table">
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    Cerrar
-                </button>
-                <button id="AddOrUpdateTransportButton" type="button" class="btn btn-primary">Guardar</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                    <button id="AddOrUpdateTransportButton" type="button" class="btn btn-primary">Guardar</button>
+                </div>
             </div>
         </div>
     </div>

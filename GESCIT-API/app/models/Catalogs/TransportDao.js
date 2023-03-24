@@ -72,5 +72,24 @@ module.exports = {
             };
         }
     },
+    getTransportDocumentType: async () => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .execute('SpGetTransportDocumentType');
+
+            return {
+                success: true,
+                message: "Consulta realizada con exito.",
+                data: result.recordset
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: error.message,
+                error: error,
+            };
+        }
+    },
 
 };
