@@ -15,6 +15,14 @@ router.get('/getTransportType', TransportController.getTransportType);
 
 router.get('/getTransportDocumentType', TransportController.getTransportDocumentType);
 
+router.post('/AddOrUpdateTransportDocument', upload.single('image'), TransportController.AddOrUpdateTransportDocumentHandler);
+
+router.post('/GetTransportDocument',TransportController.GetTransportDocumentHandler);
+
+router.post('/GetTransportDocumentById',TransportController.GetTransportDocumentByIdHandler);
+
+router.post('/DeleteDocumentById',TransportController.DeleteDocumentByIdHandler);
+
 // <--- TRANSPORT LINES ROUTES ---> 
 router.get('/getTransportLineTypes', TransportLineController.getTransportLineTypesHandler);
 

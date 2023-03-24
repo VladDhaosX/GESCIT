@@ -236,8 +236,6 @@ const initButtons = async () => {
             }
         });
 
-         style="color: transparent"
-
     } catch (error) {
         console.error(error);
     }
