@@ -205,6 +205,27 @@ module.exports = {
                 "info": error.message
             }
         }
-    }
+    },
+    IsAppointmentTimeAvailable: async () => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .output('IsTimeAvailable', sql.Bit)
+                .execute('SpIsAppointmentTimeAvailable');
+
+            return {
+                "success": true,
+                "message": "Consulta obtenida correctamente.",
+                "data": result.output
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los datos.",
+                "info": error.message
+            }
+        }
+    },
 
 };

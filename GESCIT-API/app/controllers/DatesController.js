@@ -74,8 +74,8 @@ module.exports = {
     },
     GetDates: async (req, res) => {
         try {
-            const { userId,StartDate,EndDate } = req.body;
-            const result = await DatesDao.GetDates(userId,StartDate,EndDate);
+            const { userId, StartDate, EndDate } = req.body;
+            const result = await DatesDao.GetDates(userId, StartDate, EndDate);
             res.json(result);
         } catch (error) {
             console.error(error);
@@ -83,29 +83,38 @@ module.exports = {
         }
     },
     GetTransportsByType: async (req, res) => {
-      try {
-        const { userId,TransportTypeId } = req.body;
-        const response = await DatesDao.GetTransportsByType(userId,TransportTypeId);
-        res.json(response);
-      } catch (error) {
-        res.status(500).json({ message: error.message });
-      }
+        try {
+            const { userId, TransportTypeId } = req.body;
+            const response = await DatesDao.GetTransportsByType(userId, TransportTypeId);
+            res.json(response);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     },
     GetTransportsByType: async (req, res) => {
-      try {
-        const { userId,TransportTypeId } = req.body;
-        const response = await DatesDao.GetTransportsByType(userId,TransportTypeId);
-        res.json(response);
-      } catch (error) {
-        res.status(500).json({ message: error.message });
-      }
+        try {
+            const { userId, TransportTypeId } = req.body;
+            const response = await DatesDao.GetTransportsByType(userId, TransportTypeId);
+            res.json(response);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     },
     GetTransportTypes: async (req, res) => {
-      try {
-        const response = await TransportDao.getTransportType();
-        res.json(response);
-      } catch (error) {
-        res.status(500).json({ message: error.message });
-      }
+        try {
+            const response = await TransportDao.getTransportType();
+            res.json(response);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
     },
+    IsAppointmentTimeAvailableHandler: async (req, res) => {
+        try {
+            const response = await DatesDao.IsAppointmentTimeAvailable();
+            res.json(response);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
 };

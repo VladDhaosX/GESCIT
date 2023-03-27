@@ -9,7 +9,6 @@ $(document).ready(async function () {
     await TransportLinesDataTable(true);
     await FillSelectTransportLineType();
     await tooltipTrigger();
-
 });
 
 //#region fetchs
@@ -106,7 +105,7 @@ const initButtons = async () => {
         $('#AddOrUpdateTransportLineModalButton').click(async function () {
             await AddOrUpdateTransportLineModal();
         });
-        
+
         $('#AddOrUpdateTransportLineButton').click(async function () {
             await AddOrUpdateTransportLineButton()
         });

@@ -24,4 +24,6 @@ router.get('/GetTransportType', DatesController.GetTransportTypes);
 
 router.post('/GetTransportsByType', DatesController.GetTransportsByType);
 
+router.post('/IsAppointmentTimeAvailable', DatesController.IsAppointmentTimeAvailableHandler);
+
 module.exports = router;
