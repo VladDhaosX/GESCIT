@@ -73,7 +73,7 @@ const UpdatePermission = async (permissionUserId, RolId) => {
 const initButtons = async () => {
     try {
         $('#UpdatePermissionButton').click(function () {
-            UpdatePermissionButton()
+            UpdatePermissionButton();
         });
     } catch (error) {
         console.error(error);
@@ -172,6 +172,10 @@ const UpdatePermissionButton = async () => {
         const response = await UpdatePermission(Permissions_UserId, RolId);
         const toastType = response.success ? "Primary" : "Danger";
         const toastPlacement = response.success ? "Top right" : "Middle center";
+
+        if (response.success) {
+            $('#UpdatePermissionModal').modal('hide');
+        }
 
         await ToastsNotification("Permissiones", response.message, toastType, toastPlacement);
         await PermissionsDataTable(false);

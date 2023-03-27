@@ -6,7 +6,7 @@ $(document).ready(async function () {
 
     await initButtons();
     await DriversDataTable(true);
-    await FillSelectDocumentLine();
+    await FillSelectDocumentList();
     await tooltipTrigger();
 
 });
@@ -33,16 +33,22 @@ const GetDrivers = async (UserId) => {
     }
 };
 
-const GetDriversDocuments = async () => {
+const GetDocumentsList = async (DocumentType) => {
     try {
         const response = await $.ajax({
             async: true,
             beforeSend: function () {
                 $.blockUI({ message: null });
-            },
-            complete: function () {
+            }
+            , complete: function () {
                 $.unblockUI();
-            }, url: `${UrlApi}/catalogs/GetDriversDocuments`, type: 'GET', dataType: 'json'
+            }
+            , url: `${UrlApi}/documents/GetDocumentsList`
+            , type: 'POST'
+            , dataType: 'json'
+            , data: {
+                DocumentType: DocumentType
+            }
         });
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
@@ -72,7 +78,8 @@ const AddOrUpdateDriver = async (Driver) => {
         console.error(error);
     }
 };
-const GetDriverDocument = async (DriverId, TemporalDocumentId) => {
+
+const GetDriverDocument = async (DocumentType, ModuleId, TemporalDocumentId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -82,23 +89,27 @@ const GetDriverDocument = async (DriverId, TemporalDocumentId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/GetDriverDocument`, type: 'POST', data: {
-                DriverId, TemporalDocumentId
-            }, // Enviar userId en el cuerpo de la solicitud
+            url: `${UrlApi}/documents/GetDocumentFilesByModuleId`,
+            type: 'POST',
+            data: {
+                DocumentType, ModuleId, TemporalDocumentId
+            },
             dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
         console.error(error);
+        $.unblockUI();
     }
 };
+
 const AddOrUpdateDriverDocument = async (DriverDocument) => {
     try {
         let formData = new FormData();
 
         formData.append('userId', DriverDocument.userId);
         formData.append('TemporalDocumentId', DriverDocument.TemporalDocumentId);
-        formData.append('DriverId', DriverDocument.DriverId);
+        formData.append('ModuleId', DriverDocument.DriverId);
         formData.append('image', DriverDocument.DriverDocumentFile);
         formData.append('DocumentId', DriverDocument.DocumentId);
 
@@ -109,7 +120,7 @@ const AddOrUpdateDriverDocument = async (DriverDocument) => {
             complete: async function () {
                 await $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/AddOrUpdateDriverDocument`,
+            url: `${UrlApi}/documents/AddDocumentFile`,
             type: 'POST',
             data: formData,
             processData: false,
@@ -121,6 +132,7 @@ const AddOrUpdateDriverDocument = async (DriverDocument) => {
         $.unblockUI();
     }
 };
+
 const GetDriverDocumentById = (DocumentId) => {
     try {
         $.ajax({
@@ -130,7 +142,7 @@ const GetDriverDocumentById = (DocumentId) => {
             complete: async function () {
                 await $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/GetDriverDocumentById`,
+            url: `${UrlApi}/documents/GetDocumentById`,
             type: 'POST',
             data: {
                 DocumentId
@@ -156,6 +168,7 @@ const GetDriverDocumentById = (DocumentId) => {
         $.unblockUI();
     }
 };
+
 const DeleteDocumentById = async (DocumentId) => {
     try {
         return await $.ajax({
@@ -165,7 +178,7 @@ const DeleteDocumentById = async (DocumentId) => {
             complete: async function () {
                 await $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/DeleteDocumentById`,
+            url: `${UrlApi}/documents/DeleteDocumentById`,
             type: 'POST',
             data: {
                 DocumentId
@@ -176,7 +189,29 @@ const DeleteDocumentById = async (DocumentId) => {
         console.error(error);
         $.unblockUI();
     }
-}
+};
+
+const NotDeleteDocuments = async (ModuleId, DocumentType) => {
+    try {
+        return await $.ajax({
+            beforeSend: async function (xhr) {
+                await $.blockUI({ message: null });
+            },
+            complete: async function () {
+                await $.unblockUI();
+            },
+            url: `${UrlApi}/documents/NotDeleteTransportDocuments`,
+            type: 'POST',
+            data: {
+                ModuleId, DocumentType
+            },
+            dataType: 'json'
+        });
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
 //#endregion
 //#region Controsllers
 const initButtons = async () => {
@@ -213,6 +248,18 @@ const initButtons = async () => {
             } else {
                 $('#DriverDocument').attr('style', 'color: transparent');
             }
+        });
+
+        //On Close Modal 
+        $('#AddOrUpdateDriverModal').on('hidden.bs.modal', function () {
+            let DriverId = sessionStorage.getItem("DriverId");
+            const DocumentType = "Chofer";
+            NotDeleteDocuments(DriverId, DocumentType);
+        });
+
+        //On DocumentDriverSelect Change
+        $('#DocumentDriverSelect').on('change', function () {
+            $('#DriverDocument').val("").trigger('change');
         });
 
     } catch (error) {
@@ -273,9 +320,10 @@ const DriversDataTable = async () => {
     }
 };
 
-const FillSelectDocumentLine = async () => {
+const FillSelectDocumentList = async () => {
     try {
-        const data = await GetDriversDocuments();
+        const DocumentType = "Chofer"
+        const data = await GetDocumentsList(DocumentType);
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -373,6 +421,11 @@ const AddOrUpdateDriverDocumentButton = async () => {
         const DriverDocumentInput = $('#DriverDocument')[0];
         const DriverDocumentFile = DriverDocumentInput.files[0];
 
+        if (DriverDocumentFile.size > 10485760) {
+            await ToastsNotification("Choferes", "Tamaño máximo permitido: 10 MB", "Danger", "Middle center");
+            return;
+        };
+
         const DriverDocument = {
             userId: sessionStorage.getItem('userId'),
             TemporalDocumentId: sessionStorage.getItem('TemporalDocumentId'),
@@ -384,15 +437,14 @@ const AddOrUpdateDriverDocumentButton = async () => {
         const response = await AddOrUpdateDriverDocument(DriverDocument);
 
         if (response.success) {
+            TemporalDocumentId = response.TemporalDocumentId;
+            sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
             await ToastsNotification("Chofer", "Se subio el archivo con exito.", "Primary", "Top right");
+            $('#DocumentDriverSelect').val(0).trigger('change');
             $('#DriverDocument').val("").trigger('change');
         } else {
             await ToastsNotification("Chofer", response.message, "Danger", "Middle center");
         };
-
-        TemporalDocumentId = response.TemporalDocumentId;
-
-        sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
 
         DriverDocumentsDataTable(DriverId, TemporalDocumentId);
 
@@ -411,7 +463,8 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
             $('#DriverDocuments').html('');
         };
 
-        const data = await GetDriverDocument(DriverId, TemporalDocumentId);
+        const DocumentType = "Chofer";
+        const data = await GetDriverDocument(DocumentType, DriverId, TemporalDocumentId);
         if (data.length > 0) {
             // Crea el arreglo de objetos para las columnas del DataTable
             const columns = [

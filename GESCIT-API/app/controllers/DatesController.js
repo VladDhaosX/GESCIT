@@ -1,5 +1,5 @@
-const DatesDao = require('../../models/Dates/DatesDao');
-const TransportDao = require('../../models/Catalogs/TransportDao');
+const DatesDao = require('../models/DatesDao');
+const TransportDao = require('../models/Catalogs/TransportDao');
 
 module.exports = {
     addOrUpdateDate: async (req, res) => {

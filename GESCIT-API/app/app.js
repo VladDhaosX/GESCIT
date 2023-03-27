@@ -10,6 +10,7 @@ require('dotenv').config();
 const configurationRoutes = require('./routes/configurationRoutes');
 const datesRoutes = require('./routes/datesRoutes');
 const catalogsRoutes = require('./routes/catalogsRoutes');
+const documentsRoutes = require('./routes/documentsRoutes');
 
 const app = express();
 
@@ -29,6 +30,8 @@ app.use(`${urlApi}/configuration`, configurationRoutes);
 app.use(`${urlApi}/catalogs`, catalogsRoutes);
 
 app.use(`${urlApi}/dates`, datesRoutes);
+
+app.use(`${urlApi}/documents`, documentsRoutes);
 
 app.get(`/`, (req, res) => {
   res.redirect(`${urlApi}/api-docs`);

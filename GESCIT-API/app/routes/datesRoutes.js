@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const DatesController = require('../controllers/Dates/DatesController');
+const DatesController = require('../controllers/DatesController');
 
 router.post('/addOrUpdateDates', DatesController.addOrUpdateDate);
 

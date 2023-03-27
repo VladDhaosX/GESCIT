@@ -2,6 +2,7 @@ const UrlApi = window.__env.UrlApi;
 
 $(document).ready(async function () {
     initPage();
+    await tooltipTrigger();
 });
 
 //#region Controllers
@@ -9,7 +10,7 @@ const initPage = async () => {
     sessionStorage.setItem("DateId", 0);
     $('#ActionsButtons').append(`
     <div class="row">
-        <button id="btnNewDateModal" type="button" title="Registrar" 
+        <button id="btnNewDateModal" type="button" title="Registrar Cita" 
             class="btn rounded-pill btn-icon btn-outline-primary" 
             data-bs-toggle="tooltip" data-bs-placement="top">
             <span class="tf-icons bx bx-plus"></span>
@@ -98,6 +99,7 @@ const newDateModal = () => {
     $('#TransportPlate3').val('');
     $('#DriversSelect').val(0);
     $('#txtVolume').val('');
+    $('#TransportTypeSelect').val(0).trigger('change');
 
     $('#ModalDatesTitle').text('Nueva Cita');
     $('#ModalDates').modal('show');

@@ -1,5 +1,5 @@
 const sql = require('mssql');
-const config = require('../../config/database');
+const config = require('../config/database');
 
 module.exports = {
     addOrUpdateDate: async (appointment) => {

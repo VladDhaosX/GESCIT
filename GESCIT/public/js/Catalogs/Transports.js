@@ -1,17 +1,17 @@
 const UrlApi = window.__env.UrlApi;
 
 $(document).ready(async function () {
-    
+
     sessionStorage.setItem("TransportId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
 
     await initButtons();
     await TransportsDataTable(true);
     await FillSelectTransportType();
-    await FillSelectTransportDocument();
+    await FillSelectDocumentList();
 
     await tooltipTrigger();
-    
+
 });
 //#region fetchs
 const GetTransports = async (userId) => {
@@ -35,6 +35,7 @@ const GetTransports = async (userId) => {
         $.unblockUI();
     }
 };
+
 const GetTransportType = async () => {
     try {
         const response = await $.ajax({
@@ -52,6 +53,7 @@ const GetTransportType = async () => {
         $.unblockUI();
     }
 };
+
 const AddOrUpdateTransport = async (Transport) => {
     try {
         const response = await $.ajax({
@@ -73,7 +75,8 @@ const AddOrUpdateTransport = async (Transport) => {
         $.unblockUI();
     }
 };
-const GetTransportDocumentType = async (Transport) => {
+
+const GetDocumentsList = async (DocumentType) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -83,9 +86,12 @@ const GetTransportDocumentType = async (Transport) => {
             , complete: function () {
                 $.unblockUI();
             }
-            , url: `${UrlApi}/catalogs/getTransportDocumentType`
-            , type: 'GET'
+            , url: `${UrlApi}/documents/GetDocumentsList`
+            , type: 'POST'
             , dataType: 'json'
+            , data: {
+                DocumentType: DocumentType
+            }
         });
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
@@ -93,13 +99,14 @@ const GetTransportDocumentType = async (Transport) => {
         $.unblockUI();
     }
 };
+
 const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
     try {
         let formData = new FormData();
 
         formData.append('userId', TransportDocumentObj.userId);
         formData.append('TemporalDocumentId', TransportDocumentObj.TemporalDocumentId);
-        formData.append('TransportId', TransportDocumentObj.TransportId);
+        formData.append('ModuleId', TransportDocumentObj.TransportId);
         formData.append('image', TransportDocumentObj.TransportDocumentFile);
         formData.append('DocumentId', TransportDocumentObj.DocumentId);
 
@@ -110,7 +117,7 @@ const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
             complete: async function () {
                 await $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/AddOrUpdateTransportDocument`,
+            url: `${UrlApi}/documents/AddDocumentFile`,
             type: 'POST',
             data: formData,
             processData: false,
@@ -122,7 +129,8 @@ const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
         $.unblockUI();
     }
 };
-const GetTransportDocument = async (TransportId, TemporalDocumentId) => {
+
+const GetTransportDocument = async (DocumentType, ModuleId, TemporalDocumentId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -132,9 +140,11 @@ const GetTransportDocument = async (TransportId, TemporalDocumentId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/GetTransportDocument`, type: 'POST', data: {
-                TransportId, TemporalDocumentId
-            }, // Enviar userId en el cuerpo de la solicitud
+            url: `${UrlApi}/documents/GetDocumentFilesByModuleId`,
+            type: 'POST',
+            data: {
+                DocumentType, ModuleId, TemporalDocumentId
+            },
             dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
@@ -153,7 +163,7 @@ const GetTransportDocumentById = (DocumentId) => {
             complete: async function () {
                 await $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/GetTransportDocumentById`,
+            url: `${UrlApi}/documents/GetDocumentById`,
             type: 'POST',
             data: {
                 DocumentId
@@ -179,6 +189,7 @@ const GetTransportDocumentById = (DocumentId) => {
         $.unblockUI();
     }
 };
+
 const DeleteDocumentById = async (DocumentId) => {
     try {
         return await $.ajax({
@@ -188,10 +199,32 @@ const DeleteDocumentById = async (DocumentId) => {
             complete: async function () {
                 await $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/DeleteDocumentById`,
+            url: `${UrlApi}/documents/DeleteDocumentById`,
             type: 'POST',
             data: {
                 DocumentId
+            },
+            dataType: 'json'
+        });
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
+
+const NotDeleteDocuments = async (ModuleId, DocumentType) => {
+    try {
+        return await $.ajax({
+            beforeSend: async function (xhr) {
+                await $.blockUI({ message: null });
+            },
+            complete: async function () {
+                await $.unblockUI();
+            },
+            url: `${UrlApi}/documents/NotDeleteTransportDocuments`,
+            type: 'POST',
+            data: {
+                ModuleId, DocumentType
             },
             dataType: 'json'
         });
@@ -232,11 +265,11 @@ const initButtons = async () => {
                 $('#TransportPlate2 , #TransportPlate3').parent().hide();
             };
         });
-        
+
         $('#AddOrUpdateTransportDocumentButton').click(function () {
             AddOrUpdateTransportDocumentButton();
         });
-        
+
         $('#TransportDocument').on('change', function () {
             const TransportDocument = $(this)[0];
             const TransportDocumentFile = TransportDocument.files[0];
@@ -254,6 +287,18 @@ const initButtons = async () => {
             await TransportDocumentsDataTable(TransportId, TemporalDocumentId);
         });
 
+        //On Close Modal 
+        $('#AddOrUpdateTransportModal').on('hidden.bs.modal', function () {
+            const TransportId = sessionStorage.getItem("TransportId");
+            const DocumentType = "Transporte";
+            NotDeleteDocuments(TransportId, DocumentType);
+        });
+
+        //on TransportDocument change
+        $('#TransportDocumentSelect').on('change', function () {
+            //AddOrUpdateTransportDocumentButton val 0
+            $('#TransportDocument').val("").trigger('change');
+        });
     } catch (error) {
         console.error(error);
     }
@@ -332,10 +377,10 @@ const FillSelectTransportType = async () => {
     }
 };
 
-const FillSelectTransportDocument = async () => {
+const FillSelectDocumentList = async () => {
     try {
-        const data = await GetTransportDocumentType();
-        console.log(data);
+        const DocumentType = "Transporte"
+        const data = await GetDocumentsList(DocumentType);
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -373,6 +418,8 @@ const AddOrUpdateTransportModal = async (e) => {
             $('#TransportPlate3').val("");
             $('#Capacity').val("");
         };
+
+        sessionStorage.setItem("TemporalDocumentId", 0);
         $('#TransportDocumentSelect').val(0);
         $('#TransportTypeSelect').trigger('change');
         $('#AddOrUpdateTransportModal').modal('show');
@@ -391,9 +438,10 @@ const AddOrUpdateTransportButton = async () => {
         const TransportPlate2 = $('#TransportPlate2').val();
         const TransportPlate3 = $('#TransportPlate3').val();
         const Capacity = $('#Capacity').val();
-
+        const TemporalDocumentId = sessionStorage.getItem('TemporalDocumentId');
         const Transport = {
             TransportId,
+            TemporalDocumentId,
             UserId,
             TransportTypeId,
             TransportPlate1,
@@ -421,6 +469,11 @@ const AddOrUpdateTransportDocumentButton = async () => {
         const TransportDocument = $('#TransportDocument')[0];
         const TransportDocumentFile = TransportDocument.files[0];
 
+        if (TransportDocumentFile.size > 10485760) {
+            await ToastsNotification("Transportes", "Tamaño máximo permitido: 10 MB", "Danger", "Middle center");
+            return;
+        };
+
         const TransportDocumentObj = {
             userId: sessionStorage.getItem('userId'),
             TemporalDocumentId: sessionStorage.getItem('TemporalDocumentId'),
@@ -432,15 +485,14 @@ const AddOrUpdateTransportDocumentButton = async () => {
         const response = await AddOrUpdateTransportDocument(TransportDocumentObj);
 
         if (response.success) {
+            TemporalDocumentId = response.TemporalDocumentId;
+            sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
             await ToastsNotification("Transportes", "Se subio el archivo con exito.", "Primary", "Top right");
             $('#TransportDocument').val("").trigger('change');
         } else {
             await ToastsNotification("Transportes", response.message, "Danger", "Middle center");
         };
 
-        TemporalDocumentId = response.TemporalDocumentId;
-
-        sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
 
         TransportDocumentsDataTable(TransportId, TemporalDocumentId);
 
@@ -455,10 +507,9 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
             $('#TransportDocumentDataTable').DataTable().destroy();
             $('#TransportDocumentDataTable').html('');
         };
-
-        const data = await GetTransportDocument(TransportId, TemporalDocumentId);
+        const DocumentType = "Transporte";
+        const data = await GetTransportDocument(DocumentType, TransportId, TemporalDocumentId);
         if (data.length > 0) {
-            // Crea el arreglo de objetos para las columnas del DataTable
             const columns = [
                 {
                     title: 'Acciones',
