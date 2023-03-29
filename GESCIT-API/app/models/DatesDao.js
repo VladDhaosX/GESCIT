@@ -9,12 +9,11 @@ module.exports = {
             let result = await pool.request()
                 .input('DateId', sql.Int, appointment.DateId)
                 .input('UserId', sql.Int, appointment.userId)
-                .input('SheduleTimeId', sql.Int, appointment.sheduleTimeId)
+                .input('ScheduleTimeId', sql.Int, appointment.sheduleTimeId)
                 .input('OperationTypeId', sql.Int, appointment.operationTypeId)
                 .input('ProductId', sql.Int, appointment.productId)
                 .input('TransportLineId', sql.Int, appointment.transportLineId)
                 .input('TransportId', sql.Int, appointment.transportId)
-                .input('TransportTypeId', sql.Int, appointment.transportTypeId)
                 .input('TransportPlate', sql.VarChar(50), appointment.TransportPlate)
                 .input('TransportPlate2', sql.VarChar(50), appointment.TransportPlate2)
                 .input('TransportPlate3', sql.VarChar(50), appointment.TransportPlate3)
@@ -217,6 +216,28 @@ module.exports = {
                 "success": true,
                 "message": "Consulta obtenida correctamente.",
                 "data": result.output
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los datos.",
+                "info": error.message
+            }
+        }
+    },
+    ScheduleAvailables: async (OperationTypeId,TransportId) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('OperationTypeId', sql.Int, OperationTypeId)
+                .input('TransportId', sql.Int, TransportId)
+                .execute('SpSchedulesAvailables');
+
+            return {
+                "success": true,
+                "message": "Consulta obtenida correctamente.",
+                "data": result.recordset
             }
 
         } catch (error) {

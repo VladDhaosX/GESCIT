@@ -116,5 +116,14 @@ module.exports = {
             res.status(500).json({ message: error.message });
         }
     },
-
+    // ScheduleAvailables: async (OperationTypeId,TransportId)
+    ScheduleAvailables: async (req, res) => {
+        try {
+            const { OperationTypeId, TransportId } = req.body;
+            const response = await DatesDao.ScheduleAvailables(OperationTypeId, TransportId);
+            res.json(response);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
 };
