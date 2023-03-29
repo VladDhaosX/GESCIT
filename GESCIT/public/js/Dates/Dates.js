@@ -32,55 +32,23 @@ const initPage = async () => {
         newDate();
     });
 
-    $('#TransportPlate2 , #TransportPlate3').parent().hide();
-    $('#TransportsSelect').change(async function () {
-        $('#TransportPlate2 , #TransportPlate3').parent().hide();
-        const select = $(this);
-        const data = select.find(':selected').attr('data');
-        if (data) {
-            const dataObj = JSON.parse(data);
-
-            const TransportTypeId = dataObj.TransportTypeId;
-            const TransportPlate = dataObj['Placa de Transporte'];
-            const TransportPlate2 = dataObj['Placa de Caja #1'];
-            const TransportPlate3 = dataObj['Placa de Caja #2'];
-
-            $('#TransportPlate1').val(TransportPlate);
-            $('#TransportPlate2').val(TransportPlate2);
-            $('#TransportPlate3').val(TransportPlate3);
-
-            if (TransportTypeId == 2) {
-                $('#TransportPlate2').parent().show();
-            } else if (TransportTypeId == 5) {
-                $('#TransportPlate2 , #TransportPlate3').parent().show();
-            };
-        };
-    });
-
     $('#txtStartDate , #txtEndDate').change(async function () {
         await initDatesDataTable();
     });
 
-    $('#TransportTypeSelect').change(async function (e) {
-        const TransportTypeId = $(this).val();
-        await FillSelectTransports(TransportTypeId);
-
-        $('#TransportPlate1 , TransportPlate2 , #TransportPlate3').val("");
-        $('#TransportPlate2 , #TransportPlate3').val("").parent().hide();
-
-        if (TransportTypeId == 2) {
-            $('#TransportPlate2').val("").parent().show();
-        } else if (TransportTypeId == 5) {
-            $('#TransportPlate2 , #TransportPlate3').val("").parent().show();
-        };
-        console.log('entr al transport type select');
-    });
 
     $('#OperationsSelect').change(async function (e) {
         await FillSelectScheduleAvailables();
     });
 
-    $('#TransportsSelect').change(async function (e) {
+    $('#TransportTypeSelect').change(async function (e) {
+        await onTransportTypeSelectChange();
+    });
+
+    $('#TransportPlate2 , #TransportPlate3').attr('disabled', 'disabled');
+    $('#TransportPlate2 , #TransportPlate3').parent().hide();
+    $('#TransportPlate1Select').change(async function (e) {
+        onTransportPlate1SelectChange(this);
         await FillSelectScheduleAvailables();
     });
 
@@ -88,11 +56,11 @@ const initPage = async () => {
     await FillSelectOperationTimes();
     await FillSelectProducts();
     await FillSelectTransportLines();
-    await FillSelectTransports();
+    await FillSelectTransportPlate1();
     await FillSelectTransportType();
     await FillSelectDrivers();
 
-    await initDatesDataTable();
+    initDatesDataTable();
 
 };
 
@@ -101,7 +69,7 @@ const newDateModal = async () => {
     $('#OperationsSelect').val(0);
     $('#ProductsSelect').val(0);
     $('#TransportLineTypeSelect').val(0);
-    $('#TransportsSelect').val(0).trigger('change');
+    $('#TransportPlate1Select').val(0).trigger('change');
     $('#TransportPlate1').val('');
     $('#TransportPlate2').val('');
     $('#TransportPlate3').val('');
@@ -124,17 +92,14 @@ const FillSelectAllSheduleTimes = async () => {
     try {
         const userId = sessionStorage.getItem('userId');
         const data = await GetSheduleTimes(userId);
-
-        var $options = $();
-        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
-        $options = $options.add($SeleccionaUnaopción);
-        data.forEach(function (value) {
+        const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
-            $options = $options.add($option);
+            return $option;
         });
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options.unshift($SeleccionaUnaopción);
 
-        $('#SheduleTimesSelect').empty();
-        $('#SheduleTimesSelect').append($options);
+        $('#SheduleTimesSelect').empty().append($options);
     } catch (error) {
         console.error(error);
     }
@@ -143,19 +108,19 @@ const FillSelectAllSheduleTimes = async () => {
 const FillSelectScheduleAvailables = async () => {
     try {
         const OperationTypeId = $('#OperationsSelect').val();
-        const TransportId = $('#TransportsSelect').val();
+        const TransportId = $('#TransportPlate1Select').val();
         const data = await GetScheduleAvailables(OperationTypeId, TransportId);
 
-        var $options = $();
-        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
-        $options = $options.add($SeleccionaUnaopción);
-        data.forEach(function (value) {
+        const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
-            $options = $options.add($option);
+            return $option;
         });
 
-        $('#SheduleTimesSelect').empty();
-        $('#SheduleTimesSelect').append($options);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options.unshift($SeleccionaUnaopción);
+
+        $('#SheduleTimesSelect').empty().append($options);
+        console.log('end SheduleTimesSelect');
     } catch (error) {
         console.error(error);
     }
@@ -240,24 +205,23 @@ const FillSelectTransportType = async () => {
     }
 };
 
-const FillSelectTransports = async (TransportTypeId) => {
+const FillSelectTransportPlate1 = async (TransportTypeId) => {
     try {
         const userId = sessionStorage.getItem('userId');
-        const data = await GetTransports(userId, TransportTypeId);
+        const data = await GetTransportPlate1(userId, TransportTypeId);
 
-        var $options = $();
-        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
-        $options = $options.add($SeleccionaUnaopción);
-        data.forEach(function (value) {
-            const $option = $('<option>').attr('value', value.Id).text(value['Tipo de Transporte'] + ' ' + value['Placa de Transporte']).attr('data', JSON.stringify(value));
-            $options = $options.add($option);
+        const $options = data.map(function (value) {
+            const $option = $('<option>').attr('value', value.Id).text(value['Placa de Transporte']).attr('data', JSON.stringify(value));
+            return $option;
         });
 
-        await $('#TransportsSelect').empty();
-        await $('#TransportsSelect').append($options).trigger('change');
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options.unshift($SeleccionaUnaopción);
+
+        $('#TransportPlate1Select').empty().append($options);
     } catch (error) {
         console.error(error);
-    }
+    };
 };
 
 const FillSelectDrivers = async () => {
@@ -288,7 +252,7 @@ const newDate = async () => {
         const operationTypeId = $('#OperationsSelect').val();
         const productId = $('#ProductsSelect').val();
         const transportLineId = $('#TransportLineTypeSelect').val();
-        const transportId = $('#TransportsSelect').val();
+        const transportId = $('#TransportPlate1Select').val();
         const transportTypeId = $('#TransportTypeSelect').val();
         const TransportPlate = $('#TransportPlate1').val();
         const TransportPlate2 = $('#TransportPlate2').val();
@@ -389,31 +353,61 @@ const initDatesDataTable = async () => {
 const ShowEditModal = async (element) => {
     try {
         const data = JSON.parse($(element).attr('data'));
+        console.log(data);
         sessionStorage.setItem('DateId', data.Id);
-        await asyncSetDateInfo(data);
+        $('#OperationsSelect').val(data.OperationId);
+        $('#TransportTypeSelect').val(data.TransportTypeId);
+        await onTransportTypeSelectChange();
+        $('#TransportPlate1Select').val(data.TransportId);
+        await FillSelectAllSheduleTimes();
+        $('#SheduleTimesSelect').val(data.ScheduleTimeId);
+        console.log(data.ScheduleTimeId);
+        $('#TransportLineTypeSelect').val(data.TransportLineId);
+        $('#TransportPlate1').val(data['Placa de Transporte']);
+        $('#TransportPlate3').val(data['Placa de Caja #1']);
+        $('#TransportPlate2').val(data['Placa de Caja #2']);
+        $('#DriversSelect').val(data.DriverId);
+        $('#ProductsSelect').val(data.ProductId);
+        $('#txtVolume').val(data['Volumen en Toneladas']);
         $('#ModalDates').modal('show');
     } catch (error) {
         console.error(error);
     };
 };
 
-const asyncSetDateInfo = async (data) => {
-    try {
-        $('#OperationsSelect').val(data.OperationId).trigger('change');
-        await $('#TransportTypeSelect').val(data.TransportTypeId).trigger('change');
-        console.log("TransportTypeId" + data.TransportTypeId);
-        await $('#TransportsSelect').val(data.TransportId).trigger('change');
-        console.log("TransportId" + data.TransportId);
-        $('#SheduleTimesSelect').val(data.ScheduleTimeId).trigger('change');
-        $('#TransportLineTypeSelect').val(data.TransportLineId).trigger('change');
-        $('#TransportPlate1').val(data['Placa de Transporte']);
-        $('#TransportPlate3').val(data['Placa de Caja #1']);
-        $('#TransportPlate2').val(data['Placa de Caja #2']);
-        $('#DriversSelect').val(data.DriverId).trigger('change');
-        $('#ProductsSelect').val(data.ProductId).trigger('change');
-        $('#txtVolume').val(data['Volumen en Toneladas']);
-    } catch (error) {
-        console.error(error);
+const onTransportTypeSelectChange = async (e) => {
+    const TransportTypeId = $('#TransportTypeSelect').val();
+    await FillSelectTransportPlate1(TransportTypeId);
+
+    $('#TransportPlate1 , TransportPlate2 , #TransportPlate3').val("");
+    $('#TransportPlate2 , #TransportPlate3').val("").parent().hide();
+
+    if (TransportTypeId == 2) {
+        $('#TransportPlate2').val("").parent().show();
+    } else if (TransportTypeId == 5) {
+        $('#TransportPlate2 , #TransportPlate3').val("").parent().show();
+    };
+};
+
+const onTransportPlate1SelectChange = (e) => {
+    $('#TransportPlate2 , #TransportPlate3').parent().hide();
+    const select = $(e);
+    const data = select.find(':selected').attr('data');
+    if (data) {
+        const dataObj = JSON.parse(data);
+
+        const TransportTypeId = dataObj.TransportTypeId;
+        const TransportPlate2 = dataObj['Placa de Caja #1'];
+        const TransportPlate3 = dataObj['Placa de Caja #2'];
+
+        $('#TransportPlate2').val(TransportPlate2);
+        $('#TransportPlate3').val(TransportPlate3);
+
+        if (TransportTypeId == 2) {
+            $('#TransportPlate2').parent().show();
+        } else if (TransportTypeId == 5) {
+            $('#TransportPlate2 , #TransportPlate3').parent().show();
+        };
     };
 };
 
@@ -533,7 +527,7 @@ const GetTransportLines = async (userId) => {
     }
 };
 
-const GetTransports = async (userId, TransportTypeId) => {
+const GetTransportPlate1 = async (userId, TransportTypeId) => {
     try {
         const response = await $.ajax({
             async: true,

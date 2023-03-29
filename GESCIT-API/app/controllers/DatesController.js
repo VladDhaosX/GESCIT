@@ -91,15 +91,6 @@ module.exports = {
             res.status(500).json({ message: error.message });
         }
     },
-    GetTransportsByType: async (req, res) => {
-        try {
-            const { userId, TransportTypeId } = req.body;
-            const response = await DatesDao.GetTransportsByType(userId, TransportTypeId);
-            res.json(response);
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    },
     GetTransportTypes: async (req, res) => {
         try {
             const response = await TransportDao.getTransportType();
