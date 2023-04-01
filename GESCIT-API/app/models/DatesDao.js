@@ -37,10 +37,11 @@ module.exports = {
             }
         }
     },
-    GetSheduleTimes: async () => {
+    GetSheduleTimes: async (OperationTypeId) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
+                .input('OperationTypeId', sql.Int, OperationTypeId)
                 .execute('SpGetSheduleTime');
 
             return {
@@ -226,13 +227,78 @@ module.exports = {
             }
         }
     },
-    ScheduleAvailables: async (OperationTypeId,TransportId) => {
+    ScheduleAvailables: async (OperationTypeId,TransportTypeId) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('OperationTypeId', sql.Int, OperationTypeId)
-                .input('TransportId', sql.Int, TransportId)
+                .input('TransportTypeId', sql.Int, TransportTypeId)
                 .execute('SpSchedulesAvailables');
+
+            return {
+                "success": true,
+                "message": "Consulta obtenida correctamente.",
+                "data": result.recordset
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los datos.",
+                "info": error.message
+            }
+        }
+    },
+    CancelDate: async (DateId) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('DateId', sql.Int, DateId)
+                .output('Success', sql.Bit)
+                .output('Message', sql.VarChar(sql.MAX))
+                .execute('SpCancelDate');
+
+            return {
+                "success": result.output.Success,
+                "message": result.output.Message,
+                "data": result.recordset
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los datos.",
+                "info": error.message
+            }
+        }
+    },
+    GetSchedules: async () => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .execute('SpGetSchedules');
+
+            return {
+                "success": true,
+                "message": "Consulta obtenida correctamente.",
+                "data": result.recordset
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los datos.",
+                "info": error.message
+            }
+        }
+    },
+
+    GetAllHoursOfSchedule: async (ScheduleId) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('ScheduleId', sql.Int, ScheduleId)
+                .execute('SpGetAllHoursOfSchedule');
 
             return {
                 "success": true,

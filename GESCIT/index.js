@@ -97,6 +97,31 @@ app.get(config.BasePath + '/', (req, res) => {
     res.redirect(config.BasePath + '/login');
 });
 
+
+app.get(config.BasePath + '/DatesXSchedules', (req, res) => {
+    const data = {
+        Page: './tools/DatesXSchedules',
+        Categoria: 'Herramientas',
+        Modulo: 'Numero de Citas por Horario',
+        JSFile: './js/tools/DatesXSchedules.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
+    };
+    res.render('views', data);
+});
+
+app.get(config.BasePath + '/AssignDates', (req, res) => {
+    const data = {
+        Page: './Dates/AssignDates',
+        Categoria: 'Gestor',
+        Modulo: 'Asignar Citas',
+        JSFile: './js/Dates/AssignDates.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
+    };
+    res.render('views', data);
+});
+
 app.listen(process.env.PORT || 3000, () => {
     console.log('La aplicación está escuchando en el puerto 3000');
 });

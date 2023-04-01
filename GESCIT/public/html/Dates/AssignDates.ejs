@@ -1,0 +1,93 @@
+<div id="ActionsButtons" class="demo-inline-spacing" style="padding: 0px 50px;">
+</div>
+<div class="text-nowrap table-responsive" style="margin: 25px 50px;">
+    <div class="row">
+        <div class="col-3">
+            <table id="Schedule1DataTable" class="table">
+            </table>
+        </div>
+        <div class="col-3">
+            <table id="Schedule2DataTable" class="table">
+            </table>
+        </div>
+        <div class="col-3">
+            <table id="Schedule3DataTable" class="table">
+            </table>
+        </div>
+        <div class="col-3">
+            <table id="Schedule4DataTable" class="table">
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="ModalDateInfo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="lblHorario" class="form-label">Horario: </label>
+                        <input type="text" disabled id="txtHorario" class="form-control"></label>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="lblOperacion" class="form-label">Operacion: </label>
+                        <input type="text" disabled id="txtOperacion" class="form-control"></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="lblFechaCita" class="form-label">Fecha de Cita: </label>
+                        <input type="text" disabled id="txtFechaCita" class="form-control"></label>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="lblTipoTransporte" class="form-label">Tipo de Transporte: </label>
+                        <input type="text" disabled id="txtTipoTransporte" class="form-control"></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="lblNombreCliente" class="form-label">Cliente: </label>
+                        <input type="text" disabled id="txtNombreCliente" class="form-control"></label>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="lblProducto" class="form-label">Producto: </label>
+                        <input type="text" disabled id="txtProducto" class="form-control"></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="lblLineaTransporte" class="form-label">Línea de Transporte: </label>
+                        <input type="text" disabled id="txtLineaTransporte" class="form-control"></label>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="lblVolumen" class="form-label">Volumen en Toneladas: </label>
+                        <input type="text" disabled id="txtVolumen" class="form-control"></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="lblHora" class="form-label">Hora: </label>
+                        <select id="selectHour" class="form-select">
+                        </select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="lblMinutos" class="form-label">Minuto: </label>
+                        <select id="selectMinutes" class="form-select">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+                <button id="btnCancelDate" type="button" class="btn btn-danger">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
