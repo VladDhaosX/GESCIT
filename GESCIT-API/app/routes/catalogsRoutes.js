@@ -3,6 +3,7 @@ const router = express.Router();
 const TransportController = require('../controllers/Catalogs/TransportController');
 const TransportLineController = require('../controllers/Catalogs/TransportLineController');
 const DriversController = require('../controllers/Catalogs/DriversController');
+const DocumentsController = require('../controllers/Catalogs/DocumentsController');
 
 // <--- TRANSPORT ROUTES ---> 
 router.post('/addOrUpdateTransport', TransportController.addOrUpdateTransport);
@@ -14,8 +15,6 @@ router.get('/getTransportType', TransportController.getTransportType);
 // <--- TRANSPORT LINES ROUTES ---> 
 router.get('/getTransportLineTypes', TransportLineController.getTransportLineTypesHandler);
 
-router.get('/getTransportLineDocuments', TransportLineController.getTransportLineDocumentsHandler);
-
 router.post('/addOrUpdateTransportLine', TransportLineController.addOrUpdateTransportLineHandler);
 
 router.post('/getTransportLines', TransportLineController.getTransportLinesHandler);
@@ -24,5 +23,12 @@ router.post('/getTransportLines', TransportLineController.getTransportLinesHandl
 router.post('/addOrUpdateDriver', DriversController.addOrUpdateDriverHandler);
 
 router.post('/GetDrivers', DriversController.GetDriversHandler);
+
+// <--- DOCUMENTS ROUTES ---> 
+router.post('/GetClientsByStatusDocs', DocumentsController.GetClientsByStatusDocsHandler);
+
+router.post('/GetDocumentsByClient', DocumentsController.GetDocumentsByClientHandler);
+
+router.post('/UpdateDocumentStatus', DocumentsController.UpdateDocumentStatusHandler);
 
 module.exports = router;

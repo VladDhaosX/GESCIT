@@ -1,17 +1,36 @@
 const DocumentsDao = require('../../models/Catalogs/DocumentsDao');
 
-const addOrUpdateDocumentHandler = async (req, res) => {
+module.exports = {
+
+  GetClientsByStatusDocsHandler: async (req, res) => {
     try {
-      const { Id, DocumentName, DocumentType } = req.body;
-      const document = { Id, DocumentName, DocumentType };
-      const result = await DocumentsDao.addOrUpdateDocument(document);
+      const { Status } = req.body;
+      const result = await DocumentsDao.GetClientsByStatusDocs(Status);
       res.json(result);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Error al agregar o actualizar el documento.' });
+      res.status(500).json(error);
     }
-  };
-  
-module.exports = {
-    addOrUpdateDocumentHandler: addOrUpdateDocumentHandler
+  },
+  GetDocumentsByClientHandler: async (req, res) => {
+    try {
+      const { AccountNum, Status, DocumentType } = req.body;
+      const result = await DocumentsDao.GetDocumentsByClient(AccountNum, Status, DocumentType);
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json(error);
+    }
+  },
+  UpdateDocumentStatusHandler: async (req, res) => {
+    try {
+      const { DocumentFileId, NewStatus } = req.body;
+      const result = await DocumentsDao.UpdateDocumentStatus(DocumentFileId, NewStatus);
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json(error);
+    }
+  },
+
 };

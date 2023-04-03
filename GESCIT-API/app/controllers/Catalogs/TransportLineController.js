@@ -31,14 +31,4 @@ module.exports = {
 			res.status(500).json({ error: error, message: error.message });
 		}
 	},
-
-	async getTransportLineDocumentsHandler(req, res) {
-		try {
-			const response = await TransportLineDao.getTransportLineDocuments();
-			res.json(response);
-		} catch (error) {
-			console.error(error);
-			res.status(500).json({ error: error, message: error.message });
-		}
-	},
 };

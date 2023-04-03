@@ -11,26 +11,37 @@
         <div class="layout-wrapper layout-content-navbar">
             <div class="layout-container">
                 <!-- Menú lateral -->
-                <%- include('Utils/sidebar') %>
+                    <%- include('Utils/sidebar') %>
+                <!-- Menú lateral -->
+                <!-- Content -->
                     <div class="layout-page">
-                        <!-- Contenido de la página -->
-                            <%- include(Page) %>
-                        <!-- / Contenido de la página -->
+                        <div class="content-wrapper">
+                            <div class="container-fluid flex-grow-1 container-p-y">
+                                <%- include('Utils/tittle') %>
+                                    <hr class="my-5" />
+                                    <!-- <div class="card"> -->
+                                        <!-- Contenido de la página -->
+                                        <%- include(Page) %>
+                                            <!-- / Contenido de la página -->
+                                    <!-- </div> -->
+                            </div>
+                        </div>
                     </div>
+                <!-- Content -->
             </div>
         </div>
     </main>
     <footer>
-        <script async defer >
+        <script async defer>
             window.__env = {
                 UrlApi: '<%= UrlApi %>'
             };
         </script>
         <!-- Menú inferior -->
         <%- include('Utils/footer') %>
-        <%- include('Utils/toast') %>
-        <script async defer src="./js/utils.js"></script>
-        <script async defer src="<%= JSFile %>"></script>
+            <%- include('Utils/toast') %>
+                <script async defer src="./js/utils.js"></script>
+                <script async defer src="<%= JSFile %>"></script>
     </footer>
 </body>
 

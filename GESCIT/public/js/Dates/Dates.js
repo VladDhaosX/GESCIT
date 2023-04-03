@@ -1,8 +1,7 @@
 const UrlApi = window.__env.UrlApi;
 
 $(document).ready(async function () {
-    initPage();
-    await tooltipTrigger();
+    await initPage();
 });
 
 //#region Controllers
@@ -24,7 +23,6 @@ const initPage = async () => {
     </div>
     `);
 
-    // onclick event function of btnNewDate
     $('#btnNewDateModal').click(function () {
         newDateModal();
     });
@@ -33,93 +31,89 @@ const initPage = async () => {
         newDate();
     });
 
-    $('#TransportPlate2 , #TransportPlate3').parent().hide();
-    $('#TransportsSelect').change(function () {
-        $('#TransportPlate2 , #TransportPlate3').parent().hide();
-        const select = $(this);
-        const data = select.find(':selected').attr('data');
-        if (data) {
-            const dataObj = JSON.parse(data);
-
-            const TransportTypeId = dataObj.TransportTypeId;
-            const TransportPlate = dataObj['Placa de Transporte'];
-            const TransportPlate2 = dataObj['Placa de Caja #1'];
-            const TransportPlate3 = dataObj['Placa de Caja #2'];
-
-            $('#TransportPlate1').val(TransportPlate);
-            $('#TransportPlate2').val(TransportPlate2);
-            $('#TransportPlate3').val(TransportPlate3);
-
-            if (TransportTypeId == 2) {
-                $('#TransportPlate2').parent().show();
-            } else if (TransportTypeId == 5) {
-                $('#TransportPlate2 , #TransportPlate3').parent().show();
-            };
-        };
-    });
-
     $('#txtStartDate , #txtEndDate').change(async function () {
         await initDatesDataTable();
     });
 
-    $('#TransportTypeSelect').change(async function (e) { 
-        const TransportTypeId = $(this).val();
-        await FillSelectTransports(TransportTypeId);
-
-        $('#TransportPlate1 , TransportPlate2 , #TransportPlate3').val("");
-        $('#TransportPlate2 , #TransportPlate3').val("").parent().hide();
-
-        if (TransportTypeId == 2) {
-            $('#TransportPlate2').val("").parent().show();
-        } else if (TransportTypeId == 5) {
-            $('#TransportPlate2 , #TransportPlate3').val("").parent().show();
-        };
+    $('#OperationsSelect').change(async function (e) {
+        await FillSelectScheduleAvailables();
     });
 
-    await FillSelectSheduleTimes();
+    $('#TransportTypeSelect').change(async function (e) {
+        await onTransportTypeSelectChange();
+        await FillSelectScheduleAvailables();
+    });
+
+    $('#TransportPlate2 , #TransportPlate3').attr('disabled', 'disabled');
+    $('#TransportPlate2 , #TransportPlate3').parent().hide();
+    $('#TransportPlate1Select').change(async function (e) {
+        onTransportPlate1SelectChange(this);
+    });
+
+    $('#btnCancelDate').click(async function () {
+        await CancelDateButton();
+    });
+
+    await initDatesDataTable();
+    await FillSelectAllSheduleTimes();
     await FillSelectOperationTimes();
     await FillSelectProducts();
     await FillSelectTransportLines();
-    await FillSelectTransports();
+    await FillSelectTransportPlate1();
     await FillSelectTransportType();
     await FillSelectDrivers();
 
-    await initDatesDataTable();
+    tooltipTrigger();
 
 };
 
-const newDateModal = () => {
-    $('#SheduleTimesSelect').val(0);
-    $('#OperationsSelect').val(0);
-    $('#ProductsSelect').val(0);
-    $('#TransportLineTypeSelect').val(0);
-    $('#TransportsSelect').val(0).trigger('change');
-    $('#TransportPlate1').val('');
-    $('#TransportPlate2').val('');
-    $('#TransportPlate3').val('');
-    $('#DriversSelect').val(0);
-    $('#txtVolume').val('');
-    $('#TransportTypeSelect').val(0).trigger('change');
-
-    $('#ModalDatesTitle').text('Nueva Cita');
-    $('#ModalDates').modal('show');
-};
-
-const FillSelectSheduleTimes = async () => {
+const FillSelectAllSheduleTimes = async () => {
     try {
-        const userId = sessionStorage.getItem('userId');
-        const data = await GetSheduleTimes(userId);
+        const OperationTypeId = $('#OperationsSelect').val();
 
-        var $options = $();
-        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
-        $options = $options.add($SeleccionaUnaopción);
-        data.forEach(function (value) {
+        if (OperationTypeId == 0) {
+            const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona un Tipo de Operación y Tipo de Transporte");
+            $('#SheduleTimesSelect').empty().append($SeleccionaUnaopción);
+            return;
+        };
+
+        const data = await GetSheduleTimes(OperationTypeId);
+        const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
-            $options = $options.add($option);
+            return $option;
         });
 
-        $('#SheduleTimesSelect').empty();
-        $('#SheduleTimesSelect').append($options);
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una Opción");
+        $options.unshift($SeleccionaUnaopción);
+
+        $('#SheduleTimesSelect').empty().append($options);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const FillSelectScheduleAvailables = async () => {
+    try {
+        const OperationTypeId = $('#OperationsSelect').val();
+        const TransportTypeId = $('#TransportTypeSelect').val();
+
+        if (OperationTypeId == 0 || TransportTypeId == 0) {
+            const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona un Tipo de Operación y Tipo de Transporte");
+            $('#SheduleTimesSelect').empty().append($SeleccionaUnaopción);
+            return;
+        }
+
+        const data = await GetScheduleAvailables(OperationTypeId, TransportTypeId);
+
+        const $options = data.map(function (value) {
+            const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
+            return $option;
+        });
+
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options.unshift($SeleccionaUnaopción);
+
+        $('#SheduleTimesSelect').empty().append($options);
     } catch (error) {
         console.error(error);
     }
@@ -204,24 +198,23 @@ const FillSelectTransportType = async () => {
     }
 };
 
-const FillSelectTransports = async (TransportTypeId) => {
+const FillSelectTransportPlate1 = async (TransportTypeId) => {
     try {
         const userId = sessionStorage.getItem('userId');
-        const data = await GetTransports(userId,TransportTypeId);
+        const data = await GetTransportPlate1(userId, TransportTypeId);
 
-        var $options = $();
-        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
-        $options = $options.add($SeleccionaUnaopción);
-        data.forEach(function (value) {
-            const $option = $('<option>').attr('value', value.Id).text(value['Tipo de Transporte'] + ' ' + value['Placa de Transporte']).attr('data', JSON.stringify(value));
-            $options = $options.add($option);
+        const $options = data.map(function (value) {
+            const $option = $('<option>').attr('value', value.Id).text(value['Placa de Transporte']).attr('data', JSON.stringify(value));
+            return $option;
         });
 
-        $('#TransportsSelect').empty();
-        $('#TransportsSelect').append($options).trigger('change');
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options.unshift($SeleccionaUnaopción);
+
+        $('#TransportPlate1Select').empty().append($options);
     } catch (error) {
         console.error(error);
-    }
+    };
 };
 
 const FillSelectDrivers = async () => {
@@ -244,6 +237,53 @@ const FillSelectDrivers = async () => {
     }
 };
 
+const ExistsScheduleAvailables = async () => {
+    try {
+        const OperationTypeId = $('#OperationsSelect').val();
+        const TransportTypeId = $('#TransportTypeSelect').val();
+        const data = await GetScheduleAvailables(OperationTypeId, TransportTypeId);
+
+        if (data.length > 0) {
+            return true;
+        } else {
+            return false;
+        };
+
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const newDateModal = async () => {
+    sessionStorage.setItem('DateId', 0);
+    $('#SheduleTimesSelect').val(0);
+    $('#OperationsSelect').val(0);
+    $('#ProductsSelect').val(0);
+    $('#TransportLineTypeSelect').val(0);
+    $('#TransportPlate1Select').val(0);
+    $('#TransportPlate1').val('');
+    $('#TransportPlate2').val('');
+    $('#TransportPlate3').val('');
+    $('#DriversSelect').val(0);
+    $('#txtVolume').val('');
+    $('#TransportTypeSelect').val(0);
+
+    $('#ModalDatesTitle').text('Nueva Cita');
+
+    const IsAvailable = await IsAppointmentTimeAvailable();
+    if (IsAvailable) {
+        const ExistsScheduleAvailablesResult = await ExistsScheduleAvailables();
+        if (!ExistsScheduleAvailablesResult) {
+            // await FillSelectScheduleAvailables();
+            $('#ModalDates').modal('show');
+        } else {
+            await ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
+        };
+    } else {
+        await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+    };
+};
+
 const newDate = async () => {
     try {
         const DateId = sessionStorage.getItem('DateId');
@@ -252,7 +292,7 @@ const newDate = async () => {
         const operationTypeId = $('#OperationsSelect').val();
         const productId = $('#ProductsSelect').val();
         const transportLineId = $('#TransportLineTypeSelect').val();
-        const transportId = $('#TransportsSelect').val();
+        const transportId = $('#TransportPlate1Select').val();
         const transportTypeId = $('#TransportTypeSelect').val();
         const TransportPlate = $('#TransportPlate1').val();
         const TransportPlate2 = $('#TransportPlate2').val();
@@ -282,11 +322,12 @@ const newDate = async () => {
 
         if (response.success) {
             $('#ModalDates').modal('hide');
-            await ToastsNotification("Transportes", response.message, toastType, toastPlacement);
+            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
         } else {
             toastType = "Danger";
             toastPlacement = "Middle center";
-            await ToastsNotification("Transportes", response.message, toastType, toastPlacement);
+            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+            await FillSelectScheduleAvailables();
         }
         await initDatesDataTable();
     } catch (error) {
@@ -307,30 +348,47 @@ const initDatesDataTable = async () => {
         const data = await GetDates(userId, StartDate, EndDate);
         if (data.length > 0) {
             const columns = [
-                // {
-                //     title: 'Acciones',
-                //     data: 'Id',
-                //     "render": function (data, type, row) {
-                //         return `
-                //                 <button 
-                //                     class="btn rounded-pill btn-icon btn-outline-primary" 
-                //                     type="button" 
-                //                     id="AddOrUpdateTransportTableButton"
-                //                     data='${JSON.stringify(row)}'
-                //                     title='Editar'
-                //                     data-bs-toggle="tooltip"
-                //                     data-bs-placement="top"
-                //                     onclick='initModule.AddOrUpdateTransportModal(this);'
-                //                 >
-                //                     <span class="tf-icons bx bx-edit-alt"></span>
-                //                 </button>
-                //             `
-                //     }
-                // },
+                {
+                    title: 'Acciones',
+                    data: 'Id',
+                    render: function (data, type, row) {
+                        let buttons = '';
+                        buttons += `
+                            <button
+                                class="btn rounded-pill btn-icon btn-outline-primary" 
+                                type="button" 
+                                data='${JSON.stringify(row)}'
+                                title='Editar'
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                onclick='ShowEditModal(this)'
+                            >
+                                <span class="tf-icons bx bx-edit-alt"></span>
+                            </button>
+                        `
+
+                        if (row.IsCancelable) {
+                            buttons += `
+                            <button
+                                class="btn rounded-pill btn-icon btn-outline-danger" 
+                                type="button" 
+                                data='${JSON.stringify(row)}'
+                                title='Cancelar'
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                onclick='ShowCancelateDateModal(this)'
+                            >
+                                <span class="tf-icons bx bx-x bx-md"></span>
+                            </button>
+                            `;
+                        };
+                        return buttons;
+                    }
+                },
                 ...Object.keys(data[0]).map(propName => ({
                     title: propName,
                     data: propName,
-                    visible: !propName.includes('Id')
+                    visible: !propName.includes('Id') && !propName.includes('IsCancelable')
                 }))
             ];
             $('#DatesTable').DataTable({
@@ -341,19 +399,109 @@ const initDatesDataTable = async () => {
                     url: './js/datatable-esp.json'
                 },
                 "columnDefs": [
-                  { "type": "num", "targets": 11 }
+                    { "type": "num", "targets": 11 }
                 ]
             });
-        }
+        };
     } catch (error) {
         console.error(error);
-    }
+    };
 };
 
+const ShowEditModal = async (element) => {
+    try {
+        const data = JSON.parse($(element).attr('data'));
+        sessionStorage.setItem('DateId', data.Id);
+        $('#OperationsSelect').val(data.OperationId);
+        $('#TransportTypeSelect').val(data.TransportTypeId);
+        await onTransportTypeSelectChange();
+        $('#TransportPlate1Select').val(data.TransportId);
+        await FillSelectAllSheduleTimes();
+        $('#SheduleTimesSelect').val(data.ScheduleTimeId);
+        $('#TransportLineTypeSelect').val(data.TransportLineId);
+        $('#TransportPlate1').val(data['Placa de Transporte']);
+        $('#TransportPlate3').val(data['Placa de Caja #1']);
+        $('#TransportPlate2').val(data['Placa de Caja #2']);
+        $('#DriversSelect').val(data.DriverId);
+        $('#ProductsSelect').val(data.ProductId);
+        $('#txtVolume').val(data['Volumen en Toneladas']);
+
+        $('#ModalDatesTitle').text('Editar Cita');
+        $('#ModalDates').modal('show');
+    } catch (error) {
+        console.error(error);
+    };
+};
+
+const ShowCancelateDateModal = async (element) => {
+    try {
+        const data = JSON.parse($(element).attr('data'));
+        sessionStorage.setItem('DateId', data.Id);
+        $('#ModalCancelateDate').modal('show');
+    } catch (error) {
+        console.error(error);
+    };
+};
+
+const CancelDateButton = async () => {
+    try {
+        const DateId = sessionStorage.getItem('DateId');
+        const response = await CancelDate(DateId);
+        let toastType = "Primary";
+        let toastPlacement = "Top right";
+        if (response.success) {
+            $('#ModalCancelateDate').modal('hide');
+            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+        } else {
+            toastType = "Danger";
+            toastPlacement = "Middle center";
+            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+        }
+        await initDatesDataTable();
+    } catch (error) {
+        console.error(error);
+    };
+};
+
+const onTransportTypeSelectChange = async (e) => {
+    const TransportTypeId = $('#TransportTypeSelect').val();
+    await FillSelectTransportPlate1(TransportTypeId);
+
+    $('#TransportPlate1 , TransportPlate2 , #TransportPlate3').val("");
+    $('#TransportPlate2 , #TransportPlate3').val("").parent().hide();
+
+    if (TransportTypeId == 2) {
+        $('#TransportPlate2').val("").parent().show();
+    } else if (TransportTypeId == 5) {
+        $('#TransportPlate2 , #TransportPlate3').val("").parent().show();
+    };
+};
+
+const onTransportPlate1SelectChange = (e) => {
+    $('#TransportPlate2 , #TransportPlate3').parent().hide();
+    const select = $(e);
+    const data = select.find(':selected').attr('data');
+    if (data) {
+        const dataObj = JSON.parse(data);
+
+        const TransportTypeId = dataObj.TransportTypeId;
+        const TransportPlate2 = dataObj['Placa de Caja #1'];
+        const TransportPlate3 = dataObj['Placa de Caja #2'];
+
+        $('#TransportPlate2').val(TransportPlate2);
+        $('#TransportPlate3').val(TransportPlate3);
+
+        if (TransportTypeId == 2) {
+            $('#TransportPlate2').parent().show();
+        } else if (TransportTypeId == 5) {
+            $('#TransportPlate2 , #TransportPlate3').parent().show();
+        };
+    };
+};
 //#endregion
 
 //#region Fetchs
-const GetSheduleTimes = async (userId) => {
+const GetSheduleTimes = async (OperationTypeId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -364,7 +512,32 @@ const GetSheduleTimes = async (userId) => {
                 $.unblockUI();
             },
             url: `${UrlApi}/dates/GetSheduleTimes`, type: 'POST', data: {
-                userId
+                OperationTypeId
+            },
+            dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
+
+const GetScheduleAvailables = async (OperationTypeId, TransportTypeId) => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/dates/ScheduleAvailables`,
+            type: 'POST',
+            data: {
+                OperationTypeId,
+                TransportTypeId
             },
             dataType: 'json'
         });
@@ -441,7 +614,7 @@ const GetTransportLines = async (userId) => {
     }
 };
 
-const GetTransports = async (userId,TransportTypeId) => {
+const GetTransportPlate1 = async (userId, TransportTypeId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -452,7 +625,7 @@ const GetTransports = async (userId,TransportTypeId) => {
                 $.unblockUI();
             },
             url: `${UrlApi}/dates/GetTransportsByType`, type: 'POST', data: {
-                userId,TransportTypeId
+                userId, TransportTypeId
             },
             dataType: 'json'
         });
@@ -473,7 +646,7 @@ const GetTransportType = async () => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/GetTransportType`, 
+            url: `${UrlApi}/dates/GetTransportType`,
             type: 'GET',
             dataType: 'json'
         });
@@ -542,6 +715,47 @@ const addOrUpdateDates = async (date) => {
             },
             url: `${UrlApi}/dates/addOrUpdateDates`, type: 'POST', data: {
                 date
+            },
+            dataType: 'json'
+        });
+    } catch (error) {
+        console.error(error.message);
+        $.unblockUI();
+    };
+};
+
+const IsAppointmentTimeAvailable = async () => {
+    try {
+        return await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/dates/IsAppointmentTimeAvailable`,
+            type: 'GET',
+            dataType: 'json'
+        });
+    } catch (error) {
+        console.error(error.message);
+        $.unblockUI();
+    };
+};
+
+const CancelDate = async (dateId) => {
+    try {
+        return await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/dates/CancelDate`, type: 'POST', data: {
+                dateId
             },
             dataType: 'json'
         });

@@ -11,6 +11,7 @@ const configurationRoutes = require('./routes/configurationRoutes');
 const datesRoutes = require('./routes/datesRoutes');
 const catalogsRoutes = require('./routes/catalogsRoutes');
 const documentsRoutes = require('./routes/documentsRoutes');
+const toolsRoutes = require('./routes/toolsRoutes');
 
 const app = express();
 
@@ -32,6 +33,8 @@ app.use(`${urlApi}/catalogs`, catalogsRoutes);
 app.use(`${urlApi}/dates`, datesRoutes);
 
 app.use(`${urlApi}/documents`, documentsRoutes);
+
+app.use(`${urlApi}/tools`, toolsRoutes);
 
 app.get(`/`, (req, res) => {
   res.redirect(`${urlApi}/api-docs`);
