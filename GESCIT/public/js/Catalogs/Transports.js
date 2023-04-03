@@ -13,7 +13,7 @@ $(document).ready(async function () {
     await tooltipTrigger();
 
 });
-//#region fetchs
+//#region fetches
 const GetTransports = async (userId) => {
     try {
         const response = await $.ajax({

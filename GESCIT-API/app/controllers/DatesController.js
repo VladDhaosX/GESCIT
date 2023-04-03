@@ -81,8 +81,8 @@ module.exports = {
 
     GetDates: async (req, res) => {
         try {
-            const { userId, StartDate, EndDate } = req.body;
-            const result = await DatesDao.GetDates(userId, StartDate, EndDate);
+            const { userId, StartDate, EndDate, Status } = req.body;
+            const result = await DatesDao.GetDates(userId, StartDate, EndDate, Status);
             console.log(result.data[0]);
             res.json(result);
         } catch (error) {
