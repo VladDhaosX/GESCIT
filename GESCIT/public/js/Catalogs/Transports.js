@@ -529,7 +529,8 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
                                 onclick='DonwloadTransportDocument(this);'
                                 >
                                 <span class="tf-icons bx bxs-download"></span>
-                                </button>`
+                                </button>
+                                `
                         }
                         else {
                             return `
