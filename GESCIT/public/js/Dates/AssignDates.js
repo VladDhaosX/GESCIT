@@ -6,152 +6,115 @@ $(document).ready(async function () {
 
 //#region Controllers
 const initPage = async () => {
+
     sessionStorage.setItem("DateId", 0);
     $('#ActionsButtons').append(`
     <div class="row">
         <div class="col-3 mb-3">
             <label for="txtDate" class="form-label">Fecha</label>
-            <input type="date" id="txtDate" class="form-control"/>
-        </div>
-        <div class="col-3 mb-3">
-            <button 
-                style="margin-top: 30px;"
-                class="btn rounded-pill btn-icon btn-outline-primary"  
-                type="button" id="btnSearchDates">
-                <span class="tf-icons bx bx-search"></span>
-            </button>
+            <input type="date" id="txtDate" class="form-control" disabled />
         </div>
     </div>
     `);
 
-    $('#txtDate').val(new Date().toISOString().split('T')[0]);
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    $('#txtDate').val(tomorrow.toISOString().split('T')[0]);
+
+    $('#TomorrowScheduleNav').on('shown.bs.tab', async function (e) {
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        $('#txtDate').val(tomorrow.toISOString().split('T')[0]);
+
+        $('#UlTomorrowDatesNavs button:first').tab('show');
+    });
+
+    $('#TodayScheduleNav').on('shown.bs.tab', async function (e) {
+        $('#txtDate').val(new Date().toISOString().split('T')[0]);
+
+        $('#UlTodayDatesNavs button:first').tab('show');
+    });
 
     $('#txtDate').on('change', async function () {
-        await initDatesDataTable();
+        // await initDatesDataTable('pending');
     });
 
     $('#btnSearchDates').on('click', async function () {
-        await initDatesDataTable();
+        // await initDatesDataTable('pending');
     });
 
     $('#btnAssignDateHour').on('click', async function () {
         AssignDateHour();
     });
 
-    await initDatesDataTable();
+    $('#NavTomorrowPendingDates').on('shown.bs.tab', async function (e) {
+        await initDatesDataTable('pending', 'Tomorrow');
+    });
+
+    $('#NavTomorrowAssignedDates').on('shown.bs.tab', async function (e) {
+        await initDatesDataTable('assigned', 'Tomorrow');
+    });
+
+    $('#NavTodayAssignedDates').on('shown.bs.tab', async function (e) {
+        await initDatesDataTable('assigned', 'Today');
+    });
+
+    await initDatesDataTable('pending', 'Tomorrow');
 
     tooltipTrigger();
 };
 
-const initDatesDataTable = async () => {
+const initDatesDataTable = async (Status, Day) => {
     try {
-        if ($.fn.DataTable.isDataTable('#Schedule1DataTable')) {
-            $('#Schedule1DataTable').DataTable().destroy();
-            $('#Schedule1DataTable').empty();
-        };
-        if ($.fn.DataTable.isDataTable('#Schedule2DataTable')) {
-            $('#Schedule2DataTable').DataTable().destroy();
-            $('#Schedule2DataTable').empty();
-        };
-        if ($.fn.DataTable.isDataTable('#Schedule3DataTable')) {
-            $('#Schedule3DataTable').DataTable().destroy();
-            $('#Schedule3DataTable').empty();
-        };
-        if ($.fn.DataTable.isDataTable('#Schedule4DataTable')) {
-            $('#Schedule4DataTable').DataTable().destroy();
-            $('#Schedule4DataTable').empty();
-        };
-
         const userId = sessionStorage.getItem('userId');
         const StartDate = $('#txtDate').val();
         const EndDate = $('#txtDate').val();
-        const data = await GetDates(userId, StartDate, EndDate);
+        const getDatesData = await GetDates(userId, StartDate, EndDate, Status);
 
-        const DatesWSchedule1 = data.filter(x => x.ScheduleTimeId == 1 || x.ScheduleTimeId == 5);
-        const DatesWSchedule2 = data.filter(x => x.ScheduleTimeId == 2 || x.ScheduleTimeId == 6);
-        const DatesWSchedule3 = data.filter(x => x.ScheduleTimeId == 3 || x.ScheduleTimeId == 7);
-        const DatesWSchedule4 = data.filter(x => x.ScheduleTimeId == 4 || x.ScheduleTimeId == 8);
+        const titles = ['01:00 AM a 08:00 AM', '08:00 AM a 12:00 PM', '12:00 PM a 04:00 PM', '04:00 PM a 08:00 PM'];
 
-        $('#Schedule1DataTable').DataTable({
-            data: DatesWSchedule1,
-            columns: [
-                {
-                    title: '01:00 AM a 08:00 AM',
-                    data: 'Línea de Transporte',
-                    render: function (data, type, row) {
-                        return `<label style="width: 100%" data='${JSON.stringify(row)}' onclick="ViewDateData(this);"><span class="tf-icons bx bx-time"></span> ${data}</label>`;
-                    }
-                }
-            ],
-            "dom": '',
-            language: {
-                url: './js/datatable-esp.json'
-            },
-            columnDefs: [{
-                "defaultContent": "",
-                "targets": "_all"
-            }]
-        });
-        $('#Schedule2DataTable').DataTable({
-            data: DatesWSchedule2,
-            columns: [
-                {
-                    title: '08:00 AM a 12:00 PM',
-                    data: 'Línea de Transporte',
-                    render: function (data, type, row) {
-                        return `<label data='${JSON.stringify(row)}' onclick="ViewDateData(this);"><span class="tf-icons bx bx-time"></span> ${data}</label>`;
-                    }
-                }
-            ],
-            "dom": '',
-            language: {
-                url: './js/datatable-esp.json'
-            },
-            columnDefs: [{
-                "defaultContent": "",
-                "targets": "_all"
-            }]
-        });
-        $('#Schedule3DataTable').DataTable({
-            data: DatesWSchedule3,
-            columns: [
-                {
-                    title: '12:00 PM a 04:00 PM',
-                    data: 'Línea de Transporte',
-                    render: function (data, type, row) {
-                        return `<label data='${JSON.stringify(row)}' onclick="ViewDateData(this);"><span class="tf-icons bx bx-time"></span> ${data}</label>`;
-                    }
-                }
-            ],
-            "dom": '',
-            language: {
-                url: './js/datatable-esp.json'
-            },
-            columnDefs: [{
-                "defaultContent": "",
-                "targets": "_all"
-            }]
-        });
-        $('#Schedule4DataTable').DataTable({
-            data: DatesWSchedule4,
-            columns: [
-                {
-                    title: '04:00 PM a 08:00 PM',
-                    data: 'Línea de Transporte',
-                    render: function (data, type, row) {
-                        return `<label data='${JSON.stringify(row)}' onclick="ViewDateData(this);"><span class="tf-icons bx bx-time"></span> ${data}</label>`;
-                    }
-                }
-            ],
-            "dom": '',
-            language: {
-                url: './js/datatable-esp.json'
-            },
-            columnDefs: [{
-                "defaultContent": "",
-                "targets": "_all"
-            }]
-        });
+        const $DatesTab = $(`#${Status}${Day}DatesTab`);
+        const $responsiveDiv = $(`<div class="text-nowrap table-responsive" style="margin: 25px 50px;"></div>`);
+        const $DatesRow = $(`<div class="row" id="${Status}DatesRow"></div>`);
+
+        $DatesTab.empty();
+        $responsiveDiv.append($DatesRow);
+        $DatesTab.append($responsiveDiv);
+
+        if (getDatesData) {
+            for (let i = 1; i <= 4; i++) {
+                const $table = $(`<table id="${Status}Schedule${i}DataTable" class="table"></table>`);
+                const $Row = $(`<div class="col-3"></div>`);
+                $Row.append($table);
+                $DatesRow.append($Row);
+
+                if ($.fn.DataTable.isDataTable($table)) {
+                    $($table).DataTable().destroy();
+                    $($table).empty();
+                };
+                const data = getDatesData.filter(x => x.ScheduleTimeId == i || x.ScheduleTimeId == i + 4);
+                $table.DataTable({
+                    data: data,
+                    columns: [
+                        {
+                            title: titles[i - 1],
+                            data: 'Línea de Transporte',
+                            render: function (data, type, row) {
+                                return `<label style="width: 100%" data='${JSON.stringify(row)}' onclick="ViewDateData(this);"><span class="tf-icons bx bx-time"></span> ${data}</label>`;
+                            }
+                        }
+                    ],
+                    dom: '',
+                    language: {
+                        url: './js/datatable-esp.json'
+                    },
+                    columnDefs: [{
+                        defaultContent: "",
+                        targets: "_all"
+                    }]
+                });
+            };
+        };
     } catch (error) {
         console.error(error);
     };
@@ -169,13 +132,15 @@ const ViewDateData = async (element) => {
         $('#txtProducto').val(data.Producto);
         $('#txtLineaTransporte').val(data['Línea de Transporte']);
         $('#txtVolumen').val(data['Volumen en Toneladas']);
-
         await FillSelectHour(data.ScheduleTimeId);
         $('#selectMinutes').empty();
         $('#selectMinutes').append(`<option value="0">Seleccione los minutos</option>`);
         for (let i = 0; i < 60; i++) {
             $('#selectMinutes').append(`<option value="${i}">${i}</option>`);
         };
+
+        $('#selectHour').val(data.Hour || 0);
+        $('#selectMinutes').val(data.Minute || 0);
 
         $('#ModalDateInfo').modal('show');
     } catch (error) {
@@ -208,13 +173,23 @@ const AssignDateHour = async () => {
         if (response.success) {
             await ToastsNotification("Citas", response.message, toastType, toastPlacement);
             $('#ModalDateInfo').modal('hide');
-            await GetDates();
+
+            const $activeTab = $('#UlScheduleNavs .active');
+            const $activeTabTomorrow = $('#UlTomorrowDatesNavs .active');
+            if ($activeTabTomorrow.length > 0) {
+                $activeTabTomorrow.removeClass('active').removeClass('show');
+                $activeTabTomorrow.trigger('click');
+            } else {
+                $activeTab.trigger('click');
+            };
+
         } else {
             console.log(response.message);
             toastType = "Danger";
             toastPlacement = "Middle center";
             await ToastsNotification("Citas", response.message, toastType, toastPlacement);
         };
+
     } catch (error) {
         console.error(error);
     };
@@ -243,7 +218,7 @@ const GetAllHoursOfSchedule = async (ScheduleId) => {
         $.unblockUI();
     }
 };
-const GetDates = async (userId, StartDate, EndDate) => {
+const GetDates = async (userId, StartDate, EndDate, Status) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -256,7 +231,8 @@ const GetDates = async (userId, StartDate, EndDate) => {
             url: `${UrlApi}/dates/GetDates`, type: 'POST', data: {
                 userId,
                 StartDate,
-                EndDate
+                EndDate,
+                Status
             },
             dataType: 'json'
         });

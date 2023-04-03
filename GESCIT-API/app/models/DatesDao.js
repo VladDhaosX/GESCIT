@@ -161,13 +161,14 @@ module.exports = {
             }
         }
     },
-    GetDates: async (userId, StartDate, EndDate) => {
+    GetDates: async (userId, StartDate, EndDate, Status) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('UserId', sql.Int, userId)
                 .input('StartDate', sql.VarChar(sql.MAX), StartDate)
                 .input('EndDate', sql.VarChar(sql.MAX), EndDate)
+                .input('Status', sql.VarChar(sql.MAX), Status)
                 .execute('SpGetDates');
 
             return {
