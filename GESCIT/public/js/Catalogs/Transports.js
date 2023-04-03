@@ -515,7 +515,24 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
                     title: 'Acciones',
                     data: 'Id',
                     "render": function (data, type, row) {
-                        return `
+                        const StatusId = row.StatusId;
+                        if (StatusId == 4) {
+                            return `
+                                <button 
+                                class="btn rounded-pill btn-icon btn-outline-primary" 
+                                type="button" 
+                                id="DonwloadTransportDocument"
+                                data='${JSON.stringify(row)}'
+                                title='Descargar'
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                onclick='DonwloadTransportDocument(this);'
+                                >
+                                <span class="tf-icons bx bxs-download"></span>
+                                </button>`
+                        }
+                        else {
+                            return `
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary" 
                                         type="button" 
@@ -541,6 +558,7 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
                                         <span class="tf-icons bx bx-trash"></span>
                                     </button>
                                 `
+                        }
                     }
                 },
                 ...Object.keys(data[0]).map(propName => ({
