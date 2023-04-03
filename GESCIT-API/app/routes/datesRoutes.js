@@ -32,4 +32,6 @@ router.get('/GetSchedules', DatesController.GetSchedules);
 
 router.post('/GetAllHoursOfSchedule', DatesController.GetAllHoursOfSchedule);
 
+router.post('/AssignDateHour', DatesController.AssignDateHour);
+
 module.exports = router;

@@ -4,7 +4,6 @@ $(document).ready(async function () {
     await initPage();
 });
 
-
 //#region Controllers
 const initPage = async () => {
     sessionStorage.setItem("DateId", 0);
@@ -33,6 +32,10 @@ const initPage = async () => {
 
     $('#btnSearchDates').on('click', async function () {
         await initDatesDataTable();
+    });
+
+    $('#btnAssignDateHour').on('click', async function () {
+        AssignDateHour();
     });
 
     await initDatesDataTable();
@@ -157,6 +160,7 @@ const initDatesDataTable = async () => {
 const ViewDateData = async (element) => {
     try {
         const data = JSON.parse($(element).attr('data'));
+        sessionStorage.setItem('DateId', data.Id);
         $('#txtHorario').val(data.Horario);
         $('#txtOperacion').val(data.Operacion);
         $('#txtFechaCita').val(data['Fecha de Cita']);
@@ -165,9 +169,8 @@ const ViewDateData = async (element) => {
         $('#txtProducto').val(data.Producto);
         $('#txtLineaTransporte').val(data['Línea de Transporte']);
         $('#txtVolumen').val(data['Volumen en Toneladas']);
-        
+
         await FillSelectHour(data.ScheduleTimeId);
-        // SET 60 MINUTES OPTION TO selectMinutes
         $('#selectMinutes').empty();
         $('#selectMinutes').append(`<option value="0">Seleccione los minutos</option>`);
         for (let i = 0; i < 60; i++) {
@@ -186,16 +189,39 @@ const FillSelectHour = async (ScheduleId) => {
         $('#selectHour').empty();
         $('#selectHour').append(`<option value="0">Seleccione una hora</option>`);
         AllHoursOfSchedule.forEach(x => {
-            $('#selectHour').append(`<option value="${x.Id}">${x.Hora}</option>`);
+            $('#selectHour').append(`<option value="${x.iHora}">${x.Hora}</option>`);
         });
     } catch (error) {
         console.error(error);
     };
 };
 
+const AssignDateHour = async () => {
+    try {
+        const DateId = sessionStorage.getItem('DateId');
+        const Hour = $('#selectHour').val();
+        const Minutes = $('#selectMinutes').val();
+        const response = await PostAssignDateHour(DateId, Hour, Minutes);
+        let toastType = "Primary";
+        let toastPlacement = "Top right";
+
+        if (response.success) {
+            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+            $('#ModalDateInfo').modal('hide');
+            await GetDates();
+        } else {
+            console.log(response.message);
+            toastType = "Danger";
+            toastPlacement = "Middle center";
+            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+        };
+    } catch (error) {
+        console.error(error);
+    };
+};
 //#endregion
 
-//#region fetchs
+//#region fetches
 const GetAllHoursOfSchedule = async (ScheduleId) => {
     try {
         const response = await $.ajax({
@@ -259,5 +285,28 @@ const GetSchedules = async () => {
         console.error(error);
         $.unblockUI();
     }
+};
+const PostAssignDateHour = async (DateId, Hour, Minutes) => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/dates/AssignDateHour`, type: 'POST', data: {
+                DateId,
+                Hour,
+                Minutes
+            },
+            dataType: 'json'
+        });
+        return response;
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    };
 };
 //#endregion

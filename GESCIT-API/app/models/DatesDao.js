@@ -161,7 +161,7 @@ module.exports = {
             }
         }
     },
-    GetDates: async (userId,StartDate,EndDate) => {
+    GetDates: async (userId, StartDate, EndDate) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -184,7 +184,7 @@ module.exports = {
             }
         }
     },
-    GetTransportsByType: async (UserId,TransportTypeId) => {
+    GetTransportsByType: async (UserId, TransportTypeId) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -227,7 +227,7 @@ module.exports = {
             }
         }
     },
-    ScheduleAvailables: async (OperationTypeId,TransportTypeId) => {
+    ScheduleAvailables: async (OperationTypeId, TransportTypeId) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -303,6 +303,31 @@ module.exports = {
             return {
                 "success": true,
                 "message": "Consulta obtenida correctamente.",
+                "data": result.recordset
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los datos.",
+                "info": error.message
+            }
+        }
+    },
+    AssignDateHour: async (DateId, Hour, Minutes) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('DateId', sql.Int, DateId)
+                .input('Hour', sql.Int, Hour)
+                .input('Minutes', sql.Int, Minutes)
+                .output('Success', sql.Bit)
+                .output('Message', sql.VarChar(sql.MAX))
+                .execute('SpAssignDateHour');
+
+            return {
+                "success": result.output.Success,
+                "message": result.output.Message,
                 "data": result.recordset
             }
 

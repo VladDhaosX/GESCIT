@@ -137,8 +137,8 @@ module.exports = {
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
-    },  
-    
+    },
+
     GetSchedules: async (req, res) => {
         try {
             const response = await DatesDao.GetSchedules();
@@ -153,6 +153,18 @@ module.exports = {
         try {
             const { ScheduleId } = req.body;
             const response = await DatesDao.GetAllHoursOfSchedule(ScheduleId);
+            res.json(response);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    AssignDateHour: async (req, res) => {
+        try {
+            const { DateId, Hour, Minutes } = req.body;
+            console.log(DateId, Hour, Minutes);
+            const response = await DatesDao.AssignDateHour(DateId, Hour, Minutes);
+            console.log(response);
             res.json(response);
         } catch (error) {
             res.status(500).json({ message: error.message });
