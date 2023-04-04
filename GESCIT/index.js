@@ -122,6 +122,19 @@ app.get(config.BasePath + '/AssignDates', (req, res) => {
     res.render('views', data);
 });
 
+app.get(config.BasePath + '/Documents', (req, res) => {
+    const data = {
+        Page: './Catalogs/Documents',
+        Categoria: 'Jurídico',
+        Modulo: 'Tablero documentos',
+        JSFile: './js/Catalogs/Documents.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
+    };
+    res.render('views', data);
+});
+
 app.listen(process.env.PORT || 3000, () => {
     console.log('La aplicación está escuchando en el puerto 3000');
 });
+

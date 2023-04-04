@@ -1,0 +1,34 @@
+<div class="nav-align-top mb-4">
+    <ul id="DocumentsModalNavs" class="nav nav-pills  nav-fill" role="tablist">
+        <li class="nav-item">
+            <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                data-bs-target="#navsInfoModal" aria-controls="navs-top-home" aria-selected="true">
+                Pendientes
+            </button>
+        </li>
+        <li class="nav-item">
+            <button id="DocumentsNavButton" type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                data-bs-target="#navsDocsModal" aria-controls="navs-top-profile" aria-selected="false">
+                Aprobados
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="pendingTab" role="tabpanel">
+            <div id="ActionsButtons" class="demo-inline-spacing" style="padding: 0px 50px;">
+            </div>
+            <div class="text-nowrap" style="margin: 25px 50px;">
+                <table id="pendingTable" class="table">
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="approvedTab" role="tabpanel">
+            <div id="ActionsButtons" class="demo-inline-spacing" style="padding: 0px 50px;">
+            </div>
+            <div class="text-nowrap" style="margin: 25px 50px;">
+                <table id="approvedTable" class="table">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
