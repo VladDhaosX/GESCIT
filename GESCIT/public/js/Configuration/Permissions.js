@@ -155,13 +155,13 @@ const UpdatePermissionModal = async (e) => {
             const Permission = $(e).attr('data');
             const PermissionObj = JSON.parse(Permission);
 
-            if(PermissionObj.RolId==4){
+            if (PermissionObj.RolId == 4) {
                 $('#UpdatePermissionButton').hide();
             }
-            else{
+            else {
                 $('#UpdatePermissionButton').show();
             };
-            
+
             sessionStorage.setItem("Permissions_UserId", PermissionObj.UserId);
             $('#RolSelect').val(PermissionObj.RolId);
 

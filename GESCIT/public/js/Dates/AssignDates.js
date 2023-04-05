@@ -35,14 +35,6 @@ const initPage = async () => {
         $('#UlTodayDatesNavs button:first').tab('show');
     });
 
-    $('#txtDate').on('change', async function () {
-        // await initDatesDataTable('pending');
-    });
-
-    $('#btnSearchDates').on('click', async function () {
-        // await initDatesDataTable('pending');
-    });
-
     $('#btnAssignDateHour').on('click', async function () {
         AssignDateHour();
     });
@@ -92,13 +84,14 @@ const initDatesDataTable = async (Status, Day) => {
                     $($table).DataTable().destroy();
                     $($table).empty();
                 };
+
                 const data = getDatesData.filter(x => x.ScheduleTimeId == i || x.ScheduleTimeId == i + 4);
                 $table.DataTable({
                     data: data,
                     columns: [
                         {
                             title: titles[i - 1],
-                            data: 'Línea de Transporte',
+                            data: 'Folio',
                             render: function (data, type, row) {
                                 return `<label style="width: 100%" data='${JSON.stringify(row)}' onclick="ViewDateData(this);"><span class="tf-icons bx bx-time"></span> ${data}</label>`;
                             }

@@ -94,7 +94,7 @@ const ToastsNotification = async (titulo, message, type, placement) => {
     }
 };
 
-if (pathname !== BasePath+ '/login') {
+if (pathname !== BasePath + '/login') {
     const userId = sessionStorage.getItem('userId');
     if (!userId) window.location.href = './login';
     createMenu();

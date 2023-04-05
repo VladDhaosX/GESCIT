@@ -36,12 +36,12 @@ const initPage = async () => {
     });
 
     $('#OperationsSelect').change(async function (e) {
-        await FillSelectScheduleAvailables();
+        await FillSelectScheduleAvailable();
     });
 
     $('#TransportTypeSelect').change(async function (e) {
         await onTransportTypeSelectChange();
-        await FillSelectScheduleAvailables();
+        await FillSelectScheduleAvailable();
     });
 
     $('#TransportPlate2 , #TransportPlate3').attr('disabled', 'disabled');
@@ -55,7 +55,7 @@ const initPage = async () => {
     });
 
     await initDatesDataTable();
-    await FillSelectAllSheduleTimes();
+    await FillSelectAllScheduleTimes();
     await FillSelectOperationTimes();
     await FillSelectProducts();
     await FillSelectTransportLines();
@@ -67,17 +67,17 @@ const initPage = async () => {
 
 };
 
-const FillSelectAllSheduleTimes = async () => {
+const FillSelectAllScheduleTimes = async () => {
     try {
         const OperationTypeId = $('#OperationsSelect').val();
 
         if (OperationTypeId == 0) {
             const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona un Tipo de Operación y Tipo de Transporte");
-            $('#SheduleTimesSelect').empty().append($SeleccionaUnaopción);
+            $('#ScheduleTimesSelect').empty().append($SeleccionaUnaopción);
             return;
         };
 
-        const data = await GetSheduleTimes(OperationTypeId);
+        const data = await GetScheduleTimes(OperationTypeId);
         const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
             return $option;
@@ -86,24 +86,24 @@ const FillSelectAllSheduleTimes = async () => {
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una Opción");
         $options.unshift($SeleccionaUnaopción);
 
-        $('#SheduleTimesSelect').empty().append($options);
+        $('#ScheduleTimesSelect').empty().append($options);
     } catch (error) {
         console.error(error);
     }
 };
 
-const FillSelectScheduleAvailables = async () => {
+const FillSelectScheduleAvailable = async () => {
     try {
         const OperationTypeId = $('#OperationsSelect').val();
         const TransportTypeId = $('#TransportTypeSelect').val();
 
         if (OperationTypeId == 0 || TransportTypeId == 0) {
             const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona un Tipo de Operación y Tipo de Transporte");
-            $('#SheduleTimesSelect').empty().append($SeleccionaUnaopción);
+            $('#ScheduleTimesSelect').empty().append($SeleccionaUnaopción);
             return;
         }
 
-        const data = await GetScheduleAvailables(OperationTypeId, TransportTypeId);
+        const data = await GetScheduleAvailable(OperationTypeId, TransportTypeId);
 
         const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
@@ -113,7 +113,7 @@ const FillSelectScheduleAvailables = async () => {
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
         $options.unshift($SeleccionaUnaopción);
 
-        $('#SheduleTimesSelect').empty().append($options);
+        $('#ScheduleTimesSelect').empty().append($options);
     } catch (error) {
         console.error(error);
     }
@@ -237,11 +237,11 @@ const FillSelectDrivers = async () => {
     }
 };
 
-const ExistsScheduleAvailables = async () => {
+const ExistsScheduleAvailable = async () => {
     try {
         const OperationTypeId = $('#OperationsSelect').val();
         const TransportTypeId = $('#TransportTypeSelect').val();
-        const data = await GetScheduleAvailables(OperationTypeId, TransportTypeId);
+        const data = await GetScheduleAvailable(OperationTypeId, TransportTypeId);
 
         if (data.length > 0) {
             return true;
@@ -256,7 +256,7 @@ const ExistsScheduleAvailables = async () => {
 
 const newDateModal = async () => {
     sessionStorage.setItem('DateId', 0);
-    $('#SheduleTimesSelect').val(0);
+    $('#ScheduleTimesSelect').val(0);
     $('#OperationsSelect').val(0);
     $('#ProductsSelect').val(0);
     $('#TransportLineTypeSelect').val(0);
@@ -272,9 +272,9 @@ const newDateModal = async () => {
 
     const IsAvailable = await IsAppointmentTimeAvailable();
     if (IsAvailable) {
-        const ExistsScheduleAvailablesResult = await ExistsScheduleAvailables();
-        if (!ExistsScheduleAvailablesResult) {
-            // await FillSelectScheduleAvailables();
+        const ExistsScheduleAvailableResult = await ExistsScheduleAvailable();
+        if (!ExistsScheduleAvailableResult) {
+            // await FillSelectScheduleAvailable();
             $('#ModalDates').modal('show');
         } else {
             await ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
@@ -288,7 +288,7 @@ const newDate = async () => {
     try {
         const DateId = sessionStorage.getItem('DateId');
         const userId = sessionStorage.getItem('userId');
-        const sheduleTimeId = $('#SheduleTimesSelect').val();
+        const ScheduleTimeId = $('#ScheduleTimesSelect').val();
         const operationTypeId = $('#OperationsSelect').val();
         const productId = $('#ProductsSelect').val();
         const transportLineId = $('#TransportLineTypeSelect').val();
@@ -303,7 +303,7 @@ const newDate = async () => {
         const date = {
             DateId,
             userId,
-            sheduleTimeId,
+            ScheduleTimeId,
             operationTypeId,
             productId,
             transportLineId,
@@ -327,7 +327,7 @@ const newDate = async () => {
             toastType = "Danger";
             toastPlacement = "Middle center";
             await ToastsNotification("Citas", response.message, toastType, toastPlacement);
-            await FillSelectScheduleAvailables();
+            await FillSelectScheduleAvailable();
         }
         await initDatesDataTable();
     } catch (error) {
@@ -353,7 +353,8 @@ const initDatesDataTable = async () => {
                     data: 'Id',
                     render: function (data, type, row) {
                         let buttons = '';
-                        buttons += `
+                        if (row.Estatus == 'Pendiente') {
+                            buttons += `
                             <button
                                 class="btn rounded-pill btn-icon btn-outline-primary" 
                                 type="button" 
@@ -367,8 +368,8 @@ const initDatesDataTable = async () => {
                             </button>
                         `
 
-                        if (row.IsCancelable) {
-                            buttons += `
+                            if (row.IsCancelable) {
+                                buttons += `
                             <button
                                 class="btn rounded-pill btn-icon btn-outline-danger" 
                                 type="button" 
@@ -381,15 +382,73 @@ const initDatesDataTable = async () => {
                                 <span class="tf-icons bx bx-x bx-md"></span>
                             </button>
                             `;
-                        };
+                            };
+                        }
                         return buttons;
                     }
                 },
-                ...Object.keys(data[0]).map(propName => ({
-                    title: propName,
-                    data: propName,
-                    visible: !propName.includes('Id') && !propName.includes('IsCancelable')
-                }))
+                {
+                    title: 'Cliente',
+                    data: 'Cliente'
+                },
+                {
+                    title: 'Folio',
+                    data: 'Folio'
+                },
+                {
+                    title: 'Estatus',
+                    data: 'Estatus'
+                },
+                {
+                    title: 'Fecha de Cita',
+                    data: 'Fecha de Cita'
+                },
+                {
+                    title: 'Horario',
+                    data: 'Horario'
+                },
+                {
+                    title: 'Operacion',
+                    data: 'Operacion'
+                },
+                {
+                    title: 'Línea de Transporte',
+                    data: 'Línea de Transporte'
+                },
+                {
+                    title: 'Tipo de Transporte',
+                    data: 'Tipo de Transporte'
+                },
+                {
+                    title: 'Placa de Transporte ',
+                    data: 'Placa de Transporte'
+                },
+                {
+                    title: 'Placa de Caja #1',
+                    data: 'Placa de Caja #1'
+                },
+                {
+                    title: 'Placa de Caja #2 ',
+                    data: 'Placa de Caja #2'
+                },
+                {
+                    title: 'Chofer',
+                    data: 'Chofer'
+                },
+                {
+                    title: 'Producto',
+                    data: 'Producto'
+                },
+                {
+                    title: 'Volumen en Toneladas',
+                    data: 'Volumen en Toneladas'
+                }
+                // ...Object.keys(data[0]).map(propName => ({
+                //     title: propName,
+                //     data: propName,
+                //     visible: !propName.includes('Id') && !propName.includes('IsCancelable')
+                // }
+                // ))
             ];
             $('#DatesTable').DataTable({
                 data: data,
@@ -416,8 +475,8 @@ const ShowEditModal = async (element) => {
         $('#TransportTypeSelect').val(data.TransportTypeId);
         await onTransportTypeSelectChange();
         $('#TransportPlate1Select').val(data.TransportId);
-        await FillSelectAllSheduleTimes();
-        $('#SheduleTimesSelect').val(data.ScheduleTimeId);
+        await FillSelectAllScheduleTimes();
+        $('#ScheduleTimesSelect').val(data.ScheduleTimeId);
         $('#TransportLineTypeSelect').val(data.TransportLineId);
         $('#TransportPlate1').val(data['Placa de Transporte']);
         $('#TransportPlate3').val(data['Placa de Caja #1']);
@@ -501,7 +560,7 @@ const onTransportPlate1SelectChange = (e) => {
 //#endregion
 
 //#region Fetchs
-const GetSheduleTimes = async (OperationTypeId) => {
+const GetScheduleTimes = async (OperationTypeId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -511,7 +570,7 @@ const GetSheduleTimes = async (OperationTypeId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/GetSheduleTimes`, type: 'POST', data: {
+            url: `${UrlApi}/dates/GetScheduleTimes`, type: 'POST', data: {
                 OperationTypeId
             },
             dataType: 'json'
@@ -523,7 +582,7 @@ const GetSheduleTimes = async (OperationTypeId) => {
     }
 };
 
-const GetScheduleAvailables = async (OperationTypeId, TransportTypeId) => {
+const GetScheduleAvailable = async (OperationTypeId, TransportTypeId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -533,7 +592,7 @@ const GetScheduleAvailables = async (OperationTypeId, TransportTypeId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/ScheduleAvailables`,
+            url: `${UrlApi}/dates/ScheduleAvailable`,
             type: 'POST',
             data: {
                 OperationTypeId,
