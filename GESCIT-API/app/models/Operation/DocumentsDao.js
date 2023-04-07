@@ -1,5 +1,5 @@
 const sql = require('mssql');
-const config = require('../config/database');
+const config = require('../../config/database');
 
 module.exports = {
 
@@ -43,8 +43,6 @@ module.exports = {
                 .output('Success', sql.BIT)
                 .output('Message', sql.VarChar(sql.MAX))
                 .execute('SpAddOrUpdateLineDocuments');
-
-            console.log(result.recordset);
             return {
                 success: result.output.Success,
                 message: result.output.Message,

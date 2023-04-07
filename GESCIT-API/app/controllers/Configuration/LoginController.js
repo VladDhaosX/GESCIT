@@ -148,11 +148,9 @@ module.exports = {
     try {
       const { token, user, email, NewPassword, ConfirmedNewPassword } = req.body;
       let response = await LoginDao.ValidateChangePassword(user, email, token, NewPassword, ConfirmedNewPassword);
-      console.log(response);
       if (response.success) {
         const OldPassword = response.OldPassword;
         const ADresponse = await ADController.changePasswordClient(user, NewPassword, OldPassword);
-        console.log(ADresponse);
         if (ADresponse.success) {
           response = await LoginDao.UpdateNewPassword(user, email, token, NewPassword);
           res.json({ success: true, message: response.message });

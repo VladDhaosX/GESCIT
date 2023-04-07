@@ -1,4 +1,4 @@
-const DocumentsDao = require('../models/DocumentsDao');
+const DocumentsDao = require('../../models/Operation/DocumentsDao');
 
 module.exports = {
     // <--- TRANSPORT LINES ROUTES ---> 

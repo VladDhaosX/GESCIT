@@ -1,8 +1,10 @@
-const DatesDao = require('../models/DatesDao');
-const TransportDao = require('../models/Catalogs/TransportDao');
+const DatesDao = require('../../models/Operation/DatesDao');
+const TransportDao = require('../../models/Catalogs/TransportDao');
+const MailController = require('./MailController');
 
 module.exports = {
-    addOrUpdateDate: async (req, res) => {
+    addOrUpdateDateHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { date } = req.body;
             const result = await DatesDao.addOrUpdateDate(date);
@@ -13,10 +15,11 @@ module.exports = {
         }
     },
 
-    GetSheduleTimes: async (req, res) => {
+    GetScheduleTimesHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { OperationTypeId } = req.body;
-            const result = await DatesDao.GetSheduleTimes(OperationTypeId);
+            const result = await DatesDao.GetScheduleTimes(OperationTypeId);
             res.json(result);
         } catch (error) {
             console.error(error);
@@ -24,7 +27,8 @@ module.exports = {
         }
     },
 
-    GetOperationTypes: async (req, res) => {
+    GetOperationTypesHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { userId } = req.body;
             const result = await DatesDao.GetOperationTypes(userId);
@@ -35,7 +39,8 @@ module.exports = {
         }
     },
 
-    GetProducts: async (req, res) => {
+    GetProductsHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { userId } = req.body;
             const result = await DatesDao.GetProducts(userId);
@@ -46,7 +51,8 @@ module.exports = {
         }
     },
 
-    GetTransportLines: async (req, res) => {
+    GetTransportLinesHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { userId } = req.body;
             const result = await DatesDao.GetTransportLines(userId);
@@ -57,7 +63,8 @@ module.exports = {
         }
     },
 
-    GetTransports: async (req, res) => {
+    GetTransportsHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { userId } = req.body;
             const result = await DatesDao.GetTransports(userId);
@@ -68,7 +75,8 @@ module.exports = {
         }
     },
 
-    GetDrivers: async (req, res) => {
+    GetDriversHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { userId } = req.body;
             const result = await DatesDao.GetDrivers(userId);
@@ -79,11 +87,11 @@ module.exports = {
         }
     },
 
-    GetDates: async (req, res) => {
+    GetDatesHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { userId, StartDate, EndDate, Status } = req.body;
             const result = await DatesDao.GetDates(userId, StartDate, EndDate, Status);
-            console.log(result.data[0]);
             res.json(result);
         } catch (error) {
             console.error(error);
@@ -91,7 +99,8 @@ module.exports = {
         }
     },
 
-    GetTransportsByType: async (req, res) => {
+    GetTransportsByTypeHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { userId, TransportTypeId } = req.body;
             const response = await DatesDao.GetTransportsByType(userId, TransportTypeId);
@@ -101,7 +110,8 @@ module.exports = {
         }
     },
 
-    GetTransportTypes: async (req, res) => {
+    GetTransportTypesHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const response = await TransportDao.getTransportType();
             res.json(response);
@@ -111,6 +121,7 @@ module.exports = {
     },
 
     IsAppointmentTimeAvailableHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const response = await DatesDao.IsAppointmentTimeAvailable();
             res.json(response);
@@ -119,17 +130,19 @@ module.exports = {
         }
     },
 
-    ScheduleAvailables: async (req, res) => {
+    ScheduleAvailableHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { OperationTypeId, TransportTypeId } = req.body;
-            const response = await DatesDao.ScheduleAvailables(OperationTypeId, TransportTypeId);
+            const response = await DatesDao.ScheduleAvailable(OperationTypeId, TransportTypeId);
             res.json(response);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     },
 
-    CancelDate: async (req, res) => {
+    CancelDateHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { dateId } = req.body;
             const response = await DatesDao.CancelDate(dateId);
@@ -139,7 +152,8 @@ module.exports = {
         }
     },
 
-    GetSchedules: async (req, res) => {
+    GetSchedulesHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const response = await DatesDao.GetSchedules();
             res.json(response);
@@ -148,8 +162,8 @@ module.exports = {
         }
     },
 
-    // GetAllHoursOfSchedule: async (ScheduleId) => {
-    GetAllHoursOfSchedule: async (req, res) => {
+    GetAllHoursOfScheduleHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { ScheduleId } = req.body;
             const response = await DatesDao.GetAllHoursOfSchedule(ScheduleId);
@@ -159,15 +173,71 @@ module.exports = {
         }
     },
 
-    AssignDateHour: async (req, res) => {
+    AssignDateHourHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
         try {
             const { DateId, Hour, Minutes } = req.body;
-            console.log(DateId, Hour, Minutes);
             const response = await DatesDao.AssignDateHour(DateId, Hour, Minutes);
-            console.log(response);
+
+            if (!response.success) {
+                const ClientInfoResponse = await MailController.GetClientInfo(DateId);
+                const Client = ClientInfoResponse.data[0];
+                //  DES COMENTAR EN PRODUCCIÓN
+                // const recipientsList = [Client.Mail,'abernal@almer.com.mx'];
+                //  DES COMENTAR EN PRODUCCIÓN
+                //  COMENTAR EN PRODUCCIÓN
+                const recipientsList = ['abernal@almer.com.mx'];
+                //  COMENTAR EN PRODUCCIÓN
+                const subject = 'Cita Almer';
+
+                const body = `Estimado/a cliente ${Client.Cliente}. Le informamos que hemos asignado su cita para la línea de transporte ${Client['Línea de Transporte']} a la(s) ${Client.Hora} del día ${Client.Dia}. Folio de cita: [${Client.Folio}] Agradecemos su preferencia y quedamos a su disposición para cualquier consulta o requerimiento adicional.`;
+
+                const isBodyHtml = false;
+                const mailResponse = await MailController.sendMail(recipientsList, subject, body, isBodyHtml);
+
+                const smsMessage = `Almacenadora Mercader S.A. le informa que hemos asignado su cita para la línea de transporte ${Client['Línea de Transporte']} a la(s) ${Client.Hora} del día ${Client.Dia} con el folio  [${Client.Folio}]. Agradecemos su preferencia.`;
+
+                //  DES COMENTAR EN PRODUCCIÓN
+                // const phoneNumber = Client.Teléfono;
+                //  DES COMENTAR EN PRODUCCIÓN
+                //  COMENTAR EN PRODUCCIÓN
+                const phoneNumber = "3325799271";
+                //  COMENTAR EN PRODUCCIÓN
+
+                const smsResponse = await MailController.sendSMS(smsMessage, phoneNumber);
+
+                // console.log('mailResponse', mailResponse);
+                console.log('smsResponse', smsResponse);
+
+            };
+
+            res.json(response);
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({ message: error.message });
+        }
+    },
+
+    GetClientInfoByFolioHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
+        try {
+            const { Folio } = req.body;
+            const response = await DatesDao.GetClientInfoByFolio(Folio);
             res.json(response);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     },
+
+    UpdateDateStatusHandler: async (req, res) => {
+        // #swagger.tags = ['Configuracion']
+        try {
+            const { DateId, NewStatus } = req.body;
+            const response = await DatesDao.UpdateDateStatus(DateId, NewStatus);
+            res.json(response);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
 };

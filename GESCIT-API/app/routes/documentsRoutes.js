@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const DocumentsController = require('../controllers/DocumentsController');
+const DocumentsController = require('../controllers/Operation/DocumentsController');
 const multer = require('multer');
 const upload = multer({ limits: { fileSize: 1024 * 1024 * 5 } });
 

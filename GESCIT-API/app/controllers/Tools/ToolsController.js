@@ -1,10 +1,10 @@
 const ToolsDao = require('../../models/Tools/ToolsDao');
 
 module.exports = {
-    GetAllSchedulesAvailables: async (req, res) => {
+    GetAllSchedulesAvailable: async (req, res) => {
         try {
             const { date } = req.body;
-            const result = await ToolsDao.GetAllSchedulesAvailables(date);
+            const result = await ToolsDao.GetAllSchedulesAvailable(date);
             res.json(result);
         } catch (error) {
             console.error(error);
