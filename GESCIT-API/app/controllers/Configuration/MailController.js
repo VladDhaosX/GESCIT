@@ -1,7 +1,8 @@
 const request = require('request');
 
 module.exports = {
-  SendResetPassowordEmail: async (user,email,token) => {
+  SendResetPassowordEmail: async (user, email, token) => {
+    // #swagger.tags = ['Configuración']
     const body = {
       recipientsList: [
         email

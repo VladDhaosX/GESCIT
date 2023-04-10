@@ -2,6 +2,7 @@ const ToolsDao = require('../../models/Tools/ToolsDao');
 
 module.exports = {
     GetAllSchedulesAvailable: async (req, res) => {
+        // #swagger.tags = ['Herramientas']
         try {
             const { date } = req.body;
             const result = await ToolsDao.GetAllSchedulesAvailable(date);

@@ -3,6 +3,7 @@ const fetch = require("node-fetch");
 
 module.exports = {
     GetClientInfo: async (DateId) => {
+        // #swagger.tags = ['Operaciones']
         try {
             const result = await MailDao.GetClientInfo(DateId);
             return result;
@@ -11,6 +12,7 @@ module.exports = {
         }
     },
     sendMail: async (recipientsList, subject, body, isBodyHtml) => {
+        // #swagger.tags = ['Operaciones']
         try {
             const response = await fetch('https://portalesdemo.almer.com.mx/AlmerNotificationsApi/Email/SendMailNotification', {
                 method: 'POST',
@@ -30,6 +32,7 @@ module.exports = {
         }
     },
     sendSMS: async (message, phoneNumber) => {
+        // #swagger.tags = ['Operaciones']
         try {
             const response = await fetch('https://portalesdemo.almer.com.mx/AlmerNotificationsApi/SMS/SendSMSMessage', {
                 method: 'POST',

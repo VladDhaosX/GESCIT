@@ -23,6 +23,10 @@ const initPage = async () => {
     </div>
     `);
 
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    $('#txtStartDate , #txtEndDate').val(tomorrow.toISOString().split('T')[0]);
+
     $('#btnNewDateModal').click(function () {
         newDateModal();
     });
@@ -255,8 +259,16 @@ const ExistsScheduleAvailable = async () => {
 };
 
 const newDateModal = async () => {
+
+    const IsAvailableResponse = await IsAppointmentTimeAvailable();
+    const IsAvailable = IsAvailableResponse.IsTimeAvailable;
+    if (!IsAvailable) {
+        await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+        return;
+    };
+
     sessionStorage.setItem('DateId', 0);
-    $('#ScheduleTimesSelect').val(0);
+    $('#SheduleTimesSelect').val(0);
     $('#OperationsSelect').val(0);
     $('#ProductsSelect').val(0);
     $('#TransportLineTypeSelect').val(0);
@@ -267,25 +279,28 @@ const newDateModal = async () => {
     $('#DriversSelect').val(0);
     $('#txtVolume').val('');
     $('#TransportTypeSelect').val(0);
+    $('#TransportPlate2 , #TransportPlate3').parent().hide();
 
     $('#ModalDatesTitle').text('Nueva Cita');
 
-    const IsAvailable = await IsAppointmentTimeAvailable();
-    if (IsAvailable) {
-        const ExistsScheduleAvailableResult = await ExistsScheduleAvailable();
-        if (!ExistsScheduleAvailableResult) {
-            // await FillSelectScheduleAvailable();
-            $('#ModalDates').modal('show');
-        } else {
-            await ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
-        };
+    if (ExistsScheduleAvailablesResult) {
+        // await FillSelectScheduleAvailables();
+        $('#ModalDates').modal('show');
     } else {
-        await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+        await ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
     };
 };
 
 const newDate = async () => {
     try {
+
+        const IsAvailableResponse = await IsAppointmentTimeAvailable();
+        const IsAvailable = IsAvailableResponse.IsTimeAvailable;
+        if (!IsAvailable) {
+            await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+            return;
+        };
+
         const DateId = sessionStorage.getItem('DateId');
         const userId = sessionStorage.getItem('userId');
         const ScheduleTimeId = $('#ScheduleTimesSelect').val();
@@ -300,23 +315,7 @@ const newDate = async () => {
         const driverId = $('#DriversSelect').val();
         const Volume = $('#txtVolume').val();
 
-        const date = {
-            DateId,
-            userId,
-            ScheduleTimeId,
-            operationTypeId,
-            productId,
-            transportLineId,
-            transportId,
-            transportTypeId,
-            TransportPlate,
-            TransportPlate2,
-            TransportPlate3,
-            driverId,
-            Volume
-        };
-
-        const response = await addOrUpdateDates(date);
+        const response = await addOrUpdateDates(DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume);
         let toastType = "Primary";
         let toastPlacement = "Top right";
 
@@ -479,8 +478,8 @@ const ShowEditModal = async (element) => {
         $('#ScheduleTimesSelect').val(data.ScheduleTimeId);
         $('#TransportLineTypeSelect').val(data.TransportLineId);
         $('#TransportPlate1').val(data['Placa de Transporte']);
-        $('#TransportPlate3').val(data['Placa de Caja #1']);
-        $('#TransportPlate2').val(data['Placa de Caja #2']);
+        $('#TransportPlate2').val(data['Placa de Caja #1']);
+        $('#TransportPlate3').val(data['Placa de Caja #2']);
         $('#DriversSelect').val(data.DriverId);
         $('#ProductsSelect').val(data.ProductId);
         $('#txtVolume').val(data['Volumen en Toneladas']);
@@ -762,7 +761,7 @@ const GetDates = async (userId, StartDate, EndDate) => {
     }
 };
 
-const addOrUpdateDates = async (date) => {
+const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume) => {
     try {
         return await $.ajax({
             async: true,
@@ -772,9 +771,7 @@ const addOrUpdateDates = async (date) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/addOrUpdateDates`, type: 'POST', data: {
-                date
-            },
+            url: `${UrlApi}/dates/addOrUpdateDates`, type: 'POST', data: { DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume },
             dataType: 'json'
         });
     } catch (error) {

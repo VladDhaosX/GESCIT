@@ -7,7 +7,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('Date', sql.DateTime, date)
-                .execute('SpAllSchedulesAvailable');
+                .execute('SpAllSchedulesAvailables');
 
             return {
                 "success": true,

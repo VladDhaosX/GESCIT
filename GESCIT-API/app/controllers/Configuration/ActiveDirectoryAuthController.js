@@ -3,6 +3,7 @@ const group = 'GECIT';
 
 module.exports = {
   authMercader: async (username, password) => {
+    // #swagger.tags = ['Configuración']
     const options = {
       url: 'https://portalweb.almer.com.mx/ADConnectDev/api/authenticate',
       method: 'POST',
@@ -27,7 +28,9 @@ module.exports = {
       });
     });
   },
+
   authVCliente: async (username, password) => {
+    // #swagger.tags = ['Configuración']
     const options = {
       url: 'https://portalweb.almer.com.mx/ADConnectDev/api/authenticateVClientes',
       method: 'POST',
@@ -52,7 +55,9 @@ module.exports = {
       });
     });
   },
+
   changePasswordClient: async (username, NewPassword, OldPassword) => {
+    // #swagger.tags = ['Configuración']
     const options = {
       url: 'https://portalweb.almer.com.mx/ADConnectDev/api/changePasswordClientesPC',
       method: 'POST',
@@ -78,7 +83,9 @@ module.exports = {
       });
     });
   },
+
   isMemberOfVClientesGroup: async (username) => {
+    // #swagger.tags = ['Configuración']
     const options = {
       url: 'https://portalweb.almer.com.mx/ADConnectDev/api/isMemberOfVClientesGroup',
       method: 'POST',
@@ -103,7 +110,9 @@ module.exports = {
       });
     });
   },
+
   isMemberOfMercaderGroup: async (username) => {
+    // #swagger.tags = ['Configuración']
     const options = {
       url: 'https://portalweb.almer.com.mx/ADConnectDev/api/isMemberOfMercaderGroup',
       method: 'POST',

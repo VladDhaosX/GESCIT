@@ -2,6 +2,7 @@ const DriversDao = require('../../models/Catalogs/DriversDao');
 
 module.exports = {
   addOrUpdateDriverHandler: async (req, res) => {
+    // #swagger.tags = ['Catálogos']
     try {
       const { Driver } = req.body;
       const result = await DriversDao.addOrUpdateDriver(Driver);
@@ -12,6 +13,7 @@ module.exports = {
     }
   },
   GetDriversHandler: async (req, res) => {
+    // #swagger.tags = ['Catálogos']
     try {
       const { UserId } = req.body;
       const result = await DriversDao.GetDrivers(UserId);

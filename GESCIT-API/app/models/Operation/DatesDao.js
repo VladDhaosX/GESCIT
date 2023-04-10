@@ -2,22 +2,22 @@ const sql = require('mssql');
 const config = require('../../config/database');
 
 module.exports = {
-    addOrUpdateDate: async (appointment) => {
+    addOrUpdateDate: async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('DateId', sql.Int, appointment.DateId)
-                .input('UserId', sql.Int, appointment.userId)
-                .input('ScheduleTimeId', sql.Int, appointment.ScheduleTimeId)
-                .input('OperationTypeId', sql.Int, appointment.operationTypeId)
-                .input('ProductId', sql.Int, appointment.productId)
-                .input('TransportLineId', sql.Int, appointment.transportLineId)
-                .input('TransportId', sql.Int, appointment.transportId)
-                .input('TransportPlate', sql.VarChar(50), appointment.TransportPlate)
-                .input('TransportPlate2', sql.VarChar(50), appointment.TransportPlate2)
-                .input('TransportPlate3', sql.VarChar(50), appointment.TransportPlate3)
-                .input('DriverId', sql.Int, appointment.driverId)
-                .input('Volume', sql.VarChar(50), appointment.Volume)
+                .input('DateId', sql.Int, DateId)
+                .input('UserId', sql.Int, userId)
+                .input('ScheduleTimeId', sql.Int, ScheduleTimeId)
+                .input('OperationTypeId', sql.Int, operationTypeId)
+                .input('ProductId', sql.Int, productId)
+                .input('TransportLineId', sql.Int, transportLineId)
+                .input('TransportId', sql.Int, transportId)
+                .input('TransportPlate', sql.VarChar(50), TransportPlate)
+                .input('TransportPlate2', sql.VarChar(50), TransportPlate2)
+                .input('TransportPlate3', sql.VarChar(50), TransportPlate3)
+                .input('DriverId', sql.Int, driverId)
+                .input('Volume', sql.VarChar(50), Volume)
                 .output('Success', sql.Bit, '0')
                 .output('Message', sql.VarChar(100))
                 .execute('SpAddOrUpdateDates');
@@ -32,28 +32,6 @@ module.exports = {
             return {
                 "success": false,
                 "message": "Error al crear o actualizar la cita.",
-                "info": error.message
-            }
-        }
-    },
-
-    GetScheduleTimes: async (OperationTypeId) => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('OperationTypeId', sql.Int, OperationTypeId)
-                .execute('SpGetScheduleTime');
-
-            return {
-                "success": true,
-                "message": "Horarios obtenidos correctamente.",
-                "data": result.recordset,
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los horarios.",
                 "info": error.message
             }
         }
@@ -215,51 +193,6 @@ module.exports = {
         }
     },
 
-    IsAppointmentTimeAvailable: async () => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .output('IsTimeAvailable', sql.Bit)
-                .execute('SpIsAppointmentTimeAvailable');
-
-            return {
-                "success": true,
-                "message": "Consulta obtenida correctamente.",
-                "data": result.output
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los datos.",
-                "info": error.message
-            }
-        }
-    },
-
-    ScheduleAvailable: async (OperationTypeId, TransportTypeId) => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('OperationTypeId', sql.Int, OperationTypeId)
-                .input('TransportTypeId', sql.Int, TransportTypeId)
-                .execute('SpSchedulesAvailable');
-
-            return {
-                "success": true,
-                "message": "Consulta obtenida correctamente.",
-                "data": result.recordset
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los datos.",
-                "info": error.message
-            }
-        }
-    },
-
     CancelDate: async (DateId) => {
         try {
             let pool = await sql.connect(config);
@@ -272,49 +205,6 @@ module.exports = {
             return {
                 "success": result.output.Success,
                 "message": result.output.Message,
-                "data": result.recordset
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los datos.",
-                "info": error.message
-            }
-        }
-    },
-
-    GetSchedules: async () => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .execute('SpGetSchedules');
-
-            return {
-                "success": true,
-                "message": "Consulta obtenida correctamente.",
-                "data": result.recordset
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los datos.",
-                "info": error.message
-            }
-        }
-    },
-
-    GetAllHoursOfSchedule: async (ScheduleId) => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('ScheduleId', sql.Int, ScheduleId)
-                .execute('SpGetAllHoursOfSchedule');
-
-            return {
-                "success": true,
-                "message": "Consulta obtenida correctamente.",
                 "data": result.recordset
             }
 

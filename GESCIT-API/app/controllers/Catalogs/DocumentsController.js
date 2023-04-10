@@ -3,6 +3,7 @@ const DocumentsDao = require('../../models/Catalogs/DocumentsDao');
 module.exports = {
 
   GetClientsByStatusDocsHandler: async (req, res) => {
+    // #swagger.tags = ['Catálogos']
     try {
       const { Status } = req.body;
       const result = await DocumentsDao.GetClientsByStatusDocs(Status);
@@ -13,6 +14,7 @@ module.exports = {
     }
   },
   GetDocumentsByClientHandler: async (req, res) => {
+    // #swagger.tags = ['Catálogos']
     try {
       const { AccountNum, Status, DocumentType } = req.body;
       const result = await DocumentsDao.GetDocumentsByClient(AccountNum, Status, DocumentType);
@@ -23,6 +25,7 @@ module.exports = {
     }
   },
   UpdateDocumentStatusHandler: async (req, res) => {
+    // #swagger.tags = ['Catálogos']
     try {
       const { DocumentFileId, NewStatus } = req.body;
       const result = await DocumentsDao.UpdateDocumentStatus(DocumentFileId, NewStatus);

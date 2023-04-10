@@ -2,6 +2,7 @@ const TransportLineDao = require('../../models/Catalogs/TransportLineDao');
 
 module.exports = {
 	async addOrUpdateTransportLineHandler(req, res) {
+		// #swagger.tags = ['Catálogos']
 		try {
 			const { TransportLine } = req.body;
 			const result = await TransportLineDao.addOrUpdateTransportLine(TransportLine);
@@ -12,6 +13,7 @@ module.exports = {
 	},
 
 	async getTransportLinesHandler(req, res) {
+		// #swagger.tags = ['Catálogos']
 		try {
 			const { userId } = req.body;
 			const transportLines = await TransportLineDao.getTransportLines(userId);
@@ -23,6 +25,7 @@ module.exports = {
 	},
 
 	async getTransportLineTypesHandler(req, res) {
+		// #swagger.tags = ['Catálogos']
 		try {
 			const transportLines = await TransportLineDao.getTransportLineTypes();
 			res.json(transportLines);

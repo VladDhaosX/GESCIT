@@ -4,8 +4,6 @@ const DatesController = require('../controllers/Operation/DatesController');
 
 router.post('/addOrUpdateDates', DatesController.addOrUpdateDateHandler);
 
-router.post('/GetScheduleTimes', DatesController.GetScheduleTimesHandler);
-
 router.post('/GetOperationTypes', DatesController.GetOperationTypesHandler);
 
 router.post('/GetProducts', DatesController.GetProductsHandler);
@@ -22,15 +20,7 @@ router.get('/GetTransportType', DatesController.GetTransportTypesHandler);
 
 router.post('/GetTransportsByType', DatesController.GetTransportsByTypeHandler);
 
-router.get('/IsAppointmentTimeAvailable', DatesController.IsAppointmentTimeAvailableHandler);
-
-router.post('/ScheduleAvailable', DatesController.ScheduleAvailableHandler);
-
 router.post('/CancelDate', DatesController.CancelDateHandler);
-
-router.get('/GetSchedules', DatesController.GetSchedulesHandler);
-
-router.post('/GetAllHoursOfSchedule', DatesController.GetAllHoursOfScheduleHandler);
 
 router.post('/AssignDateHour', DatesController.AssignDateHourHandler);
 

@@ -3,6 +3,7 @@ const DocumentsDao = require('../../models/Operation/DocumentsDao');
 module.exports = {
     // <--- TRANSPORT LINES ROUTES ---> 
     AddOrUpdateLineDocumentHandler: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
         try {
             let { userId, TemporalDocumentId, DocumentId, TransportLineId } = req.body;
             if (req.file) {
@@ -25,6 +26,7 @@ module.exports = {
 
     // <--- DRIVERS ROUTES ---> 
     AddOrUpdateDriverDocumentHandler: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
         try {
             let { userId, TemporalDocumentId, DocumentId, DriverId } = req.body;
             if (req.file) {
@@ -47,6 +49,7 @@ module.exports = {
 
     //AddDocumentFileHandler
     AddDocumentFileHandler: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
         try {
             let { userId, TemporalDocumentId, DocumentId, ModuleId } = req.body;
             if (req.file) {
@@ -68,18 +71,21 @@ module.exports = {
     },
 
     GetDocumentFilesByModuleIdHandler: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
         const { DocumentType, ModuleId, TemporalDocumentId } = req.body;
         const response = await DocumentsDao.GetDocumentFilesByModuleId(DocumentType, ModuleId, TemporalDocumentId);
         res.send(response);
     },
 
     GetDocumentsListHandler: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
         const { DocumentType } = req.body;
         const response = await DocumentsDao.GetDocumentsList(DocumentType);
         res.send(response);
     },
 
     GetDocumentByIdHandler: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
         const { DocumentId } = req.body;
         const response = await DocumentsDao.GetDocumentById(DocumentId);
         res.header('Access-Control-Expose-Headers', '*');
@@ -88,12 +94,14 @@ module.exports = {
     },
 
     DeleteDocumentByIdHandler: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
         const { DocumentId } = req.body;
         const response = await DocumentsDao.DeleteDocumentById(DocumentId);
         res.send(response);
     },
 
     NotDeleteDocuments: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
         const { ModuleId, DocumentType } = req.body;
         const response = await DocumentsDao.NotDeleteDocuments(ModuleId, DocumentType);
         res.send(response);
