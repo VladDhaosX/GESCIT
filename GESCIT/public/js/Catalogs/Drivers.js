@@ -471,8 +471,25 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                 {
                     title: 'Acciones',
                     data: 'Id',
-                    "render": function (data, type, row) {
-                        return `
+                    render: function (data, type, row) {
+                        const StatusId = row.StatusId;
+                        if (StatusId == 4) {
+                            return `
+                                    <button 
+                                        class="btn rounded-pill btn-icon btn-outline-primary" 
+                                        type="button" 
+                                        id="DonwloadDriverDocument"
+                                        data='${JSON.stringify(row)}'
+                                        title='Descargar'
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        onclick='DonwloadDriverDocument(this);'
+                                    >
+                                        <span class="tf-icons bx bxs-download"></span>
+                                    </button>`
+                        }
+                        else {
+                            return `
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary" 
                                         type="button" 
@@ -498,6 +515,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                                         <span class="tf-icons bx bx-trash"></span>
                                     </button>
                                 `
+                        }
                     }
                 },
                 ...Object.keys(data[0]).map(propName => ({
