@@ -134,6 +134,18 @@ app.get(config.BasePath + '/Documents', (req, res) => {
     res.render('views', data);
 });
 
+app.get(config.BasePath + '/Security', (req, res) => {
+    const data = {
+        Page: './Dates/Security',
+        Categoria: 'Gestor',
+        Modulo: 'Seguridad',
+        JSFile: './js/Dates/Security.js',
+        BasePath: config.BasePath,
+        UrlApi: config.urlApi,
+    };
+    res.render('views', data);
+});
+
 app.listen(process.env.PORT || 3000, () => {
     console.log('La aplicación está escuchando en el puerto 3000');
 });
