@@ -125,8 +125,8 @@ app.get(config.BasePath + '/AssignDates', (req, res) => {
 app.get(config.BasePath + '/Documents', (req, res) => {
     const data = {
         Page: './Catalogs/Documents',
-        Categoria: 'Jurídico',
-        Modulo: 'Tablero documentos',
+        Categoria: 'Catálogos',
+        Modulo: 'Documentos',
         JSFile: './js/Catalogs/Documents.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
