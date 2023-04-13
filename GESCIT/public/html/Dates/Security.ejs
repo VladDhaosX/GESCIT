@@ -1,17 +1,113 @@
 <div class="col-md-8 mx-auto">
-    <div class="card mb-4">
-      <h5 class="card-header">Ingresar Folio</h5>
-      <div class="card-body">
-        <div class="form-floating">
-          <input type="text" class="form-control my-3" id="InputDateId" placeholder="ENT-xxxxxxxx-xx	" aria-describedby="floatingInputHelp">
-          <label for="floatingInput">Folio</label>
-          <div id="floatingInputHelp" class="form-text">
-            Ingresar el folio mostrará la información a validar.
-          </div>
+  <div class="card mb-4">
+    <h5 class="card-header">Ingresar Folio</h5>
+    <div class="card-body">
+      <div class="form-floating">
+        <input type="text" class="form-control my-3" id="InputDateId" placeholder="ENT-xxxxxxxx-xx	"
+          aria-describedby="floatingInputHelp">
+        <label for="floatingInput">Folio</label>
+        <div id="floatingInputHelp" class="form-text">
+          Ingresar el folio mostrará la información a validar.
         </div>
       </div>
-      <button type="button" class="btn btn-primary btn-lg btn-block my-3 mx-4" id="ConfirmIdButton">Enviar</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-lg btn-block my-3 mx-4" id="ConfirmIdButton">Enviar</button>
+  </div>
+</div>
+
+<!-- Alertas-->
+
+<div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center"
+  style="min-height: 200px;">
+  <!-- Alerta folio incompleto -->
+  <div class="bs-toast toast fade bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <i class="bx bx-bell me-2"></i>
+      <div class="me-auto fw-semibold">Información Incompleta</div>
+      <small></small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Favor de agregar el folio completo de la cita.
     </div>
   </div>
 
-<!-- Modal -->
+  <!-- Alerta folio incorrecto -->
+  <div class="bs-toast toast fade bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <i class="bx bx-bell me-2"></i>
+      <div class="me-auto fw-semibold">Folio no existe</div>
+      <small></small>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      El folio ingresado no existe dentro del sistema.
+    </div>
+  </div>
+
+  <!-- Alerta Registro Correcto -->
+  <div class="bs-toast toast fade bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <i class="bx bx-bell me-2"></i>
+      <div class="me-auto fw-semibold">Aviso</div>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Se ha registrado satisfactoriamente la llegada.
+    </div>
+  </div>
+</div>
+
+<!-- Modal Info Cita -->
+<div class="modal fade" id="DateInformationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Información de Cita</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col mb-3">
+            <label for="DriverName" class="form-label">Nombre del Chofer:</label>
+            <div class="form-control-plaintext" id="DriverName"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-3">
+            <label for="TransportLine" class="form-label">Línea de Transporte:</label>
+            <div class="form-control-plaintext" id="TransportLine"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-3">
+            <label for="TransportType" class="form-label">Tipo de Transporte:</label>
+            <div class="form-control-plaintext" id="TransportType"></div>
+          </div>
+          <div class="col mb-3">
+            <label for="TransportPlates" class="form-label">Placas:</label>
+            <div class="form-control-plaintext" id="TransportPlates"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col mb-3">
+            <label for="Date" class="form-label">Fecha de Cita:</label>
+            <div class="form-control-plaintext" id="Date"></div>
+          </div>
+          <div class="col mb-3">
+            <label for="Time" class="form-label">Horario de Cita:</label>
+            <div class="form-control-plaintext" id="Time"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="button" class="btn btn-outline-secondary" id="RegisterAccess">
+          Registrar Ingreso
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -5,12 +5,13 @@ $(document).ready(async function () {
     sessionStorage.setItem("TemporalDocumentId", 0);
 
     await UnreviewedTable();
-    await ApprovedTable();
+    await initButtons();
+    //await ApprovedTable();
 
 });
 
 const GetDocumentsByClient = async (AccountNum, Status, DocumentType) => {
-    try {
+    try{
         const response = await $.ajax({
             async: true,
             beforeSend: function () {
@@ -114,8 +115,8 @@ const GetDocumentById = (DocumentId) => {
     }
 };
 
-const UpdateDocumentStatus = async (DocumentFileId, NewStatus) =>{
-    try{
+const UpdateDocumentStatus = async (DocumentFileId, NewStatus) => {
+    try {
         const response = await $.ajax({
             async: true,
             beforeSend: function () {
@@ -129,12 +130,12 @@ const UpdateDocumentStatus = async (DocumentFileId, NewStatus) =>{
             , dataType: 'json'
             , data: {
                 DocumentFileId: DocumentFileId,
-                NewStatus: NewStatus,
+                NewStatus: NewStatus
             }
         });
         return response;
 
-    } catch(error){
+    } catch (error) {
         console.error(error);
     }
 };
@@ -168,6 +169,7 @@ const UnreviewedTable = async () => {
                                     <ul class="dropdown-menu">
                                         <li>
                                             <button class="dropdown-item" 
+                                            id="UnreviewedTransportLinesModalButton"
                                             onclick= 'TransportLinesDocumentsModal(this, "unreviewed")';
                                             data='${JSON.stringify(row)}'
                                             >
@@ -175,12 +177,14 @@ const UnreviewedTable = async () => {
                                         </li>
                                         <li>
                                             <button class="dropdown-item" 
+                                            id="UnreviewedDriversModalButton"
                                             onclick= 'DriversDocumentsModal(this, "unreviewed")';
                                             data='${JSON.stringify(row)}'
                                             >
                                             Chofer</button></li>
                                         <li>
                                             <button class="dropdown-item" 
+                                            id="UnreviewedTransportsModalButton"
                                             onclick= 'TransportsDocumentsModal(this, "unreviewed")';
                                             data='${JSON.stringify(row)}'
                                             >
@@ -203,7 +207,11 @@ const UnreviewedTable = async () => {
                     url: './js/datatable-esp.json'
                 }
             });
+            $('#UnreviewedDriversModalButton').on('shown.bs.modal', async function () {
+                await DriversDocumentsModal(this, "unreviewed")
+            });
         }
+
     } catch (error) {
         console.error(error);
     }
@@ -283,6 +291,8 @@ const UnreviewedTransportLinesTable = async (AccountNum) => {
     try {
         if ($.fn.DataTable.isDataTable('#DocumentsTable')) {
             $('#DocumentsTable').DataTable().destroy();
+            var div = document.getElementById('DocumentsTable');
+            div.innerHTML = "";
         }
 
         const data = await GetDocumentsByClient(AccountNum, "unreviewed", "Linea Transportista");
@@ -357,6 +367,8 @@ const UnreviewedDriversTable = async (AccountNum) => {
     try {
         if ($.fn.DataTable.isDataTable('#DocumentsTable')) {
             $('#DocumentsTable').DataTable().destroy();
+            var div = document.getElementById('DocumentsTable');
+            div.innerHTML = "";
         }
 
         const data = await GetDocumentsByClient(AccountNum, "unreviewed", "Chofer");
@@ -431,6 +443,8 @@ const UnreviewedTransportsTable = async (AccountNum) => {
     try {
         if ($.fn.DataTable.isDataTable('#DocumentsTable')) {
             $('#DocumentsTable').DataTable().destroy();
+            var div = document.getElementById('DocumentsTable');
+            div.innerHTML = "";
         }
 
         const data = await GetDocumentsByClient(AccountNum, "unreviewed", "Transporte");
@@ -505,6 +519,8 @@ const ApprovedTransportLinesTable = async (AccountNum) => {
     try {
         if ($.fn.DataTable.isDataTable('#DocumentsTable')) {
             $('#DocumentsTable').DataTable().destroy();
+            var div = document.getElementById('DocumentsTable');
+            div.innerHTML = "";
         }
 
         const data = await GetDocumentsByClient(AccountNum, "approved", "Linea Transportista");
@@ -556,6 +572,8 @@ const ApprovedDriversTable = async (AccountNum) => {
     try {
         if ($.fn.DataTable.isDataTable('#DocumentsTable')) {
             $('#DocumentsTable').DataTable().destroy();
+            var div = document.getElementById('DocumentsTable');
+            div.innerHTML = "";
         }
 
         const data = await GetDocumentsByClient(AccountNum, "approved", "Chofer");
@@ -607,6 +625,8 @@ const ApprovedTransportsTable = async (AccountNum) => {
     try {
         if ($.fn.DataTable.isDataTable('#DocumentsTable')) {
             $('#DocumentsTable').DataTable().destroy();
+            var div = document.getElementById('DocumentsTable');
+            div.innerHTML = "";
         }
 
         const data = await GetDocumentsByClient(AccountNum, "approved", "Transporte");
@@ -656,15 +676,27 @@ const ApprovedTransportsTable = async (AccountNum) => {
 
 const TransportLinesDocumentsModal = async (e, Status) => {
     try {
+        const DocumentType = 'Linea Transportista';
+        let Cliente = 0;
         const Client = $(e).attr('data');
         const ClientObj = JSON.parse(Client);
-        if(Status=='unreviewed'){
-            await UnreviewedTransportLinesTable(ClientObj.Cliente);
-            $('#Documents').modal('show');
+
+        Cliente = ClientObj.Cliente;
+
+        data = await GetDocumentsByClient(Cliente,Status,DocumentType);
+
+        sessionStorage.setItem("AccountNum", Cliente);
+        sessionStorage.setItem("DocumentType", DocumentType);
+        sessionStorage.setItem("Status", Status);
+        
+
+        if(data.length>0){
+            $('#Documents').modal('show');  
         }
-        else if(Status='approved'){
-            await ApprovedTransportLinesTable(ClientObj.Cliente);
-            $('#Documents').modal('show');
+        else{
+            toastType = 'Danger';
+            toastPlacement = 'Middle center';
+            await ToastsNotification("No Existen Documentos", "El apartado que intentas consultar se encuentra vacío.", toastType, toastPlacement);
         }
 
     } catch (error) {
@@ -674,16 +706,28 @@ const TransportLinesDocumentsModal = async (e, Status) => {
 
 const DriversDocumentsModal = async (e, Status) => {
     try {
+        const DocumentType = 'Chofer';
+        let Cliente = 0;
         const Client = $(e).attr('data');
         const ClientObj = JSON.parse(Client);
-        if(Status=='unreviewed'){
-            await UnreviewedDriversTable(ClientObj.Cliente);
-            $('#Documents').modal('show');
+
+        Cliente = ClientObj.Cliente;
+
+        const data = await GetDocumentsByClient(Cliente,Status,DocumentType);
+
+        sessionStorage.setItem("AccountNum", Cliente);
+        sessionStorage.setItem("DocumentType", DocumentType);
+        sessionStorage.setItem("Status", Status);
+
+        if(data.length>0){
+            $('#Documents').modal('show');  
         }
-        else if(Status='approved'){
-            await ApprovedDriversTable(ClientObj.Cliente);
-            $('#Documents').modal('show');
+        else{
+            toastType = 'Danger';
+            toastPlacement = 'Middle center';
+            await ToastsNotification("No Existen Documentos", "El apartado que intentas consultar se encuentra vacío.", toastType, toastPlacement);
         }
+
     } catch (error) {
         console.error(error);
     }
@@ -691,16 +735,29 @@ const DriversDocumentsModal = async (e, Status) => {
 
 const TransportsDocumentsModal = async (e, Status) => {
     try {
+        const DocumentType = 'Transporte';
+        let Cliente = 0;
         const Client = $(e).attr('data');
-        const ClientObj = JSON.parse(Client);
-        if(Status=='unreviewed'){
-            await UnreviewedTransportsTable(ClientObj.Cliente);
-            $('#Documents').modal('show');
+        const ClientObj = JSON.parse(Cliente);
+        
+
+        Cliente = ClientObj.Cliente;
+
+        const data = await GetDocumentsByClient(Cliente,Status,DocumentType);
+
+        sessionStorage.setItem("AccountNum", Client);
+        sessionStorage.setItem("DocumentType", DocumentType);
+        sessionStorage.setItem("Status", Status);
+
+        if(data.length>0){
+            $('#Documents').modal('show');  
         }
-        else if(Status='approved'){
-            await ApprovedTransportsTable(ClientObj.Cliente);
-            $('#Documents').modal('show');
+        else{
+            toastType = 'Danger';
+            toastPlacement = 'Middle center';
+            await ToastsNotification("No Existen Documentos", "El apartado que intentas consultar se encuentra vacío.", toastType, toastPlacement);
         }
+
     } catch (error) {
         console.error(error);
     }
@@ -716,22 +773,68 @@ const DownloadDocument = async (e) => {
     }
 };
 
-const ApproveDocument = async (e)=>{
+const ApproveDocument = async (e) => {
     if (e) {
         const data = $(e).attr('data');
         const dataObj = JSON.parse(data);
-        const DocumentFileId = dataObj.DocumentFileId;
+        const DocumentFileId = dataObj.Id;
 
         UpdateDocumentStatus(DocumentFileId, 'approved');
     }
 }
 
-const RejectDocument = async (e)=>{
+const RejectDocument = async (e) => {
     if (e) {
         const data = $(e).attr('data');
         const dataObj = JSON.parse(data);
-        const DocumentFileId = dataObj.DocumentFileId;
+        const DocumentFileId = dataObj.Id;
 
         UpdateDocumentStatus(DocumentFileId, 'rejected');
     }
 }
+
+const initButtons = async () => {
+    try {
+
+        $('#ApprovedTabButton').on('shown.bs.tab', async function () {
+            await ApprovedTable();
+        });
+
+        $('#Documents').on('shown.bs.modal', async function () {
+            let AccountNum = sessionStorage.getItem('AccountNum');
+            let DocumentType = sessionStorage.getItem('DocumentType');
+            let Status = sessionStorage.getItem('Status');
+
+            if (DocumentType=='Chofer'){
+                if(Status== 'approved'){
+                    await ApprovedDriversTable(AccountNum);
+                }
+                else if (Status== 'unreviewed'){
+                    await UnreviewedDriversTable(AccountNum);
+                }
+            }
+            else if (DocumentType=='Transporte'){
+                if(Status== 'approved'){
+                    await ApprovedTransportsTable(AccountNum);
+                }
+                else if (Status== 'unreviewed'){
+                    await UnreviewedTransportsTable(AccountNum);
+                }            }
+            else if (DocumentType=='Linea Transportista'){
+                if(Status== 'approved'){
+                    await ApprovedTransportLinesTable(AccountNum);
+                }
+                else if (Status== 'unreviewed'){
+                    await UnreviewedTransportLinesTable(AccountNum);
+                }  
+            }
+            else{
+                console.log("No se encontró el tipo de documento pedido.")
+            }
+        });
+
+
+    } catch (error) {
+        console.error(error);
+    }
+};
