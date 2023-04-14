@@ -696,7 +696,7 @@ const TransportLinesDocumentsModal = async (e, Status) => {
         else{
             toastType = 'Danger';
             toastPlacement = 'Middle center';
-            await ToastsNotification("No Existen Documentos", "El apartado que intentas consultar se encuentra vacío.", toastType, toastPlacement);
+            await ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
         }
 
     } catch (error) {
@@ -725,7 +725,7 @@ const DriversDocumentsModal = async (e, Status) => {
         else{
             toastType = 'Danger';
             toastPlacement = 'Middle center';
-            await ToastsNotification("No Existen Documentos", "El apartado que intentas consultar se encuentra vacío.", toastType, toastPlacement);
+            await ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
         }
 
     } catch (error) {
@@ -755,7 +755,7 @@ const TransportsDocumentsModal = async (e, Status) => {
         else{
             toastType = 'Danger';
             toastPlacement = 'Middle center';
-            await ToastsNotification("No Existen Documentos", "El apartado que intentas consultar se encuentra vacío.", toastType, toastPlacement);
+            await ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
         }
 
     } catch (error) {
