@@ -780,7 +780,6 @@ const ApproveDocument = async (e) => {
         const DocumentFileId = dataObj.Id; 
         
         const response = await UpdateDocumentStatus(DocumentFileId, 'approved');
-        console.log(response);
 
         if(response.output.Success){
             toastType = 'Primary';
@@ -805,7 +804,6 @@ const RejectDocument = async (e) => {
         const DocumentFileId = dataObj.Id;
 
         const response = await UpdateDocumentStatus(DocumentFileId, 'rejected');
-        console.log(response);
 
         if(response.output.Success){
             toastType = 'Primary';
