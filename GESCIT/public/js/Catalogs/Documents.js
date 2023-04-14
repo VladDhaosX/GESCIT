@@ -777,14 +777,24 @@ const ApproveDocument = async (e) => {
     if (e) {
         const data = $(e).attr('data');
         const dataObj = JSON.parse(data);
-        const DocumentFileId = dataObj.Id;
+        const DocumentFileId = dataObj.Id; 
+        
+        const response = await UpdateDocumentStatus(DocumentFileId, 'approved');
+        console.log(response);
 
-        toastType = 'Primary';
-        toastPlacement = 'Top right';
+        if(response.output.Success){
+            toastType = 'Primary';
+            toastPlacement = 'Top right';
+            await ToastsNotification("Documento Aprobado", "El documento ha sido aprobado correctamente.", toastType, toastPlacement);
+            ApprovedTable();
+            UnreviewedTable();
 
-        UpdateDocumentStatus(DocumentFileId, 'approved');
-
-        await ToastsNotification("Documento Aprobado", "El documento ha sido aprobado correctamente.", toastType, toastPlacement);
+        }
+        else{
+            toastType = 'Danger';
+            toastPlacement = 'Top right';
+            await ToastsNotification("Falla en Aprobación", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
+        }
     }
 }
 
@@ -794,13 +804,22 @@ const RejectDocument = async (e) => {
         const dataObj = JSON.parse(data);
         const DocumentFileId = dataObj.Id;
 
-        toastType = 'Primary';
-        toastPlacement = 'Top right';
+        const response = await UpdateDocumentStatus(DocumentFileId, 'rejected');
+        console.log(response);
 
+        if(response.output.Success){
+            toastType = 'Primary';
+            toastPlacement = 'Top right';
+            await ToastsNotification("Documento Rechazado", "El documento ha sido rechazado correctamente.", toastType, toastPlacement);
+            ApprovedTable();
+            UnreviewedTable();
 
-        UpdateDocumentStatus(DocumentFileId, 'rejected');
-
-        await ToastsNotification("Documento Rechazado", "El documento ha sido rechazado correctamente.", toastType, toastPlacement);
+        }
+        else{
+            toastType = 'Danger';
+            toastPlacement = 'Top right';
+            await ToastsNotification("Falla en Rechazo", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
+        }
     }
 }
 
