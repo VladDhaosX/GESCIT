@@ -75,13 +75,13 @@ const ConfirmIdButton = async () => {
             }
             else {
                 toastType = 'Danger';
-                toastPlacement = 'Middle center';
+                toastPlacement = 'Top right';
                 await ToastsNotification("Folio no encontrado", "La cita no concuerda con ninguna cita del día de hoy.", toastType, toastPlacement);
             }
         }
         else {
             toastType = 'Danger';
-            toastPlacement = 'Middle center';
+            toastPlacement = 'Top right';
             await ToastsNotification("Campo Vacío", "Favor de insertar un folio.", toastType, toastPlacement);
         }
     } catch (error) {
@@ -96,7 +96,7 @@ const RegisterAccessButton = async () => {
         const data = $(Response).attr('data');
         if (data.length > 0) {
             toastType = 'Success';
-            toastPlacement = 'Middle center';
+            toastPlacement = 'Top right';
             await ToastsNotification("Arribo Registrado", "Se registró correctamente la llegada a almacén.", toastType, toastPlacement);
         }
 

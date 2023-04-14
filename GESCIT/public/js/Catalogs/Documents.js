@@ -11,7 +11,7 @@ $(document).ready(async function () {
 });
 
 const GetDocumentsByClient = async (AccountNum, Status, DocumentType) => {
-    try{
+    try {
         const response = await $.ajax({
             async: true,
             beforeSend: function () {
@@ -683,19 +683,19 @@ const TransportLinesDocumentsModal = async (e, Status) => {
 
         Cliente = ClientObj.Cliente;
 
-        data = await GetDocumentsByClient(Cliente,Status,DocumentType);
+        data = await GetDocumentsByClient(Cliente, Status, DocumentType);
 
         sessionStorage.setItem("AccountNum", Cliente);
         sessionStorage.setItem("DocumentType", DocumentType);
         sessionStorage.setItem("Status", Status);
-        
 
-        if(data.length>0){
-            $('#Documents').modal('show');  
+
+        if (data.length > 0) {
+            $('#Documents').modal('show');
         }
-        else{
+        else {
             toastType = 'Danger';
-            toastPlacement = 'Middle center';
+            toastPlacement = 'Top right';
             await ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
         }
 
@@ -713,18 +713,18 @@ const DriversDocumentsModal = async (e, Status) => {
 
         Cliente = ClientObj.Cliente;
 
-        const data = await GetDocumentsByClient(Cliente,Status,DocumentType);
+        const data = await GetDocumentsByClient(Cliente, Status, DocumentType);
 
         sessionStorage.setItem("AccountNum", Cliente);
         sessionStorage.setItem("DocumentType", DocumentType);
         sessionStorage.setItem("Status", Status);
 
-        if(data.length>0){
-            $('#Documents').modal('show');  
+        if (data.length > 0) {
+            $('#Documents').modal('show');
         }
-        else{
+        else {
             toastType = 'Danger';
-            toastPlacement = 'Middle center';
+            toastPlacement = 'Top right';
             await ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
         }
 
@@ -739,22 +739,22 @@ const TransportsDocumentsModal = async (e, Status) => {
         let Cliente = 0;
         const Client = $(e).attr('data');
         const ClientObj = JSON.parse(Cliente);
-        
+
 
         Cliente = ClientObj.Cliente;
 
-        const data = await GetDocumentsByClient(Cliente,Status,DocumentType);
+        const data = await GetDocumentsByClient(Cliente, Status, DocumentType);
 
         sessionStorage.setItem("AccountNum", Client);
         sessionStorage.setItem("DocumentType", DocumentType);
         sessionStorage.setItem("Status", Status);
 
-        if(data.length>0){
-            $('#Documents').modal('show');  
+        if (data.length > 0) {
+            $('#Documents').modal('show');
         }
-        else{
+        else {
             toastType = 'Danger';
-            toastPlacement = 'Middle center';
+            toastPlacement = 'Top right';
             await ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
         }
 
@@ -779,7 +779,12 @@ const ApproveDocument = async (e) => {
         const dataObj = JSON.parse(data);
         const DocumentFileId = dataObj.Id;
 
+        toastType = 'Success';
+        toastPlacement = 'Top right';
+
         UpdateDocumentStatus(DocumentFileId, 'approved');
+
+        await ToastsNotification("Documento Aprobado", "El documento ha sido aprobado correctamente.", toastType, toastPlacement);
     }
 }
 
@@ -789,7 +794,13 @@ const RejectDocument = async (e) => {
         const dataObj = JSON.parse(data);
         const DocumentFileId = dataObj.Id;
 
+        toastType = 'Success';
+        toastPlacement = 'Top right';
+
+
         UpdateDocumentStatus(DocumentFileId, 'rejected');
+
+        await ToastsNotification("Documento Rechazado", "El documento ha sido rechazado correctamente.", toastType, toastPlacement);
     }
 }
 
@@ -805,30 +816,31 @@ const initButtons = async () => {
             let DocumentType = sessionStorage.getItem('DocumentType');
             let Status = sessionStorage.getItem('Status');
 
-            if (DocumentType=='Chofer'){
-                if(Status== 'approved'){
+            if (DocumentType == 'Chofer') {
+                if (Status == 'approved') {
                     await ApprovedDriversTable(AccountNum);
                 }
-                else if (Status== 'unreviewed'){
+                else if (Status == 'unreviewed') {
                     await UnreviewedDriversTable(AccountNum);
                 }
             }
-            else if (DocumentType=='Transporte'){
-                if(Status== 'approved'){
+            else if (DocumentType == 'Transporte') {
+                if (Status == 'approved') {
                     await ApprovedTransportsTable(AccountNum);
                 }
-                else if (Status== 'unreviewed'){
+                else if (Status == 'unreviewed') {
                     await UnreviewedTransportsTable(AccountNum);
-                }            }
-            else if (DocumentType=='Linea Transportista'){
-                if(Status== 'approved'){
+                }
+            }
+            else if (DocumentType == 'Linea Transportista') {
+                if (Status == 'approved') {
                     await ApprovedTransportLinesTable(AccountNum);
                 }
-                else if (Status== 'unreviewed'){
+                else if (Status == 'unreviewed') {
                     await UnreviewedTransportLinesTable(AccountNum);
-                }  
+                }
             }
-            else{
+            else {
                 console.log("No se encontró el tipo de documento pedido.")
             }
         });
