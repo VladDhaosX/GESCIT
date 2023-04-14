@@ -63,6 +63,7 @@ const ConfirmIdButton = async () => {
                 const AssignedTime = $(Date).attr('Horario');
 
                 sessionStorage.setItem("Id", DateId);
+                sessionStorage.setItem("Folio", Folio);
 
                 document.getElementById('DriverName').innerHTML = "<p>" + DriverName + "</p>";
                 document.getElementById('TransportLine').innerHTML = "<p>" + TransportLine + "</p>";
@@ -95,7 +96,7 @@ const RegisterAccessButton = async () => {
         const Response = await UpdateDateStatusArrival(Folio, "arrival");
         const data = $(Response).attr('data');
         if (data.length > 0) {
-            toastType = 'Success';
+            toastType = 'Primary';
             toastPlacement = 'Top right';
             await ToastsNotification("Arribo Registrado", "Se registró correctamente la llegada a almacén.", toastType, toastPlacement);
         }

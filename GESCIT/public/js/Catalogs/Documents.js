@@ -738,14 +738,14 @@ const TransportsDocumentsModal = async (e, Status) => {
         const DocumentType = 'Transporte';
         let Cliente = 0;
         const Client = $(e).attr('data');
-        const ClientObj = JSON.parse(Cliente);
+        const ClientObj = JSON.parse(Client);
 
 
         Cliente = ClientObj.Cliente;
 
         const data = await GetDocumentsByClient(Cliente, Status, DocumentType);
 
-        sessionStorage.setItem("AccountNum", Client);
+        sessionStorage.setItem("AccountNum", Cliente);
         sessionStorage.setItem("DocumentType", DocumentType);
         sessionStorage.setItem("Status", Status);
 
@@ -779,7 +779,7 @@ const ApproveDocument = async (e) => {
         const dataObj = JSON.parse(data);
         const DocumentFileId = dataObj.Id;
 
-        toastType = 'Success';
+        toastType = 'Primary';
         toastPlacement = 'Top right';
 
         UpdateDocumentStatus(DocumentFileId, 'approved');
@@ -794,7 +794,7 @@ const RejectDocument = async (e) => {
         const dataObj = JSON.parse(data);
         const DocumentFileId = dataObj.Id;
 
-        toastType = 'Success';
+        toastType = 'Primary';
         toastPlacement = 'Top right';
 
 
