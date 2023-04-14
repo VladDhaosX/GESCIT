@@ -51,28 +51,27 @@ const ConfirmIdButton = async () => {
     try {
         const Folio = $('#InputDateId').val();
         const Response = await RegisterEntrance(Folio);
-        console.log(Response);
-
         const Date = $(Response).attr('data');
         if (Folio != "") {
             if (Date.length > 0) {
-                const DriverName = $(Date).attr('Chófer')
-                const TransportLine = $(Date).attr('Línea de Transporte')
-                const Transport = $(Date).attr('Tipo de Transporte')
-                const TransportPlate = $(Date).attr('Placa de Transporte')
-                const AssignedDate = $(Date).attr('Dia')
-                const AssignedTime = $(Date).attr('Horario')
+                const DateId = $(Date).attr('Id');
+                const DriverName = $(Date).attr('Chófer');
+                const TransportLine = $(Date).attr('Línea de Transporte');
+                const Transport = $(Date).attr('Tipo de Transporte');
+                const TransportPlate = $(Date).attr('Placa de Transporte');
+                const AssignedDate = $(Date).attr('Dia');
+                const AssignedTime = $(Date).attr('Horario');
 
-                sessionStorage.setItem("Folio", Folio);
+                sessionStorage.setItem("Id", DateId);
 
-                document.getElementById('DriverName').innerHTML = "<p>" + DriverName + "</p>"
-                document.getElementById('TransportLine').innerHTML = "<p>" + TransportLine + "</p>"
-                document.getElementById('TransportType').innerHTML = "<p>" + Transport + "</p>"
-                document.getElementById('TransportPlates').innerHTML = "<p>" + TransportPlate + "</p>"
-                document.getElementById('Date').innerHTML = "<p>" + AssignedDate + "</p>"
-                document.getElementById('Time').innerHTML = "<p>" + AssignedTime + "</p>"
+                document.getElementById('DriverName').innerHTML = "<p>" + DriverName + "</p>";
+                document.getElementById('TransportLine').innerHTML = "<p>" + TransportLine + "</p>";
+                document.getElementById('TransportType').innerHTML = "<p>" + Transport + "</p>";
+                document.getElementById('TransportPlates').innerHTML = "<p>" + TransportPlate + "</p>";
+                document.getElementById('Date').innerHTML = "<p>" + AssignedDate + "</p>";
+                document.getElementById('Time').innerHTML = "<p>" + AssignedTime + "</p>";
 
-                $('#DateInformationModal').modal('show')
+                $('#DateInformationModal').modal('show');
             }
             else {
                 toastType = 'Danger';
@@ -92,6 +91,16 @@ const ConfirmIdButton = async () => {
 
 const RegisterAccessButton = async () => {
     try {
+        Folio = sessionStorage.getItem('Id');
+        const Response = await UpdateDateStatusArrival(Folio, "arrival");
+        const data = $(Response).attr('data');
+        if (data.length > 0) {
+            toastType = 'Success';
+            toastPlacement = 'Middle center';
+            await ToastsNotification("Arribo Registrado", "Se registró correctamente la llegada a almacén.", toastType, toastPlacement);
+        }
+
+        $('#DateInformationModal').modal('hide');
 
     } catch (error) {
         console.error(error);
