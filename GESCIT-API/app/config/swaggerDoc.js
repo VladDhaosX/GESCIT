@@ -31,6 +31,22 @@ const swaggerDoc = {
       "description": "Endpoints para la gestión de catálogos"
     },
     {
+      "name": "Catálogos/Transportes",
+      "description": "Endpoints para la gestión de Transportes"
+    },
+    {
+      "name": "Catálogos/Lineas de Transporte",
+      "description": "Endpoints para la gestión de Lineas de Transportes"
+    },
+    {
+      "name": "Catálogos/Choferes",
+      "description": "Endpoints para la gestión de Lineas de Transportes"
+    },
+    {
+      "name": "Catálogos/Documentos",
+      "description": "Endpoints para la gestión de Lineas de Transportes"
+    },
+    {
       "name": "Herramientas",
       "description": "Endpoints para la consulta de datos adicionales."
     }

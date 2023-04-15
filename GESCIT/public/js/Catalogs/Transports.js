@@ -2,19 +2,18 @@ const UrlApi = window.__env.UrlApi;
 
 $(document).ready(async function () {
 
-    sessionStorage.setItem("TransportId", 0);
+    sessionStorage.setItem("TransportLineId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
 
     await initButtons();
-    await TransportsDataTable(true);
-    await FillSelectTransportType();
-    await FillSelectDocumentList();
-
+    await TransportLinesDataTable(true);
+    await FillSelectTransportLineType();
     await tooltipTrigger();
-
+    await FillSelectDocumentList();
 });
-//#region fetches
-const GetTransports = async (userId) => {
+
+//#region fetchs
+const GetTransportLines = async (userId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -24,7 +23,7 @@ const GetTransports = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/getTransports`, type: 'POST', data: {
+            url: `${UrlApi}/catalogs/getTransportLines`, type: 'POST', data: {
                 userId
             }, // Enviar userId en el cuerpo de la solicitud
             dataType: 'json'
@@ -35,8 +34,7 @@ const GetTransports = async (userId) => {
         $.unblockUI();
     }
 };
-
-const GetTransportType = async () => {
+const GetTransportLineType = async () => {
     try {
         const response = await $.ajax({
             async: true,
@@ -45,7 +43,7 @@ const GetTransportType = async () => {
             },
             complete: function () {
                 $.unblockUI();
-            }, url: `${UrlApi}/catalogs/getTransportType`, type: 'GET', dataType: 'json'
+            }, url: `${UrlApi}/catalogs/getTransportLineTypes`, type: 'GET', dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
@@ -53,8 +51,24 @@ const GetTransportType = async () => {
         $.unblockUI();
     }
 };
-
-const AddOrUpdateTransport = async (Transport) => {
+const GetTransportLineDocuments = async () => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            }, url: `${UrlApi}/catalogs/getTransportLineDocuments`, type: 'GET', dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
+const AddOrUpdateTransportLine = async (TransportLine) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -64,9 +78,11 @@ const AddOrUpdateTransport = async (Transport) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/addOrUpdateTransport`, type: 'POST', data: {
-                Transport
-            }, // Enviar Transport en el cuerpo de la solicitud
+            url: `${UrlApi}/catalogs/addOrUpdateTransportLine`,
+            type: 'POST',
+            data: {
+                TransportLine
+            }, // Enviar TransportLine en el cuerpo de la solicitud
             dataType: 'json'
         });
         return response;
@@ -75,7 +91,6 @@ const AddOrUpdateTransport = async (Transport) => {
         $.unblockUI();
     }
 };
-
 const GetDocumentsList = async (DocumentType) => {
     try {
         const response = await $.ajax({
@@ -99,14 +114,13 @@ const GetDocumentsList = async (DocumentType) => {
         $.unblockUI();
     }
 };
-
 const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
     try {
         let formData = new FormData();
 
         formData.append('userId', TransportDocumentObj.userId);
         formData.append('TemporalDocumentId', TransportDocumentObj.TemporalDocumentId);
-        formData.append('ModuleId', TransportDocumentObj.TransportId);
+        formData.append('ModuleId', TransportDocumentObj.TransportLineId);
         formData.append('image', TransportDocumentObj.TransportDocumentFile);
         formData.append('DocumentId', TransportDocumentObj.DocumentId);
 
@@ -129,7 +143,6 @@ const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
         $.unblockUI();
     }
 };
-
 const GetTransportDocument = async (DocumentType, ModuleId, TemporalDocumentId) => {
     try {
         const response = await $.ajax({
@@ -153,7 +166,6 @@ const GetTransportDocument = async (DocumentType, ModuleId, TemporalDocumentId) 
         $.unblockUI();
     }
 };
-
 const GetTransportDocumentById = (DocumentId) => {
     try {
         $.ajax({
@@ -189,7 +201,6 @@ const GetTransportDocumentById = (DocumentId) => {
         $.unblockUI();
     }
 };
-
 const DeleteDocumentById = async (DocumentId) => {
     try {
         return await $.ajax({
@@ -211,7 +222,6 @@ const DeleteDocumentById = async (DocumentId) => {
         $.unblockUI();
     }
 };
-
 const NotDeleteDocuments = async (ModuleId, DocumentType) => {
     try {
         return await $.ajax({
@@ -237,33 +247,22 @@ const NotDeleteDocuments = async (ModuleId, DocumentType) => {
 //#region Controllers
 const initButtons = async () => {
     try {
-        $('#ActionsButtons').append(`
-                <button id="AddOrUpdateTransportModalButton" type="button" title="Registrar Transporte" 
+        const userRolKey = sessionStorage.getItem('userRolKey');
+        if (userRolKey != 'Juridico') {
+            $('#ActionsButtons').append(`
+                <button id="AddOrUpdateTransportLineModalButton" type="button" title="Registrar Linea de Transporte" 
                     class="btn rounded-pill btn-icon btn-outline-primary" 
                     data-bs-toggle="tooltip" data-bs-placement="top">
                     <span class="tf-icons bx bx-plus"></span>
                 </button>
             `);
-
-        $('#AddOrUpdateTransportModalButton').click(function () {
-            AddOrUpdateTransportModal();
-        });
-        $('#AddOrUpdateTransportButton').click(function () {
-            AddOrUpdateTransportButton()
+        };
+        $('#AddOrUpdateTransportLineModalButton').click(async function () {
+            await AddOrUpdateTransportLineModal();
         });
 
-        $('#TransportPlate2 , #TransportPlate3').parent().hide();
-
-        $('#TransportTypeSelect').change(function () {
-            $('#TransportPlate2 , #TransportPlate3').parent().hide();
-            let TransportTypeId = $(this).val();
-            if (TransportTypeId == 2) {
-                $('#TransportPlate2').parent().show();
-            } else if (TransportTypeId == 5) {
-                $('#TransportPlate2 , #TransportPlate3').parent().show();
-            } else {
-                $('#TransportPlate2 , #TransportPlate3').parent().hide();
-            };
+        $('#AddOrUpdateTransportLineButton').click(async function () {
+            await AddOrUpdateTransportLineButton()
         });
 
         $('#AddOrUpdateTransportDocumentButton').click(function () {
@@ -282,16 +281,16 @@ const initButtons = async () => {
         });
 
         $('#DocumentsNavButton').on('shown.bs.tab', async function (e) {
-            let TransportId = sessionStorage.getItem("TransportId");
+            let TransportLineId = sessionStorage.getItem("TransportLineId");
             let TemporalDocumentId = sessionStorage.getItem("TemporalDocumentId");
-            await TransportDocumentsDataTable(TransportId, TemporalDocumentId);
+            await TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
         });
 
         //On Close Modal 
         $('#AddOrUpdateTransportModal').on('hidden.bs.modal', function () {
-            const TransportId = sessionStorage.getItem("TransportId");
+            const TransportLineId = sessionStorage.getItem("TransportLineId");
             const DocumentType = "Transporte";
-            NotDeleteDocuments(TransportId, DocumentType);
+            NotDeleteDocuments(TransportLineId, DocumentType);
         });
 
         //on TransportDocument change
@@ -299,20 +298,24 @@ const initButtons = async () => {
             //AddOrUpdateTransportDocumentButton val 0
             $('#TransportDocument').val("").trigger('change');
         });
+
+        $('#myModal').on('hidden.bs.modal', function (e) {
+            // do something...
+          })
+
     } catch (error) {
         console.error(error);
     }
 };
 
-const TransportsDataTable = async () => {
+const TransportLinesDataTable = async () => {
     try {
-        if ($.fn.DataTable.isDataTable('#TransportTable')) {
-            $('#TransportTable').DataTable().destroy();
-            $('#TransportTable').empty();
+        if ($.fn.DataTable.isDataTable('#TransportLineTable')) {
+            $('#TransportLineTable').DataTable().destroy();
         }
 
         const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
-        const data = await GetTransports(userId);
+        const data = await GetTransportLines(userId);
         if (data.length > 0) {
             // Crea el arreglo de objetos para las columnas del DataTable
             const columns = [
@@ -324,12 +327,12 @@ const TransportsDataTable = async () => {
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary" 
                                         type="button" 
-                                        id="AddOrUpdateTransportTableButton"
+                                        id="AddOrUpdateTransportLineTableButton"
                                         data='${JSON.stringify(row)}'
                                         title='Editar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='AddOrUpdateTransportModal(this);'
+                                        onclick='AddOrUpdateTransportLineModal(this);'
                                     >
                                         <span class="tf-icons bx bx-edit-alt"></span>
                                     </button>
@@ -339,18 +342,18 @@ const TransportsDataTable = async () => {
                 ...Object.keys(data[0]).map(propName => ({
                     title: propName,
                     data: propName,
-                    visible: !propName.includes('Id')
+                    visible: !propName.includes('Id'),
+                    render: function (data) {
+                        return propName === "Capacidad" ? data + " Toneladas" : data
+                    }
                 }))
             ];
-            $('#TransportTable').DataTable({
+            $('#TransportLineTable').DataTable({
                 data: data,
                 columns: columns,
                 language: {
                     url: './js/datatable-esp.json'
-                },
-                "columnDefs": [
-                    { "type": "num", "targets": 5 }
-                ]
+                }
             });
         }
     } catch (error) {
@@ -358,9 +361,9 @@ const TransportsDataTable = async () => {
     }
 };
 
-const FillSelectTransportType = async () => {
+const FillSelectTransportLineType = async () => {
     try {
-        const data = await GetTransportType();
+        const data = await GetTransportLineType();
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -370,8 +373,101 @@ const FillSelectTransportType = async () => {
             $options = $options.add($option);
         });
 
-        $('#TransportTypeSelect').empty();
-        $('#TransportTypeSelect').append($options);
+        $('#TransportLineTypeSelect').empty();
+        $('#TransportLineTypeSelect').append($options);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const AddOrUpdateTransportLineModal = async (e) => {
+    try {
+        $('#AddOrUpdateTransportLineModal').modal('show');
+        let TransportLineId = 0;
+        let TemporalDocumentId = 0;
+        if (e) {
+            const TransportLine = $(e).attr('data');
+            const TransportLineObj = JSON.parse(TransportLine);
+
+            TransportLineId = TransportLineObj.Id;
+            sessionStorage.setItem("TransportLineId", TransportLineId);
+
+            $('#TransportLineTypeSelect').val(TransportLineObj.LineTypeId);
+            $('#LineName').val(TransportLineObj['Línea de Transporte']);
+        } else {
+            sessionStorage.setItem("TransportLineId", TransportLineId);
+            sessionStorage.setItem("TemporalDocumentId", TemporalDocumentId);
+
+            $('#TransportLineTypeSelect').val(0);
+            $('#LineName').val("");
+        };
+
+        sessionStorage.setItem("TemporalDocumentId", 0);
+        $('#DocumentLineSelect').val(0);
+        $('#LineDocument').val("");
+        $('#DocumentsModalNavs button:first').tab('show');
+
+        const userRolKey = sessionStorage.getItem('userRolKey');
+        if (userRolKey === 'Juridico') {
+            $('#InfoNavButton').hide();
+            $('#DocumentsNavButton').show();
+            //navsInfoModal remove class show active
+            $('#navsInfoModal').removeClass('show');
+            $('#navsInfoModal').removeClass('active');
+
+            $('#DocumentsNavButton').addClass('active');
+            $('#navsDocsModal').addClass('show');
+            $('#navsDocsModal').addClass('active');
+            let TransportLineId = sessionStorage.getItem("TransportLineId");
+            let TemporalDocumentId = sessionStorage.getItem("TemporalDocumentId");
+            
+            setTimeout(async function () {
+                await TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
+            }, 500);
+
+        } else {
+            $('#InfoNavButton').show();
+            $('#DocumentsNavButton').hide();
+            $('#DocumentsModalNavs button:first').tab('show');
+        };
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const AddOrUpdateTransportLineButton = async () => {
+    try {
+        let TransportLineId = sessionStorage.getItem("TransportLineId");
+        let TemporalDocumentId = sessionStorage.getItem("TemporalDocumentId");
+        const userId = sessionStorage.getItem("userId");
+        const LineName = $('#LineName').val();
+        const TransportLineTypeSelect = $('#TransportLineTypeSelect').val();
+
+        const TransportLine = {
+            TransportLineId: TransportLineId,
+            TemporalDocumentId: TemporalDocumentId,
+            userId: userId,
+            Name: LineName,
+            TransportLineTypeId: TransportLineTypeSelect,
+        };
+
+        const response = await AddOrUpdateTransportLine(TransportLine);
+        let toastType = 'Primary';
+        let toastPlacement = 'Top right';
+
+        if (response.success) {
+            TransportLineId = response.TransportLineId;
+            TemporalDocumentId = response.TemporalDocumentId;
+            sessionStorage.setItem("TransportLineId", TransportLineId);
+            TransportLinesDataTable();
+            $('#AddOrUpdateTransportLineModal').modal('hide');
+        } else {
+            toastType = 'Danger';
+            toastPlacement = 'Middle center';
+        };
+
+        await ToastsNotification("Líneas de Transporte", response.message, toastType, toastPlacement);
+
     } catch (error) {
         console.error(error);
     }
@@ -379,7 +475,7 @@ const FillSelectTransportType = async () => {
 
 const FillSelectDocumentList = async () => {
     try {
-        const DocumentType = "Transporte"
+        const DocumentType = "Linea Transportista"
         const data = await GetDocumentsList(DocumentType);
 
         var $options = $();
@@ -398,74 +494,9 @@ const FillSelectDocumentList = async () => {
     }
 };
 
-const AddOrUpdateTransportModal = async (e) => {
-    try {
-        if (e) {
-            const Transport = $(e).attr('data');
-            const TransportObj = JSON.parse(Transport);
-
-            sessionStorage.setItem("TransportId", TransportObj.Id);
-            $('#TransportTypeSelect').val(TransportObj.TransportTypeId).trigger('change');
-            $('#TransportPlate1').val(TransportObj["Placa de Transporte"]);
-            $('#TransportPlate2').val(TransportObj["Placa de Caja #1"]);
-            $('#TransportPlate3').val(TransportObj["Placa de Caja #2"]);
-            $('#Capacity').val(TransportObj["Capacidad en Toneladas"]);
-        } else {
-            sessionStorage.setItem("TransportId", 0);
-            $('#TransportTypeSelect').val(0);
-            $('#TransportPlate1').val("");
-            $('#TransportPlate2').val("");
-            $('#TransportPlate3').val("");
-            $('#Capacity').val("");
-        };
-
-        sessionStorage.setItem("TemporalDocumentId", 0);
-        $('#TransportDocumentSelect').val(0);
-        $('#TransportTypeSelect').trigger('change');
-        $('#AddOrUpdateTransportModal').modal('show');
-        $('#DocumentsModalNavs button:first').tab('show');
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-const AddOrUpdateTransportButton = async () => {
-    try {
-        const TransportId = sessionStorage.getItem("TransportId");
-        const UserId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
-        const TransportTypeId = $('#TransportTypeSelect').val();
-        const TransportPlate1 = $('#TransportPlate1').val();
-        const TransportPlate2 = $('#TransportPlate2').val();
-        const TransportPlate3 = $('#TransportPlate3').val();
-        const Capacity = $('#Capacity').val();
-        const TemporalDocumentId = sessionStorage.getItem('TemporalDocumentId');
-        const Transport = {
-            TransportId,
-            TemporalDocumentId,
-            UserId,
-            TransportTypeId,
-            TransportPlate1,
-            TransportPlate2,
-            TransportPlate3,
-            Capacity
-        };
-
-        const response = await AddOrUpdateTransport(Transport);
-        const toastType = response.success ? "Primary" : "Danger";
-        const toastPlacement = response.success ? "Top right" : "Middle center";
-        if (response.success) $('#AddOrUpdateTransportModal').modal('hide');
-
-        await ToastsNotification("Transportes", response.message, toastType, toastPlacement);
-        await TransportsDataTable(false);
-
-    } catch (error) {
-        console.error(error);
-    }
-};
-
 const AddOrUpdateTransportDocumentButton = async () => {
     try {
-        const TransportId = sessionStorage.getItem("TransportId");
+        const TransportLineId = sessionStorage.getItem("TransportLineId");
         const TransportDocument = $('#TransportDocument')[0];
         const TransportDocumentFile = TransportDocument.files[0];
 
@@ -477,7 +508,7 @@ const AddOrUpdateTransportDocumentButton = async () => {
         const TransportDocumentObj = {
             userId: sessionStorage.getItem('userId'),
             TemporalDocumentId: sessionStorage.getItem('TemporalDocumentId'),
-            TransportId: TransportId,
+            TransportLineId: TransportLineId,
             TransportDocumentFile: TransportDocumentFile,
             DocumentId: $('#TransportDocumentSelect').val()
         };
@@ -494,21 +525,21 @@ const AddOrUpdateTransportDocumentButton = async () => {
         };
 
 
-        TransportDocumentsDataTable(TransportId, TemporalDocumentId);
+        TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
 
     } catch (error) {
         console.error(error);
     }
 };
 
-const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
+const TransportDocumentsDataTable = async (TransportLineId, TemporalDocumentId) => {
     try {
         if ($.fn.DataTable.isDataTable('#TransportDocumentDataTable')) {
             $('#TransportDocumentDataTable').DataTable().destroy();
             $('#TransportDocumentDataTable').html('');
         };
-        const DocumentType = "Transporte";
-        const data = await GetTransportDocument(DocumentType, TransportId, TemporalDocumentId);
+        const DocumentType = "Linea Transportista"
+        const data = await GetTransportDocument(DocumentType, TransportLineId, TemporalDocumentId);
         if (data.length > 0) {
             const columns = [
                 {
@@ -574,18 +605,18 @@ const DonwloadTransportDocument = async (e) => {
 
 const DeleteDocument = async (e) => {
     try {
-        const TransportId = sessionStorage.getItem('TransportId');
+        const TransportLineId = sessionStorage.getItem('TransportLineId');
         const TemporalDocumentId = sessionStorage.getItem('TemporalDocumentId');
         let data = $(e).attr('data');
         let dataObj = JSON.parse(data);
         let DocumentId = dataObj.Id;
 
         const response = await DeleteDocumentById(DocumentId);
+
         let toastType = 'Primary';
         let toastPlacement = 'Top right';
-
         if (response.success) {
-            TransportDocumentsDataTable(TransportId, TemporalDocumentId);
+            await TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
         } else {
             toastType = 'Danger';
             toastPlacement = 'Middle center';

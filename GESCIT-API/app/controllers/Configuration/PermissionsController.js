@@ -13,7 +13,7 @@ GetUserRol : async (req, res) => {
 },
 
 UpdatePermission : async (req, res) => {
-    // #swagger.tags = ['Configuración']
+    // #swagger.tags = ['Configuración/Usuario']
     try {
         const { permissionUserId, RolId } = req.body;
         const response = await PermissionsDao.UpdatePermission(permissionUserId, RolId);

@@ -90,6 +90,7 @@ module.exports = {
         const response = await DocumentsDao.GetDocumentById(DocumentId);
         res.header('Access-Control-Expose-Headers', '*');
         res.setHeader('Content-Disposition', 'attachment; filename=' + response.data.OriginalName);
+
         res.type(response.data.Mimetype).send(response.data.FileData);
     },
 

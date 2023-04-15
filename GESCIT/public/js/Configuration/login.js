@@ -1,5 +1,7 @@
 const UrlApi = window.__env.UrlApi;
 
+$('#divFooter').hide();
+
 $(document).ready(async function () {
     sessionStorage.clear();
     let loginAttempts = localStorage.getItem('loginAttempts');
@@ -191,28 +193,29 @@ const ChangePassword = async () => {
 
 };
 
-const PrivacyNoticeModal = () => {
+const PrivacyNoticeModal = async () => {
+    // const pdfUrl = `https://portalesdemo.almer.com.mx/Gecit/assets/ALMER/priv.pdf`;
+
+    // $('#pdf-iframe').attr('src', 'https://docs.google.com/viewerng/viewer?url=' + encodeURIComponent(pdfUrl) + '&embedded=true');
+
     $('#PrivacyNoticeModal').modal('show');
-    var pdfUrl = `https://portalesdemo.almer.com.mx/Gecit/assets/ALMER/AVISO%20DE%20PRIVACIDAD.pdf`;
-    $('#pdf-iframe').attr('src', 'https://docs.google.com/viewerng/viewer?url=' + encodeURIComponent(pdfUrl) + '&embedded=true');
+    // var count = 0;
+    // $('#pdf-iframe').on('load', function () {
+    //     count++;
+    //     if (count > 0) {
+    //         clearInterval(ref)
+    //     }
+    // });
 
-    var count = 0;
-    $('#pdf-iframe').on('load', function () {
-        count++;
-        if (count > 0) {
-            clearInterval(ref)
-        }
-    });
-
-    var ref = setInterval(() => {
-        $('#pdf-iframe').attr('src', 'https://docs.google.com/viewerng/viewer?url=' + encodeURIComponent(pdfUrl) + '&embedded=true');
-        $('#pdf-iframe').on('load', function () {
-            count++;
-            if (count > 0) {
-                clearInterval(ref)
-            }
-        });
-    }, 1000)
+    // var ref = setInterval(() => {
+    //     $('#pdf-iframe').attr('src', 'https://docs.google.com/viewerng/viewer?url=' + encodeURIComponent(pdfUrl) + '&embedded=true');
+    //     $('#pdf-iframe').on('load', function () {
+    //         count++;
+    //         if (count > 0) {
+    //             clearInterval(ref)
+    //         }
+    //     });
+    // }, 1000)
 };
 
 const AcepptPrivacyNotice = async () => {

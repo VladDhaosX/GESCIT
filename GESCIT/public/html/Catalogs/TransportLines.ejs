@@ -1,7 +1,7 @@
 <div id="ActionsButtons" class="demo-inline-spacing" style="padding: 0px 50px;">
 </div>
 <div class="text-nowrap" style="margin: 25px 50px;">
-    <table id="TransportLineTable" class="table">
+    <table id="TransportLineTable" class="table hover">
     </table>
 </div>
 
@@ -16,9 +16,16 @@
                 <div class="nav-align-top mb-4">
                     <ul id="DocumentsModalNavs" class="nav nav-pills  nav-fill" role="tablist">
                         <li class="nav-item">
-                            <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                            <button id="InfoNavButton" type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
                                 data-bs-target="#navsInfoModal" aria-controls="navs-top-home" aria-selected="true">
                                 Línea de Transporte
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button id="DocumentsNavButton" type="button" class="nav-link" role="tab"
+                                data-bs-toggle="tab" data-bs-target="#navsDocsModal" aria-controls="navs-top-profile"
+                                aria-selected="false">
+                                Documentos
                             </button>
                         </li>
                     </ul>
@@ -35,6 +42,39 @@
                                     <label for="TransportLineTypeSelect" class="form-label">Tipo de Línea*</label>
                                     <select id="TransportLineTypeSelect" class="form-select">
                                     </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="navsDocsModal" role="tabpanel">
+                            <div class="row">
+                                <div class="mb-3">
+                                    <label for="TransportDocumentSelect" class="form-label">Tipo de Documento</label>
+                                    <select id="TransportDocumentSelect" class="form-select">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="TransportDocument" class="form-label">Documento</label>
+                                    <input class="form-control" type="file" id="TransportDocument"
+                                        style="color: transparent" />
+                                    <div id="defaultFormControlHelp" class="form-text">
+                                        <label for="defaultFormControlHelp" style="padding-left: 60%;">
+                                            Tamaño máximo permitido: 10 MB.</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3" style="padding-top: 30px;">
+                                    <button id="AddOrUpdateTransportDocumentButton" type="button"
+                                        title="Guardar Documento" class="btn rounded-pill btn-icon btn-outline-primary"
+                                        data-bs-toggle="tooltip" data-bs-placement="top">
+                                        <span class="tf-icons bx bx-plus"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <table id="TransportDocumentDataTable" class="table hover">
+                                    </table>
                                 </div>
                             </div>
                         </div>

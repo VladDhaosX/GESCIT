@@ -8,6 +8,7 @@ const documentsRoutes = require('./documentsRoutes');
 const toolsRoutes = require('./toolsRoutes');
 const swaggerRoutes = require('./swaggerRoutes');
 const scheduleRoutes = require('./ScheduleRoutes');
+const mailRoutes = require('./MailRoutes');
 
 router.use(`/swagger`, swaggerRoutes);
 
@@ -22,5 +23,7 @@ router.use(`/documents`, documentsRoutes);
 router.use(`/tools`, toolsRoutes);
 
 router.use(`/schedule`, scheduleRoutes);
+
+router.use(`/mail`, mailRoutes);
 
 module.exports = router;

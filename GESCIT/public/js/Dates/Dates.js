@@ -20,6 +20,11 @@ const initPage = async () => {
         <div class="col mb-3">
             <input type="date" id="txtEndDate" class="form-control"/>
         </div>
+        <button id="btnSearch" type="button" title="Buscar" 
+            class="btn rounded-pill btn-icon btn-outline-primary" 
+            data-bs-toggle="tooltip" data-bs-placement="top">
+            <span class="tf-icons bx bx-search"></span>
+        </button>
     </div>
     `);
 
@@ -36,6 +41,11 @@ const initPage = async () => {
     });
 
     $('#txtStartDate , #txtEndDate').change(async function () {
+        await initDatesDataTable();
+    });
+
+    // on btnSearch click
+    $('#btnSearch').click(async function () {
         await initDatesDataTable();
     });
 
@@ -68,7 +78,6 @@ const initPage = async () => {
     await FillSelectDrivers();
 
     tooltipTrigger();
-
 };
 
 const FillSelectAllScheduleTimes = async () => {
@@ -267,28 +276,29 @@ const newDateModal = async () => {
         return;
     };
 
-    sessionStorage.setItem('DateId', 0);
-    $('#SheduleTimesSelect').val(0);
-    $('#OperationsSelect').val(0);
-    $('#ProductsSelect').val(0);
-    $('#TransportLineTypeSelect').val(0);
-    $('#TransportPlate1Select').val(0);
-    $('#TransportPlate1').val('');
-    $('#TransportPlate2').val('');
-    $('#TransportPlate3').val('');
-    $('#DriversSelect').val(0);
-    $('#txtVolume').val('');
-    $('#TransportTypeSelect').val(0);
-    $('#TransportPlate2 , #TransportPlate3').parent().hide();
+    const ExistsScheduleAvailablesResult = await ExistsScheduleAvailables();
+    if (!ExistsScheduleAvailablesResult) {
+        await ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
+        return;
+    };
+
+    // sessionStorage.setItem('DateId', 0);
+    // $('#SheduleTimesSelect').val(0);
+    // $('#OperationsSelect').val(0);
+    // $('#ProductsSelect').val(0);
+    // $('#TransportLineTypeSelect').val(0);
+    // $('#TransportPlate1Select').val(0);
+    // $('#TransportPlate1').val('');
+    // $('#TransportPlate2').val('');
+    // $('#TransportPlate3').val('');
+    // $('#DriversSelect').val(0);
+    // $('#txtVolume').val('');
+    // $('#TransportTypeSelect').val(0);
+    // $('#TransportPlate2 , #TransportPlate3').parent().hide();
 
     $('#ModalDatesTitle').text('Nueva Cita');
 
-    if (ExistsScheduleAvailablesResult) {
-        // await FillSelectScheduleAvailables();
-        $('#ModalDates').modal('show');
-    } else {
-        await ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
-    };
+    $('#ModalDates').modal('show');
 };
 
 const newDate = async () => {
@@ -365,10 +375,11 @@ const initDatesDataTable = async () => {
                             >
                                 <span class="tf-icons bx bx-edit-alt"></span>
                             </button>
-                        `
+                        `;
+                        }
 
-                            if (row.IsCancelable) {
-                                buttons += `
+                        if (row.IsCancelable && row.Estatus != 'Cancelada') {
+                            buttons += `
                             <button
                                 class="btn rounded-pill btn-icon btn-outline-danger" 
                                 type="button" 
@@ -381,8 +392,7 @@ const initDatesDataTable = async () => {
                                 <span class="tf-icons bx bx-x bx-md"></span>
                             </button>
                             `;
-                            };
-                        }
+                        };
                         return buttons;
                     }
                 },
@@ -405,6 +415,10 @@ const initDatesDataTable = async () => {
                 {
                     title: 'Horario',
                     data: 'Horario'
+                },
+                {
+                    title: 'Hora de Cita',
+                    data: 'Hora de Cita'
                 },
                 {
                     title: 'Operacion',
@@ -459,7 +473,10 @@ const initDatesDataTable = async () => {
                 "columnDefs": [
                     { "type": "num", "targets": 11 }
                 ]
-            });
+            }).on('draw', function () {
+                tooltipTrigger();
+            });;
+
         };
     } catch (error) {
         console.error(error);
@@ -468,6 +485,14 @@ const initDatesDataTable = async () => {
 
 const ShowEditModal = async (element) => {
     try {
+
+        const IsAvailableResponse = await IsAppointmentTimeAvailable();
+        const IsAvailable = IsAvailableResponse.IsTimeAvailable;
+        if (!IsAvailable) {
+            await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+            return;
+        };
+
         const data = JSON.parse($(element).attr('data'));
         sessionStorage.setItem('DateId', data.Id);
         $('#OperationsSelect').val(data.OperationId);
@@ -556,6 +581,24 @@ const onTransportPlate1SelectChange = (e) => {
         };
     };
 };
+
+const ExistsScheduleAvailables = async () => {
+    try {
+        const OperationTypeId = $('#OperationsSelect').val();
+        const TransportTypeId = $('#TransportTypeSelect').val();
+        const data = await GetScheduleAvailables(OperationTypeId, TransportTypeId);
+        console.log(data);
+        if (data.length > 0) {
+            return true;
+        } else {
+            return false;
+        };
+
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 //#endregion
 
 //#region Fetchs
@@ -569,7 +612,7 @@ const GetScheduleTimes = async (OperationTypeId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/GetScheduleTimes`, type: 'POST', data: {
+            url: `${UrlApi}/schedule/GetScheduleTimes`, type: 'POST', data: {
                 OperationTypeId
             },
             dataType: 'json'
@@ -591,7 +634,7 @@ const GetScheduleAvailable = async (OperationTypeId, TransportTypeId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/ScheduleAvailable`,
+            url: `${UrlApi}/schedule/ScheduleAvailable`,
             type: 'POST',
             data: {
                 OperationTypeId,
@@ -782,7 +825,7 @@ const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId,
 
 const IsAppointmentTimeAvailable = async () => {
     try {
-        return await $.ajax({
+        const response = await $.ajax({
             async: true,
             beforeSend: function () {
                 $.blockUI({ message: null });
@@ -790,10 +833,11 @@ const IsAppointmentTimeAvailable = async () => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/IsAppointmentTimeAvailable`,
+            url: `${UrlApi}/schedule/IsAppointmentTimeAvailable`,
             type: 'GET',
             dataType: 'json'
         });
+        return response.success ? response.data : console.log(response.message);
     } catch (error) {
         console.error(error.message);
         $.unblockUI();
@@ -821,4 +865,28 @@ const CancelDate = async (dateId) => {
     };
 };
 
+const GetScheduleAvailables = async (OperationTypeId, TransportTypeId) => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/schedule/ScheduleAvailable`,
+            type: 'POST',
+            data: {
+                OperationTypeId,
+                TransportTypeId
+            },
+            dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
 //#endregion

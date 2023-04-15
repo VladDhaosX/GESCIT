@@ -23,6 +23,7 @@ module.exports = {
                 .input('StatusKey', sql.VarChar(sql.MAX), Status)
                 .input('DocumentType', sql.VarChar(sql.MAX), DocumentType)
                 .execute('SpGetDocumentsByClient');
+
             return result.recordset;
         } catch (error) {
             console.error(error);
@@ -38,7 +39,8 @@ module.exports = {
                 .output('Success', sql.Bit)
                 .output('Message', sql.VarChar(sql.MAX))
                 .execute('SpUpdateDocumentStatus');
-            return result;
+
+            return result.output;
         } catch (error) {
             console.error(error);
         }

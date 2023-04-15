@@ -27,6 +27,22 @@
       "description": "Endpoints para la gestión de catálogos"
     },
     {
+      "name": "Catálogos/Transportes",
+      "description": "Endpoints para la gestión de Transportes"
+    },
+    {
+      "name": "Catálogos/Lineas de Transporte",
+      "description": "Endpoints para la gestión de Lineas de Transportes"
+    },
+    {
+      "name": "Catálogos/Choferes",
+      "description": "Endpoints para la gestión de Lineas de Transportes"
+    },
+    {
+      "name": "Catálogos/Documentos",
+      "description": "Endpoints para la gestión de Lineas de Transportes"
+    },
+    {
       "name": "Herramientas",
       "description": "Endpoints para la consulta de datos adicionales."
     }
@@ -53,7 +69,7 @@
     "/configuration/login": {
       "post": {
         "tags": [
-          "Configuración"
+          "Configuración/Usuario"
         ],
         "description": "",
         "parameters": [
@@ -86,7 +102,7 @@
     "/configuration/ResetPassowrd": {
       "post": {
         "tags": [
-          "Configuración"
+          "Configuración/Usuario"
         ],
         "description": "",
         "parameters": [
@@ -119,7 +135,7 @@
     "/configuration/ChangePassword": {
       "post": {
         "tags": [
-          "Configuración"
+          "Configuración/Usuario"
         ],
         "description": "",
         "parameters": [
@@ -161,7 +177,7 @@
     "/configuration/UserPrivacyNotice": {
       "post": {
         "tags": [
-          "Configuración"
+          "Configuración/Usuario"
         ],
         "description": "",
         "parameters": [
@@ -208,7 +224,7 @@
     "/configuration/getUserData": {
       "post": {
         "tags": [
-          "Configuración"
+          "Configuración/Usuario"
         ],
         "description": "",
         "parameters": [
@@ -255,7 +271,7 @@
     "/configuration/UpdatePermission": {
       "post": {
         "tags": [
-          "Configuración"
+          "Configuración/Usuario"
         ],
         "description": "",
         "parameters": [
@@ -288,9 +304,10 @@
     "/catalogs/addOrUpdateTransport": {
       "post": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Transportes"
         ],
-        "description": "",
+        "summary": "Agregar o actualizar un transporte.",
+        "description": "Endpoint para agregar o actualizar un transporte.",
         "parameters": [
           {
             "name": "body",
@@ -318,9 +335,10 @@
     "/catalogs/getTransports": {
       "post": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Transportes"
         ],
-        "description": "",
+        "summary": "Obtener transportes.",
+        "description": "Endpoint para obtener transportes.",
         "parameters": [
           {
             "name": "body",
@@ -348,9 +366,10 @@
     "/catalogs/getTransportType": {
       "get": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Transportes"
         ],
-        "description": "",
+        "summary": "Obtener tipos de transporte.",
+        "description": "Endpoint para obtener tipos de transporte.",
         "parameters": [],
         "responses": {
           "200": {
@@ -365,9 +384,10 @@
     "/catalogs/getTransportLineTypes": {
       "get": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Lineas de Transporte"
         ],
-        "description": "",
+        "summary": "Obtener tipos de linea de transporte.",
+        "description": "Endpoint para obtener tipos de linea de transporte.",
         "parameters": [],
         "responses": {
           "200": {
@@ -382,9 +402,10 @@
     "/catalogs/addOrUpdateTransportLine": {
       "post": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Lineas de Transporte"
         ],
-        "description": "",
+        "summary": "Agregar o actualizar una linea de transporte.",
+        "description": "Endpoint para agregar o actualizar una linea de transporte.",
         "parameters": [
           {
             "name": "body",
@@ -412,9 +433,10 @@
     "/catalogs/getTransportLines": {
       "post": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Lineas de Transporte"
         ],
-        "description": "",
+        "summary": "Obtener lineas de transporte.",
+        "description": "Endpoint para obtener lineas de transporte.",
         "parameters": [
           {
             "name": "body",
@@ -442,9 +464,10 @@
     "/catalogs/addOrUpdateDriver": {
       "post": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Choferes"
         ],
-        "description": "",
+        "summary": "Agregar o actualizar un conductor.",
+        "description": "Endpoint para agregar o actualizar un conductor.",
         "parameters": [
           {
             "name": "body",
@@ -472,9 +495,10 @@
     "/catalogs/GetDrivers": {
       "post": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Choferes"
         ],
-        "description": "",
+        "summary": "Obtener conductores.",
+        "description": "Endpoint para obtener conductores.",
         "parameters": [
           {
             "name": "body",
@@ -502,9 +526,10 @@
     "/catalogs/GetClientsByStatusDocs": {
       "post": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Documentos"
         ],
-        "description": "",
+        "summary": "Obtener clientes por estatus de documentos.",
+        "description": "Endpoint para obtener clientes por estatus de documentos.",
         "parameters": [
           {
             "name": "body",
@@ -532,9 +557,10 @@
     "/catalogs/GetDocumentsByClient": {
       "post": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Documentos"
         ],
-        "description": "",
+        "summary": "Obtener documentos por cliente.",
+        "description": "Endpoint para obtener documentos por cliente.",
         "parameters": [
           {
             "name": "body",
@@ -568,9 +594,10 @@
     "/catalogs/UpdateDocumentStatus": {
       "post": {
         "tags": [
-          "Catálogos"
+          "Catálogos/Documentos"
         ],
-        "description": "",
+        "summary": "Actualizar estatus de documento.",
+        "description": "Endpoint para actualizar estatus de documento.",
         "parameters": [
           {
             "name": "body",
@@ -1249,7 +1276,8 @@
         "tags": [
           "Operaciones"
         ],
-        "description": "",
+        "summary": "Obtener horarios disponibles por el Tipo de Operación",
+        "description": "Endpoint que obtiene las horas que hay dentro de un horario dependiendo el Tipo de Operación.",
         "parameters": [
           {
             "name": "body",
@@ -1279,8 +1307,8 @@
         "tags": [
           "Operaciones/Horarios"
         ],
-        "summary": "Validar si el horario está disponible.",
-        "description": "Endpoint que valida si el horario está disponible.",
+        "summary": "Validar el horario actual.",
+        "description": "Endpoint que valida si la hora actual se encuentra entre las 12 y 5.",
         "parameters": [],
         "responses": {
           "200": {
@@ -1298,7 +1326,7 @@
           "Operaciones/Horarios"
         ],
         "summary": "Obtener horarios disponibles.",
-        "description": "Endpoint que obtiene los horarios disponibles por el tipo de Operación y el Tipo de Transporte.",
+        "description": "Endpoint que recibe el Tipo de Operación y el Tipo de Transporte y devuelve los horarios con citas disponibles.",
         "parameters": [
           {
             "name": "body",
@@ -1332,7 +1360,7 @@
           "Operaciones/Horarios"
         ],
         "summary": "Obtener horarios.",
-        "description": "Endpoint que obtiene los horarios.",
+        "description": "Endpoint que devuelve todos los horarios.",
         "parameters": [],
         "responses": {
           "200": {
@@ -1350,7 +1378,7 @@
           "Operaciones/Horarios"
         ],
         "summary": "Obtener horas de un horario.",
-        "description": "Endpoint que obtiene las horas de un horario.",
+        "description": "Endpoint que obtiene las horas que hay dentro de un horario.",
         "parameters": [
           {
             "name": "body",
@@ -1371,6 +1399,66 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/mail/ReSendSMS": {
+      "post": {
+        "tags": [
+          "Operaciones"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "DateId": {
+                  "example": "any"
+                },
+                "Phone": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/mail/ReSendMail": {
+      "post": {
+        "tags": [
+          "Operaciones"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "DateId": {
+                  "example": "any"
+                },
+                "Mail": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }

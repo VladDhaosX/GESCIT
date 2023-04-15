@@ -22,11 +22,13 @@ const createMenu = async () => {
     const $menu = $('#ulSideMenu');
     const userCategories = userData.userCategories;
 
+    const userRolKey = userData.userRol.Key;
     const userRol = userData.userRol.Name;
     const userName = userData.userData[0].Name;
     $menu.empty();
     $('#txtUserName').text(userName);
     $('#txtUserRol').text(userRol);
+    sessionStorage.setItem('userRolKey', userRolKey);
 
     userCategories.forEach((category) => {
         const $categoryHeader = $('<li>').addClass('menu-header small text-uppercase')

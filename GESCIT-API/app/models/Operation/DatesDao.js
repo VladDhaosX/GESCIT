@@ -19,7 +19,7 @@ module.exports = {
                 .input('DriverId', sql.Int, driverId)
                 .input('Volume', sql.VarChar(50), Volume)
                 .output('Success', sql.Bit, '0')
-                .output('Message', sql.VarChar(100))
+                .output('Message', sql.VarChar(sql.MAX))
                 .execute('SpAddOrUpdateDates');
 
             return {

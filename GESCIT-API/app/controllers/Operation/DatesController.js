@@ -53,38 +53,25 @@ module.exports = {
             const response = await DatesDao.AssignDateHour(DateId, Hour, Minutes);
 
             if (!response.success) {
+                res.json(response);
+                return;
+            };
+
+            if (response.success) {
                 const ClientInfoResponse = await MailController.GetClientInfo(DateId);
                 const Client = ClientInfoResponse.data[0];
-                //  DES COMENTAR EN PRODUCCIÓN
-                // const recipientsList = [Client.Mail,'abernal@almer.com.mx'];
-                //  DES COMENTAR EN PRODUCCIÓN
-                //  COMENTAR EN PRODUCCIÓN
-                const recipientsList = ['abernal@almer.com.mx'];
-                //  COMENTAR EN PRODUCCIÓN
+                const recipientsList = [Client.Mail];
                 const subject = 'Cita Almer';
-
                 const body = `Estimado/a cliente ${Client.Cliente}. Le informamos que hemos asignado su cita para la línea de transporte ${Client['Línea de Transporte']} a la(s) ${Client.Hora} del día ${Client.Dia}. Folio de cita: [${Client.Folio}] Agradecemos su preferencia y quedamos a su disposición para cualquier consulta o requerimiento adicional.`;
-
                 const isBodyHtml = false;
                 const mailResponse = await MailController.sendMail(recipientsList, subject, body, isBodyHtml);
 
                 const smsMessage = `Almacenadora Mercader S.A. le informa que hemos asignado su cita para la línea de transporte ${Client['Línea de Transporte']} a la(s) ${Client.Hora} del día ${Client.Dia} con el folio  [${Client.Folio}]. Agradecemos su preferencia.`;
-
-                //  DES COMENTAR EN PRODUCCIÓN
-                // const phoneNumber = Client.Teléfono;
-                //  DES COMENTAR EN PRODUCCIÓN
-                //  COMENTAR EN PRODUCCIÓN
-                const phoneNumber = "3325799271";
-                //  COMENTAR EN PRODUCCIÓN
-
+                const phoneNumber = Client.Teléfono;
                 const smsResponse = await MailController.sendSMS(smsMessage, phoneNumber);
 
-                // console.log('mailResponse', mailResponse);
-                console.log('smsResponse', smsResponse);
-
+                res.json({ response, mailResponse, smsResponse });
             };
-
-            res.json(response);
         } catch (error) {
             console.log(error.message);
             res.status(500).json({ message: error.message, info: error });

@@ -14,6 +14,6 @@ router.post('/GetDocumentById', DocumentsController.GetDocumentByIdHandler);
 
 router.post('/DeleteDocumentById', DocumentsController.DeleteDocumentByIdHandler);
 
-router.post('/NotDeleteTransportDocuments',DocumentsController.NotDeleteDocuments);
+router.post('/NotDeleteTransportDocuments', DocumentsController.NotDeleteDocuments);
 
 module.exports = router;
