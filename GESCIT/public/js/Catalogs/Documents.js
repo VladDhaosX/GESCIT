@@ -144,6 +144,8 @@ const UnreviewedTable = async () => {
     try {
         if ($.fn.DataTable.isDataTable('#pendingTable')) {
             $('#pendingTable').DataTable().destroy();
+            var div = document.getElementById('pendingTable');
+            div.innerHTML = "";
         }
 
         const data = await GetClientsUnreviewed();
@@ -221,6 +223,8 @@ const ApprovedTable = async () => {
     try {
         if ($.fn.DataTable.isDataTable('#approvedTable')) {
             $('#approvedTable').DataTable().destroy();
+            var div = document.getElementById('approvedTable');
+            div.innerHTML = "";
         }
 
         const data = await GetClientsApproved();
@@ -805,8 +809,6 @@ const ApproveDocument = async (e) => {
             toastType = 'Primary';
             toastPlacement = 'Top right';
             await ToastsNotification("Documento Aprobado", "El documento ha sido aprobado correctamente.", toastType, toastPlacement);
-            await ApprovedTable();
-            await UnreviewedTable();
             if (DocumentType == 'Chofer') {
                 await UnreviewedDriversTable(AccountNum);
             }
@@ -815,8 +817,7 @@ const ApproveDocument = async (e) => {
             }
             else if (DocumentType == 'Transporte') {
                 await UnreviewedTransportsTable(AccountNum);
-            };
-
+            }
         }
         else {
             toastType = 'Danger';
@@ -840,8 +841,7 @@ const RejectDocument = async (e) => {
             toastType = 'Primary';
             toastPlacement = 'Top right';
             await ToastsNotification("Documento Rechazado", "El documento ha sido rechazado correctamente.", toastType, toastPlacement);
-            await ApprovedTable();
-            await UnreviewedTable();
+
             if (DocumentType == 'Chofer') {
                 await UnreviewedDriversTable(AccountNum);
             }
@@ -902,6 +902,9 @@ const initButtons = async () => {
             }
         });
 
+        $('#Documents').on('hidden.bs.modal', async function () {
+            await UnreviewedTable();
+        });
 
     } catch (error) {
         console.error(error);

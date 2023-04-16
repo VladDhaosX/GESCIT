@@ -120,7 +120,7 @@ const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
 
         formData.append('userId', TransportDocumentObj.userId);
         formData.append('TemporalDocumentId', TransportDocumentObj.TemporalDocumentId);
-        formData.append('ModuleId', TransportDocumentObj.TransportId);
+        formData.append('ModuleId', TransportDocumentObj.TransportLineId);
         formData.append('image', TransportDocumentObj.TransportDocumentFile);
         formData.append('DocumentId', TransportDocumentObj.DocumentId);
 
@@ -281,16 +281,16 @@ const initButtons = async () => {
         });
 
         $('#DocumentsNavButton').on('shown.bs.tab', async function (e) {
-            let TransportId = sessionStorage.getItem("TransportLineId");
+            let TransportLineId = sessionStorage.getItem("TransportLineId");
             let TemporalDocumentId = sessionStorage.getItem("TemporalDocumentId");
-            await TransportDocumentsDataTable(TransportId, TemporalDocumentId);
+            await TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
         });
 
         //On Close Modal 
         $('#AddOrUpdateTransportModal').on('hidden.bs.modal', function () {
-            const TransportId = sessionStorage.getItem("TransportLineId");
+            const TransportLineId = sessionStorage.getItem("TransportLineId");
             const DocumentType = "Transporte";
-            NotDeleteDocuments(TransportId, DocumentType);
+            NotDeleteDocuments(TransportLineId, DocumentType);
         });
 
         //on TransportDocument change
@@ -298,6 +298,10 @@ const initButtons = async () => {
             //AddOrUpdateTransportDocumentButton val 0
             $('#TransportDocument').val("").trigger('change');
         });
+
+        $('#myModal').on('hidden.bs.modal', function (e) {
+            // do something...
+        })
 
     } catch (error) {
         console.error(error);
@@ -414,9 +418,13 @@ const AddOrUpdateTransportLineModal = async (e) => {
             $('#DocumentsNavButton').addClass('active');
             $('#navsDocsModal').addClass('show');
             $('#navsDocsModal').addClass('active');
-            let TransportId = sessionStorage.getItem("TransportLineId");
+            let TransportLineId = sessionStorage.getItem("TransportLineId");
             let TemporalDocumentId = sessionStorage.getItem("TemporalDocumentId");
-            await TransportDocumentsDataTable(TransportId, TemporalDocumentId);
+
+            setTimeout(async function () {
+                await TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
+            }, 500);
+
         } else {
             $('#InfoNavButton').show();
             $('#DocumentsNavButton').hide();
@@ -488,7 +496,7 @@ const FillSelectDocumentList = async () => {
 
 const AddOrUpdateTransportDocumentButton = async () => {
     try {
-        const TransportId = sessionStorage.getItem("TransportLineId");
+        const TransportLineId = sessionStorage.getItem("TransportLineId");
         const TransportDocument = $('#TransportDocument')[0];
         const TransportDocumentFile = TransportDocument.files[0];
 
@@ -500,7 +508,7 @@ const AddOrUpdateTransportDocumentButton = async () => {
         const TransportDocumentObj = {
             userId: sessionStorage.getItem('userId'),
             TemporalDocumentId: sessionStorage.getItem('TemporalDocumentId'),
-            TransportId: TransportId,
+            TransportLineId: TransportLineId,
             TransportDocumentFile: TransportDocumentFile,
             DocumentId: $('#TransportDocumentSelect').val()
         };
@@ -517,21 +525,21 @@ const AddOrUpdateTransportDocumentButton = async () => {
         };
 
 
-        TransportDocumentsDataTable(TransportId, TemporalDocumentId);
+        TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
 
     } catch (error) {
         console.error(error);
     }
 };
 
-const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
+const TransportDocumentsDataTable = async (TransportLineId, TemporalDocumentId) => {
     try {
         if ($.fn.DataTable.isDataTable('#TransportDocumentDataTable')) {
             $('#TransportDocumentDataTable').DataTable().destroy();
             $('#TransportDocumentDataTable').html('');
         };
         const DocumentType = "Linea Transportista"
-        const data = await GetTransportDocument(DocumentType, TransportId, TemporalDocumentId);
+        const data = await GetTransportDocument(DocumentType, TransportLineId, TemporalDocumentId);
         if (data.length > 0) {
             const columns = [
                 {
@@ -597,18 +605,18 @@ const DonwloadTransportDocument = async (e) => {
 
 const DeleteDocument = async (e) => {
     try {
-        const TransportId = sessionStorage.getItem('TransportId');
+        const TransportLineId = sessionStorage.getItem('TransportLineId');
         const TemporalDocumentId = sessionStorage.getItem('TemporalDocumentId');
         let data = $(e).attr('data');
         let dataObj = JSON.parse(data);
         let DocumentId = dataObj.Id;
 
         const response = await DeleteDocumentById(DocumentId);
+
         let toastType = 'Primary';
         let toastPlacement = 'Top right';
-
         if (response.success) {
-            TransportDocumentsDataTable(TransportId, TemporalDocumentId);
+            await TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
         } else {
             toastType = 'Danger';
             toastPlacement = 'Middle center';
