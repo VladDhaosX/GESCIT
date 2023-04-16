@@ -144,6 +144,8 @@ const UnreviewedTable = async () => {
     try {
         if ($.fn.DataTable.isDataTable('#pendingTable')) {
             $('#pendingTable').DataTable().destroy();
+            var div = document.getElementById('pendingTable');
+            div.innerHTML = "";
         }
 
         const data = await GetClientsUnreviewed();
@@ -221,6 +223,8 @@ const ApprovedTable = async () => {
     try {
         if ($.fn.DataTable.isDataTable('#approvedTable')) {
             $('#approvedTable').DataTable().destroy();
+            var div = document.getElementById('approvedTable');
+            div.innerHTML = "";
         }
 
         const data = await GetClientsApproved();
@@ -358,11 +362,11 @@ const UnreviewedTransportLinesTable = async (AccountNum) => {
                 }
             });
         }
-        else{
+        else {
             $('#Documents').modal('hide');
             toastType = 'Primary';
             toastPlacement = 'Top right';
-            await ToastsNotification("Fin de la Revisión", "Actualmente no quedan documentos cargados en el sistema", toastType, toastPlacement); 
+            await ToastsNotification("Fin de la Revisión", "Actualmente no quedan documentos cargados en el sistema", toastType, toastPlacement);
         }
     } catch (error) {
         console.error(error);
@@ -440,11 +444,11 @@ const UnreviewedDriversTable = async (AccountNum) => {
                 }
             });
         }
-        else{
+        else {
             $('#Documents').modal('hide');
             toastType = 'Primary';
             toastPlacement = 'Top right';
-            await ToastsNotification("Fin de la Revisión", "Actualmente no quedan documentos cargados en el sistema", toastType, toastPlacement); 
+            await ToastsNotification("Fin de la Revisión", "Actualmente no quedan documentos cargados en el sistema", toastType, toastPlacement);
         }
     } catch (error) {
         console.error(error);
@@ -522,11 +526,11 @@ const UnreviewedTransportsTable = async (AccountNum) => {
                 }
             });
         }
-        else{
+        else {
             $('#Documents').modal('hide');
             toastType = 'Primary';
             toastPlacement = 'Top right';
-            await ToastsNotification("Fin de la Revisión", "Actualmente no quedan documentos cargados en el sistema", toastType, toastPlacement); 
+            await ToastsNotification("Fin de la Revisión", "Actualmente no quedan documentos cargados en el sistema", toastType, toastPlacement);
         }
     } catch (error) {
         console.error(error);
@@ -795,29 +799,27 @@ const ApproveDocument = async (e) => {
     if (e) {
         const data = $(e).attr('data');
         const dataObj = JSON.parse(data);
-        const DocumentFileId = dataObj.Id; 
+        const DocumentFileId = dataObj.Id;
         const AccountNum = sessionStorage.getItem('AccountNum');
-        
+
         const response = await UpdateDocumentStatus(DocumentFileId, 'approved');
 
-        if(response.output.Success){
+        if (response.Success) {
             const DocumentType = sessionStorage.getItem('DocumentType');
             toastType = 'Primary';
             toastPlacement = 'Top right';
             await ToastsNotification("Documento Aprobado", "El documento ha sido aprobado correctamente.", toastType, toastPlacement);
-            ApprovedTable();
-            UnreviewedTable();
-            if(DocumentType=='Chofer'){
+            if (DocumentType == 'Chofer') {
                 await UnreviewedDriversTable(AccountNum);
             }
-            else if(DocumentType=='Linea Transportista'){
+            else if (DocumentType == 'Linea Transportista') {
                 await UnreviewedTransportLinesTable(AccountNum);
             }
-            else if (DocumentType=='Transporte'){
+            else if (DocumentType == 'Transporte') {
                 await UnreviewedTransportsTable(AccountNum);
-            }       
+            }
         }
-        else{
+        else {
             toastType = 'Danger';
             toastPlacement = 'Top right';
             await ToastsNotification("Falla en Aprobación", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
@@ -834,25 +836,24 @@ const RejectDocument = async (e) => {
 
         const response = await UpdateDocumentStatus(DocumentFileId, 'rejected');
 
-        if(response.output.Success){
+        if (response.Success) {
             const DocumentType = sessionStorage.getItem('DocumentType');
             toastType = 'Primary';
             toastPlacement = 'Top right';
             await ToastsNotification("Documento Rechazado", "El documento ha sido rechazado correctamente.", toastType, toastPlacement);
-            ApprovedTable();
-            UnreviewedTable();
-            if(DocumentType=='Chofer'){
+
+            if (DocumentType == 'Chofer') {
                 await UnreviewedDriversTable(AccountNum);
             }
-            else if(DocumentType=='Linea Transportista'){
+            else if (DocumentType == 'Linea Transportista') {
                 await UnreviewedTransportLinesTable(AccountNum);
             }
-            else if (DocumentType=='Transporte'){
+            else if (DocumentType == 'Transporte') {
                 await UnreviewedTransportsTable(AccountNum);
-            }  
+            }
 
         }
-        else{
+        else {
             toastType = 'Danger';
             toastPlacement = 'Top right';
             await ToastsNotification("Falla en Rechazo", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
@@ -901,6 +902,9 @@ const initButtons = async () => {
             }
         });
 
+        $('#Documents').on('hidden.bs.modal', async function () {
+            await UnreviewedTable();
+        });
 
     } catch (error) {
         console.error(error);
