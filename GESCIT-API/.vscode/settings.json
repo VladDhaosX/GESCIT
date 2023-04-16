@@ -4,6 +4,7 @@
         "Almer",
         "Gecit",
         "gescitapi",
-        "recordset"
+        "recordset",
+        "trustedconnection"
     ]
 }
