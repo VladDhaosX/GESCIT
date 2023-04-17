@@ -73,9 +73,9 @@ const ConfirmIdButton = async () => {
                 document.getElementById('TransportPlates').innerHTML = "<p>" + TransportPlate + "</p>";
                 document.getElementById('Date').innerHTML = "<p>" + AssignedDate + "</p>";
                 document.getElementById('Time').innerHTML = "<p>" + AssignedTime + "</p>";
+                document.getElementById('OptionalPlatesRow').innerHTML = "";
 
                 if (TransportPlateOne != "") {
-                    document.getElementById('OptionalPlatesRow').innerHTML = "";
                     $('#OptionalPlatesRow').append(`
                     <div class="col mb-3">
                         <label for="PlateOne" class="form-label">Placa de caja #1:</label>
@@ -88,9 +88,6 @@ const ConfirmIdButton = async () => {
                     `);
                     document.getElementById('PlateOne').innerHTML = "<p>" + TransportPlateOne + "</p>";
                     document.getElementById('PlateTwo').innerHTML = "<p>" + TransportPlateTwo + "</p>";
-                }
-                else {
-                    document.getElementById('OptionalPlatesRow').innerHTML = "";
                 }
 
                 $('#DateInformationModal').modal('show');
