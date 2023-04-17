@@ -61,6 +61,8 @@ const ConfirmIdButton = async () => {
                 const TransportPlate = $(Date).attr('Placa de Transporte');
                 const AssignedDate = $(Date).attr('Dia');
                 const AssignedTime = $(Date).attr('Horario');
+                const TransportPlateOne = $(Date).attr('Placa de Caja #1');
+                const TransportPlateTwo = $(Date).attr('Placa de Caja #2');
 
                 sessionStorage.setItem("Id", DateId);
                 sessionStorage.setItem("Folio", Folio);
@@ -71,6 +73,24 @@ const ConfirmIdButton = async () => {
                 document.getElementById('TransportPlates').innerHTML = "<p>" + TransportPlate + "</p>";
                 document.getElementById('Date').innerHTML = "<p>" + AssignedDate + "</p>";
                 document.getElementById('Time').innerHTML = "<p>" + AssignedTime + "</p>";
+
+                if (TransportPlateOne != "") {
+                    $('#OptionalPlatesRow').append(`
+                    <div class="col mb-3">
+                        <label for="PlateOne" class="form-label">Placa de caja #1:</label>
+                        <div class="form-control-plaintext" id="PlateOne"></div>
+                    </div>
+                    <div class="col mb-3">
+                        <label for="PlateTwo" class="form-label">Placa de caja #2:</label>
+                        <div class="form-control-plaintext" id="PlateTwo"></div>
+                    </div>
+                    `);
+                    document.getElementById('PlateOne').innerHTML = "<p>" + TransportPlateOne + "</p>";
+                    document.getElementById('PlateTwo').innerHTML = "<p>" + TransportPlateTwo + "</p>";
+                }
+                else {
+                    document.getElementById('OptionalPlatesRow').innerHTML = "";
+                }
 
                 $('#DateInformationModal').modal('show');
             }
