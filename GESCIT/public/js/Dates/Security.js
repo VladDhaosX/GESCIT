@@ -75,6 +75,7 @@ const ConfirmIdButton = async () => {
                 document.getElementById('Time').innerHTML = "<p>" + AssignedTime + "</p>";
 
                 if (TransportPlateOne != "") {
+                    document.getElementById('OptionalPlatesRow').innerHTML = "";
                     $('#OptionalPlatesRow').append(`
                     <div class="col mb-3">
                         <label for="PlateOne" class="form-label">Placa de caja #1:</label>
