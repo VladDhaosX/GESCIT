@@ -6,6 +6,7 @@ const CryptoController = require('./CryptoController');
 
 module.exports = {
   async validateUser(req, res) {
+    // #swagger.tags = ['Configuración/Usuario']
     try {
       const { username, password } = req.body;
 
@@ -73,6 +74,7 @@ module.exports = {
   },
 
   UserPrivacyNoticeHandler: async (req, res) => {
+    // #swagger.tags = ['Configuración/Usuario']
     try {
       const { userId } = req.body;
       const response = await LoginDao.UserPrivacyNotice(userId);
@@ -84,6 +86,7 @@ module.exports = {
   },
 
   getRoles: async (req, res) => {
+    // #swagger.tags = ['Configuración']
     try {
       const response = await LoginDao.getRoles();
       return res.json(response);
@@ -94,6 +97,7 @@ module.exports = {
   },
 
   getUserData: async (req, res) => {
+    // #swagger.tags = ['Configuración/Usuario']
     try {
       const { userId } = req.body;
       const userRole = await LoginDao.getUserRole(userId);
@@ -121,6 +125,7 @@ module.exports = {
   },
 
   ResetPassowrdHandler: async (req, res) => {
+    // #swagger.tags = ['Configuración/Usuario']
     try {
       const { userResetPassword, emailResetPassword } = req.body;
       const MailExists = await LoginDao.ValidateUserEmail(userResetPassword, emailResetPassword);
@@ -145,14 +150,13 @@ module.exports = {
   },
 
   ChangePasswordHandler: async (req, res) => {
+    // #swagger.tags = ['Configuración/Usuario']
     try {
       const { token, user, email, NewPassword, ConfirmedNewPassword } = req.body;
       let response = await LoginDao.ValidateChangePassword(user, email, token, NewPassword, ConfirmedNewPassword);
-      console.log(response);
       if (response.success) {
         const OldPassword = response.OldPassword;
         const ADresponse = await ADController.changePasswordClient(user, NewPassword, OldPassword);
-        console.log(ADresponse);
         if (ADresponse.success) {
           response = await LoginDao.UpdateNewPassword(user, email, token, NewPassword);
           res.json({ success: true, message: response.message });

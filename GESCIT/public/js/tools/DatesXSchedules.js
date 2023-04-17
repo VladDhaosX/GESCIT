@@ -79,7 +79,7 @@ const GetDatesXSchedules = async (date) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/tools/GetAllSchedulesAvailables`,
+            url: `${UrlApi}/tools/GetAllSchedulesAvailable`,
             type: 'POST',
             data: {
                 date

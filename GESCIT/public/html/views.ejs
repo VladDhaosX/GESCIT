@@ -6,28 +6,35 @@
     <%- include('Utils/head') %>
 </head>
 
+<style>
+    table.dataTable.hover tbody tr:hover,
+    table.dataTable.display tbody tr:hover {
+        background-color: rgba(105, 108, 255, 0.1);
+    }
+</style>
+
 <body>
     <main>
         <div class="layout-wrapper layout-content-navbar">
             <div class="layout-container">
                 <!-- Menú lateral -->
-                    <%- include('Utils/sidebar') %>
-                <!-- Menú lateral -->
-                <!-- Content -->
+                <%- include('Utils/sidebar') %>
+                    <!-- Menú lateral -->
+                    <!-- Content -->
                     <div class="layout-page">
                         <div class="content-wrapper">
                             <div class="container-fluid flex-grow-1 container-p-y">
                                 <%- include('Utils/tittle') %>
                                     <hr class="my-5" />
                                     <!-- <div class="card"> -->
-                                        <!-- Contenido de la página -->
-                                        <%- include(Page) %>
-                                            <!-- / Contenido de la página -->
-                                    <!-- </div> -->
+                                    <!-- Contenido de la página -->
+                                    <%- include(Page) %>
+                                        <!-- / Contenido de la página -->
+                                        <!-- </div> -->
                             </div>
                         </div>
                     </div>
-                <!-- Content -->
+                    <!-- Content -->
             </div>
         </div>
     </main>

@@ -7,6 +7,7 @@ module.exports = {
             let pool = await sql.connect(config);
             let result = await pool.request()
                 .input('TransportId', sql.Int, transport.TransportId)
+                .input('TemporalDocumentId', sql.Int, transport.TemporalDocumentId)
                 .input('UserId', sql.Int, transport.UserId)
                 .input('TransportTypeId', sql.Int, transport.TransportTypeId)
                 .input('TransportPlate1', sql.VarChar(20), transport.TransportPlate1)

@@ -1,28 +1,27 @@
 
 const PermissionsDao = require('../../models/Configuration/PermissionsDao');
 
-const GetUserRol = async (req, res) => {
+module.exports = {
+GetUserRol : async (req, res) => {
+    // #swagger.tags = ['Configuración']
     try {
         const response = await PermissionsDao.GetUserRol();
         return res.json(response);
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Error al realizar el login.2', info: error });
+        res.status(500).json({ success: false, message: 'Error al realizar el login.', info: error });
     };
-};
+},
 
-const UpdatePermission = async (req, res) => {
+UpdatePermission : async (req, res) => {
+    // #swagger.tags = ['Configuración/Usuario']
     try {
-
         const { permissionUserId, RolId } = req.body;
         const response = await PermissionsDao.UpdatePermission(permissionUserId, RolId);
 
         res.json(response);
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Error al realizar la actualizacion.', info: error.message });
+        res.status(500).json({ success: false, message: 'Error al realizar la actualización.', info: error.message });
     };
-};
+}
 
-module.exports = {
-    GetUserRol,
-    UpdatePermission
 };

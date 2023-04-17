@@ -35,14 +35,6 @@ const initPage = async () => {
         $('#UlTodayDatesNavs button:first').tab('show');
     });
 
-    $('#txtDate').on('change', async function () {
-        // await initDatesDataTable('pending');
-    });
-
-    $('#btnSearchDates').on('click', async function () {
-        // await initDatesDataTable('pending');
-    });
-
     $('#btnAssignDateHour').on('click', async function () {
         AssignDateHour();
     });
@@ -57,6 +49,34 @@ const initPage = async () => {
 
     $('#NavTodayAssignedDates').on('shown.bs.tab', async function (e) {
         await initDatesDataTable('assigned', 'Today');
+    });
+
+    // btnSendSms ONCLICK
+    $('#btnSendSms').on('click', async function () {
+        const PhoneNumber = $('#txtPhoneNumber').val();
+        const DateId = sessionStorage.getItem('DateId');
+        const response = await ReSendSms(DateId, PhoneNumber);
+
+        let toastType = "Primary";
+        let toastPlacement = "Top right";
+        if (response.returnCodeInformation.success) {
+            await ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
+        } else {
+            toastType = "Danger";
+            await ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
+        };
+    });
+
+    //btnSendMail ONCLICK
+    $('#btnSendMail').on('click', async function () {
+        const Email = $('#txtMail').val();
+        const DateId = sessionStorage.getItem('DateId');
+        const response = await ReSendMail(DateId, Email);
+        if (response.returnCodeInformation.success) {
+            await ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
+        } else {
+            await ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
+        };
     });
 
     await initDatesDataTable('pending', 'Tomorrow');
@@ -83,7 +103,7 @@ const initDatesDataTable = async (Status, Day) => {
 
         if (getDatesData) {
             for (let i = 1; i <= 4; i++) {
-                const $table = $(`<table id="${Status}Schedule${i}DataTable" class="table"></table>`);
+                const $table = $(`<table id="${Status}Schedule${i}DataTable" class="table hover"></table>`);
                 const $Row = $(`<div class="col-3"></div>`);
                 $Row.append($table);
                 $DatesRow.append($Row);
@@ -92,13 +112,15 @@ const initDatesDataTable = async (Status, Day) => {
                     $($table).DataTable().destroy();
                     $($table).empty();
                 };
+
                 const data = getDatesData.filter(x => x.ScheduleTimeId == i || x.ScheduleTimeId == i + 4);
                 $table.DataTable({
+                    paging: false,
                     data: data,
                     columns: [
                         {
                             title: titles[i - 1],
-                            data: 'Línea de Transporte',
+                            data: 'Folio',
                             render: function (data, type, row) {
                                 return `<label style="width: 100%" data='${JSON.stringify(row)}' onclick="ViewDateData(this);"><span class="tf-icons bx bx-time"></span> ${data}</label>`;
                             }
@@ -134,13 +156,34 @@ const ViewDateData = async (element) => {
         $('#txtVolumen').val(data['Volumen en Toneladas']);
         await FillSelectHour(data.ScheduleTimeId);
         $('#selectMinutes').empty();
-        $('#selectMinutes').append(`<option value="0">Seleccione los minutos</option>`);
-        for (let i = 0; i < 60; i++) {
+        $('#selectMinutes').append(`<option value="">Seleccione los minutos</option>`);
+        for (let i = 1; i < 60; i++) {
             $('#selectMinutes').append(`<option value="${i}">${i}</option>`);
         };
 
         $('#selectHour').val(data.Hour || 0);
-        $('#selectMinutes').val(data.Minute || 0);
+        $('#selectMinutes').val(data.Minute || "");
+
+        $('#txtPhoneNumber').val(data['PhoneNumber']);
+        $('#txtMail').val(data.Mail);
+
+        if (data.Estatus == 'Asignada') {
+            $('#selectHour').attr('disabled', true);
+            $('#selectMinutes').attr('disabled', true);
+            $('#btnAssignDateHour').hide();
+            $('#txtPhoneNumber').parent().show();
+            $('#txtMail').parent().show();
+            $('#btnSendSms').show();
+            $('#btnSendMail').show();
+        } else {
+            $('#selectHour').attr('disabled', false);
+            $('#selectMinutes').attr('disabled', false);
+            $('#btnAssignDateHour').show();
+            $('#txtPhoneNumber').parent().hide();
+            $('#txtMail').parent().hide();
+            $('#btnSendSms').hide();
+            $('#btnSendMail').hide();
+        };
 
         $('#ModalDateInfo').modal('show');
     } catch (error) {
@@ -207,7 +250,7 @@ const GetAllHoursOfSchedule = async (ScheduleId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/GetAllHoursOfSchedule`, type: 'POST', data: {
+            url: `${UrlApi}/schedule/GetAllHoursOfSchedule`, type: 'POST', data: {
                 ScheduleId
             },
             dataType: 'json'
@@ -252,7 +295,7 @@ const GetSchedules = async () => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/GetSchedules`,
+            url: `${UrlApi}/schedule/GetSchedules`,
             type: 'GET',
             dataType: 'json'
         });
@@ -283,6 +326,48 @@ const PostAssignDateHour = async (DateId, Hour, Minutes) => {
     } catch (error) {
         console.error(error);
         $.unblockUI();
+    };
+};
+const ReSendSms = async (DateId, PhoneNumber) => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/mail/ReSendSms`, type: 'POST', data: {
+                DateId,
+                PhoneNumber
+            },
+            dataType: 'json'
+        });
+        return response;
+    } catch (error) {
+        console.error(error);
+    };
+};
+const ReSendMail = async (DateId, Mail) => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/mail/ReSendMail`, type: 'POST', data: {
+                DateId,
+                Mail
+            },
+            dataType: 'json'
+        });
+        return response;
+    } catch (error) {
+        console.error(error);
     };
 };
 //#endregion

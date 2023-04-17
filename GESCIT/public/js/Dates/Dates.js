@@ -20,8 +20,17 @@ const initPage = async () => {
         <div class="col mb-3">
             <input type="date" id="txtEndDate" class="form-control"/>
         </div>
+        <button id="btnSearch" type="button" title="Buscar" 
+            class="btn rounded-pill btn-icon btn-outline-primary" 
+            data-bs-toggle="tooltip" data-bs-placement="top">
+            <span class="tf-icons bx bx-search"></span>
+        </button>
     </div>
     `);
+
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    $('#txtStartDate , #txtEndDate').val(tomorrow.toISOString().split('T')[0]);
 
     $('#btnNewDateModal').click(function () {
         newDateModal();
@@ -35,13 +44,18 @@ const initPage = async () => {
         await initDatesDataTable();
     });
 
+    // on btnSearch click
+    $('#btnSearch').click(async function () {
+        await initDatesDataTable();
+    });
+
     $('#OperationsSelect').change(async function (e) {
-        await FillSelectScheduleAvailables();
+        await FillSelectScheduleAvailable();
     });
 
     $('#TransportTypeSelect').change(async function (e) {
         await onTransportTypeSelectChange();
-        await FillSelectScheduleAvailables();
+        await FillSelectScheduleAvailable();
     });
 
     $('#TransportPlate2 , #TransportPlate3').attr('disabled', 'disabled');
@@ -55,7 +69,7 @@ const initPage = async () => {
     });
 
     await initDatesDataTable();
-    await FillSelectAllSheduleTimes();
+    await FillSelectAllScheduleTimes();
     await FillSelectOperationTimes();
     await FillSelectProducts();
     await FillSelectTransportLines();
@@ -64,20 +78,19 @@ const initPage = async () => {
     await FillSelectDrivers();
 
     tooltipTrigger();
-
 };
 
-const FillSelectAllSheduleTimes = async () => {
+const FillSelectAllScheduleTimes = async () => {
     try {
         const OperationTypeId = $('#OperationsSelect').val();
 
         if (OperationTypeId == 0) {
             const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona un Tipo de Operación y Tipo de Transporte");
-            $('#SheduleTimesSelect').empty().append($SeleccionaUnaopción);
+            $('#ScheduleTimesSelect').empty().append($SeleccionaUnaopción);
             return;
         };
 
-        const data = await GetSheduleTimes(OperationTypeId);
+        const data = await GetScheduleTimes(OperationTypeId);
         const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
             return $option;
@@ -86,24 +99,24 @@ const FillSelectAllSheduleTimes = async () => {
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una Opción");
         $options.unshift($SeleccionaUnaopción);
 
-        $('#SheduleTimesSelect').empty().append($options);
+        $('#ScheduleTimesSelect').empty().append($options);
     } catch (error) {
         console.error(error);
     }
 };
 
-const FillSelectScheduleAvailables = async () => {
+const FillSelectScheduleAvailable = async () => {
     try {
         const OperationTypeId = $('#OperationsSelect').val();
         const TransportTypeId = $('#TransportTypeSelect').val();
 
         if (OperationTypeId == 0 || TransportTypeId == 0) {
             const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona un Tipo de Operación y Tipo de Transporte");
-            $('#SheduleTimesSelect').empty().append($SeleccionaUnaopción);
+            $('#ScheduleTimesSelect').empty().append($SeleccionaUnaopción);
             return;
         }
 
-        const data = await GetScheduleAvailables(OperationTypeId, TransportTypeId);
+        const data = await GetScheduleAvailable(OperationTypeId, TransportTypeId);
 
         const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
@@ -113,7 +126,7 @@ const FillSelectScheduleAvailables = async () => {
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
         $options.unshift($SeleccionaUnaopción);
 
-        $('#SheduleTimesSelect').empty().append($options);
+        $('#ScheduleTimesSelect').empty().append($options);
     } catch (error) {
         console.error(error);
     }
@@ -237,11 +250,11 @@ const FillSelectDrivers = async () => {
     }
 };
 
-const ExistsScheduleAvailables = async () => {
+const ExistsScheduleAvailable = async () => {
     try {
         const OperationTypeId = $('#OperationsSelect').val();
         const TransportTypeId = $('#TransportTypeSelect').val();
-        const data = await GetScheduleAvailables(OperationTypeId, TransportTypeId);
+        const data = await GetScheduleAvailable(OperationTypeId, TransportTypeId);
 
         if (data.length > 0) {
             return true;
@@ -255,40 +268,52 @@ const ExistsScheduleAvailables = async () => {
 };
 
 const newDateModal = async () => {
-    sessionStorage.setItem('DateId', 0);
-    $('#SheduleTimesSelect').val(0);
-    $('#OperationsSelect').val(0);
-    $('#ProductsSelect').val(0);
-    $('#TransportLineTypeSelect').val(0);
-    $('#TransportPlate1Select').val(0);
-    $('#TransportPlate1').val('');
-    $('#TransportPlate2').val('');
-    $('#TransportPlate3').val('');
-    $('#DriversSelect').val(0);
-    $('#txtVolume').val('');
-    $('#TransportTypeSelect').val(0);
+
+    const IsAvailableResponse = await IsAppointmentTimeAvailable();
+    const IsAvailable = IsAvailableResponse.IsTimeAvailable;
+    if (!IsAvailable) {
+        await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+        return;
+    };
+
+    const ExistsScheduleAvailablesResult = await ExistsScheduleAvailables();
+    if (!ExistsScheduleAvailablesResult) {
+        await ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
+        return;
+    };
+
+    // sessionStorage.setItem('DateId', 0);
+    // $('#SheduleTimesSelect').val(0);
+    // $('#OperationsSelect').val(0);
+    // $('#ProductsSelect').val(0);
+    // $('#TransportLineTypeSelect').val(0);
+    // $('#TransportPlate1Select').val(0);
+    // $('#TransportPlate1').val('');
+    // $('#TransportPlate2').val('');
+    // $('#TransportPlate3').val('');
+    // $('#DriversSelect').val(0);
+    // $('#txtVolume').val('');
+    // $('#TransportTypeSelect').val(0);
+    // $('#TransportPlate2 , #TransportPlate3').parent().hide();
 
     $('#ModalDatesTitle').text('Nueva Cita');
 
-    const IsAvailable = await IsAppointmentTimeAvailable();
-    if (IsAvailable) {
-        const ExistsScheduleAvailablesResult = await ExistsScheduleAvailables();
-        if (!ExistsScheduleAvailablesResult) {
-            // await FillSelectScheduleAvailables();
-            $('#ModalDates').modal('show');
-        } else {
-            await ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
-        };
-    } else {
-        await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
-    };
+    $('#ModalDates').modal('show');
 };
 
 const newDate = async () => {
     try {
+
+        const IsAvailableResponse = await IsAppointmentTimeAvailable();
+        const IsAvailable = IsAvailableResponse.IsTimeAvailable;
+        if (!IsAvailable) {
+            await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+            return;
+        };
+
         const DateId = sessionStorage.getItem('DateId');
         const userId = sessionStorage.getItem('userId');
-        const sheduleTimeId = $('#SheduleTimesSelect').val();
+        const ScheduleTimeId = $('#ScheduleTimesSelect').val();
         const operationTypeId = $('#OperationsSelect').val();
         const productId = $('#ProductsSelect').val();
         const transportLineId = $('#TransportLineTypeSelect').val();
@@ -300,23 +325,7 @@ const newDate = async () => {
         const driverId = $('#DriversSelect').val();
         const Volume = $('#txtVolume').val();
 
-        const date = {
-            DateId,
-            userId,
-            sheduleTimeId,
-            operationTypeId,
-            productId,
-            transportLineId,
-            transportId,
-            transportTypeId,
-            TransportPlate,
-            TransportPlate2,
-            TransportPlate3,
-            driverId,
-            Volume
-        };
-
-        const response = await addOrUpdateDates(date);
+        const response = await addOrUpdateDates(DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume);
         let toastType = "Primary";
         let toastPlacement = "Top right";
 
@@ -327,7 +336,7 @@ const newDate = async () => {
             toastType = "Danger";
             toastPlacement = "Middle center";
             await ToastsNotification("Citas", response.message, toastType, toastPlacement);
-            await FillSelectScheduleAvailables();
+            await FillSelectScheduleAvailable();
         }
         await initDatesDataTable();
     } catch (error) {
@@ -353,7 +362,8 @@ const initDatesDataTable = async () => {
                     data: 'Id',
                     render: function (data, type, row) {
                         let buttons = '';
-                        buttons += `
+                        if (row.Estatus == 'Pendiente') {
+                            buttons += `
                             <button
                                 class="btn rounded-pill btn-icon btn-outline-primary" 
                                 type="button" 
@@ -365,9 +375,10 @@ const initDatesDataTable = async () => {
                             >
                                 <span class="tf-icons bx bx-edit-alt"></span>
                             </button>
-                        `
+                        `;
+                        }
 
-                        if (row.IsCancelable) {
+                        if (row.IsCancelable && row.Estatus != 'Cancelada') {
                             buttons += `
                             <button
                                 class="btn rounded-pill btn-icon btn-outline-danger" 
@@ -385,11 +396,72 @@ const initDatesDataTable = async () => {
                         return buttons;
                     }
                 },
-                ...Object.keys(data[0]).map(propName => ({
-                    title: propName,
-                    data: propName,
-                    visible: !propName.includes('Id') && !propName.includes('IsCancelable')
-                }))
+                {
+                    title: 'Cliente',
+                    data: 'Cliente'
+                },
+                {
+                    title: 'Folio',
+                    data: 'Folio'
+                },
+                {
+                    title: 'Estatus',
+                    data: 'Estatus'
+                },
+                {
+                    title: 'Fecha de Cita',
+                    data: 'Fecha de Cita'
+                },
+                {
+                    title: 'Horario',
+                    data: 'Horario'
+                },
+                {
+                    title: 'Hora de Cita',
+                    data: 'Hora de Cita'
+                },
+                {
+                    title: 'Operacion',
+                    data: 'Operacion'
+                },
+                {
+                    title: 'Línea de Transporte',
+                    data: 'Línea de Transporte'
+                },
+                {
+                    title: 'Tipo de Transporte',
+                    data: 'Tipo de Transporte'
+                },
+                {
+                    title: 'Placa de Transporte ',
+                    data: 'Placa de Transporte'
+                },
+                {
+                    title: 'Placa de Caja #1',
+                    data: 'Placa de Caja #1'
+                },
+                {
+                    title: 'Placa de Caja #2 ',
+                    data: 'Placa de Caja #2'
+                },
+                {
+                    title: 'Chofer',
+                    data: 'Chofer'
+                },
+                {
+                    title: 'Producto',
+                    data: 'Producto'
+                },
+                {
+                    title: 'Volumen en Toneladas',
+                    data: 'Volumen en Toneladas'
+                }
+                // ...Object.keys(data[0]).map(propName => ({
+                //     title: propName,
+                //     data: propName,
+                //     visible: !propName.includes('Id') && !propName.includes('IsCancelable')
+                // }
+                // ))
             ];
             $('#DatesTable').DataTable({
                 data: data,
@@ -401,7 +473,10 @@ const initDatesDataTable = async () => {
                 "columnDefs": [
                     { "type": "num", "targets": 11 }
                 ]
-            });
+            }).on('draw', function () {
+                tooltipTrigger();
+            });;
+
         };
     } catch (error) {
         console.error(error);
@@ -410,18 +485,26 @@ const initDatesDataTable = async () => {
 
 const ShowEditModal = async (element) => {
     try {
+
+        const IsAvailableResponse = await IsAppointmentTimeAvailable();
+        const IsAvailable = IsAvailableResponse.IsTimeAvailable;
+        if (!IsAvailable) {
+            await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+            return;
+        };
+
         const data = JSON.parse($(element).attr('data'));
         sessionStorage.setItem('DateId', data.Id);
         $('#OperationsSelect').val(data.OperationId);
         $('#TransportTypeSelect').val(data.TransportTypeId);
         await onTransportTypeSelectChange();
         $('#TransportPlate1Select').val(data.TransportId);
-        await FillSelectAllSheduleTimes();
-        $('#SheduleTimesSelect').val(data.ScheduleTimeId);
+        await FillSelectAllScheduleTimes();
+        $('#ScheduleTimesSelect').val(data.ScheduleTimeId);
         $('#TransportLineTypeSelect').val(data.TransportLineId);
         $('#TransportPlate1').val(data['Placa de Transporte']);
-        $('#TransportPlate3').val(data['Placa de Caja #1']);
-        $('#TransportPlate2').val(data['Placa de Caja #2']);
+        $('#TransportPlate2').val(data['Placa de Caja #1']);
+        $('#TransportPlate3').val(data['Placa de Caja #2']);
         $('#DriversSelect').val(data.DriverId);
         $('#ProductsSelect').val(data.ProductId);
         $('#txtVolume').val(data['Volumen en Toneladas']);
@@ -498,10 +581,28 @@ const onTransportPlate1SelectChange = (e) => {
         };
     };
 };
+
+const ExistsScheduleAvailables = async () => {
+    try {
+        const OperationTypeId = $('#OperationsSelect').val();
+        const TransportTypeId = $('#TransportTypeSelect').val();
+        const data = await GetScheduleAvailables(OperationTypeId, TransportTypeId);
+        console.log(data);
+        if (data.length > 0) {
+            return true;
+        } else {
+            return false;
+        };
+
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 //#endregion
 
 //#region Fetchs
-const GetSheduleTimes = async (OperationTypeId) => {
+const GetScheduleTimes = async (OperationTypeId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -511,7 +612,7 @@ const GetSheduleTimes = async (OperationTypeId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/GetSheduleTimes`, type: 'POST', data: {
+            url: `${UrlApi}/schedule/GetScheduleTimes`, type: 'POST', data: {
                 OperationTypeId
             },
             dataType: 'json'
@@ -523,7 +624,7 @@ const GetSheduleTimes = async (OperationTypeId) => {
     }
 };
 
-const GetScheduleAvailables = async (OperationTypeId, TransportTypeId) => {
+const GetScheduleAvailable = async (OperationTypeId, TransportTypeId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -533,7 +634,7 @@ const GetScheduleAvailables = async (OperationTypeId, TransportTypeId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/ScheduleAvailables`,
+            url: `${UrlApi}/schedule/ScheduleAvailable`,
             type: 'POST',
             data: {
                 OperationTypeId,
@@ -703,7 +804,7 @@ const GetDates = async (userId, StartDate, EndDate) => {
     }
 };
 
-const addOrUpdateDates = async (date) => {
+const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume) => {
     try {
         return await $.ajax({
             async: true,
@@ -713,9 +814,7 @@ const addOrUpdateDates = async (date) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/addOrUpdateDates`, type: 'POST', data: {
-                date
-            },
+            url: `${UrlApi}/dates/addOrUpdateDates`, type: 'POST', data: { DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume },
             dataType: 'json'
         });
     } catch (error) {
@@ -726,7 +825,7 @@ const addOrUpdateDates = async (date) => {
 
 const IsAppointmentTimeAvailable = async () => {
     try {
-        return await $.ajax({
+        const response = await $.ajax({
             async: true,
             beforeSend: function () {
                 $.blockUI({ message: null });
@@ -734,10 +833,11 @@ const IsAppointmentTimeAvailable = async () => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/IsAppointmentTimeAvailable`,
+            url: `${UrlApi}/schedule/IsAppointmentTimeAvailable`,
             type: 'GET',
             dataType: 'json'
         });
+        return response.success ? response.data : console.log(response.message);
     } catch (error) {
         console.error(error.message);
         $.unblockUI();
@@ -765,4 +865,28 @@ const CancelDate = async (dateId) => {
     };
 };
 
+const GetScheduleAvailables = async (OperationTypeId, TransportTypeId) => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/schedule/ScheduleAvailable`,
+            type: 'POST',
+            data: {
+                OperationTypeId,
+                TransportTypeId
+            },
+            dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
 //#endregion

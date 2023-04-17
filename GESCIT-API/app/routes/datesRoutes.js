@@ -1,37 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const DatesController = require('../controllers/DatesController');
+const DatesController = require('../controllers/Operation/DatesController');
 
-router.post('/addOrUpdateDates', DatesController.addOrUpdateDate);
+router.post('/addOrUpdateDates', DatesController.addOrUpdateDateHandler);
 
-router.post('/GetSheduleTimes', DatesController.GetSheduleTimes);
+router.post('/GetOperationTypes', DatesController.GetOperationTypesHandler);
 
-router.post('/GetOperationTypes', DatesController.GetOperationTypes);
+router.post('/GetProducts', DatesController.GetProductsHandler);
 
-router.post('/GetProducts', DatesController.GetProducts);
+router.post('/GetTransportLines', DatesController.GetTransportLinesHandler);
 
-router.post('/GetTransportLines', DatesController.GetTransportLines);
+router.post('/GetTransports', DatesController.GetTransportsHandler);
 
-router.post('/GetTransports', DatesController.GetTransports);
+router.post('/GetDrivers', DatesController.GetDriversHandler);
 
-router.post('/GetDrivers', DatesController.GetDrivers);
+router.post('/GetDates', DatesController.GetDatesHandler);
 
-router.post('/GetDates', DatesController.GetDates);
+router.get('/GetTransportType', DatesController.GetTransportTypesHandler);
 
-router.get('/GetTransportType', DatesController.GetTransportTypes);
+router.post('/GetTransportsByType', DatesController.GetTransportsByTypeHandler);
 
-router.post('/GetTransportsByType', DatesController.GetTransportsByType);
+router.post('/CancelDate', DatesController.CancelDateHandler);
 
-router.get('/IsAppointmentTimeAvailable', DatesController.IsAppointmentTimeAvailableHandler);
+router.post('/AssignDateHour', DatesController.AssignDateHourHandler);
 
-router.post('/ScheduleAvailables', DatesController.ScheduleAvailables);
+router.post('/GetClientInfoByFolio', DatesController.GetClientInfoByFolioHandler);
 
-router.post('/CancelDate', DatesController.CancelDate);
-
-router.get('/GetSchedules', DatesController.GetSchedules);
-
-router.post('/GetAllHoursOfSchedule', DatesController.GetAllHoursOfSchedule);
-
-router.post('/AssignDateHour', DatesController.AssignDateHour);
+router.post('/UpdateDateStatus', DatesController.UpdateDateStatusHandler);
 
 module.exports = router;

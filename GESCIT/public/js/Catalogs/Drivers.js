@@ -471,7 +471,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                 {
                     title: 'Acciones',
                     data: 'Id',
-                    "render": function (data, type, row) {
+                    render: function (data, type, row) {
                         const StatusId = row.StatusId;
                         if (StatusId == 4) {
                             return `

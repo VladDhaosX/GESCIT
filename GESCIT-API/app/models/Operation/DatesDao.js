@@ -1,26 +1,25 @@
 const sql = require('mssql');
-const config = require('../config/database');
+const config = require('../../config/database');
 
 module.exports = {
-    addOrUpdateDate: async (appointment) => {
-        console.log('appointment: ', appointment);
+    addOrUpdateDate: async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
-                .input('DateId', sql.Int, appointment.DateId)
-                .input('UserId', sql.Int, appointment.userId)
-                .input('ScheduleTimeId', sql.Int, appointment.sheduleTimeId)
-                .input('OperationTypeId', sql.Int, appointment.operationTypeId)
-                .input('ProductId', sql.Int, appointment.productId)
-                .input('TransportLineId', sql.Int, appointment.transportLineId)
-                .input('TransportId', sql.Int, appointment.transportId)
-                .input('TransportPlate', sql.VarChar(50), appointment.TransportPlate)
-                .input('TransportPlate2', sql.VarChar(50), appointment.TransportPlate2)
-                .input('TransportPlate3', sql.VarChar(50), appointment.TransportPlate3)
-                .input('DriverId', sql.Int, appointment.driverId)
-                .input('Volume', sql.VarChar(50), appointment.Volume)
+                .input('DateId', sql.Int, DateId)
+                .input('UserId', sql.Int, userId)
+                .input('ScheduleTimeId', sql.Int, ScheduleTimeId)
+                .input('OperationTypeId', sql.Int, operationTypeId)
+                .input('ProductId', sql.Int, productId)
+                .input('TransportLineId', sql.Int, transportLineId)
+                .input('TransportId', sql.Int, transportId)
+                .input('TransportPlate', sql.VarChar(50), TransportPlate)
+                .input('TransportPlate2', sql.VarChar(50), TransportPlate2)
+                .input('TransportPlate3', sql.VarChar(50), TransportPlate3)
+                .input('DriverId', sql.Int, driverId)
+                .input('Volume', sql.VarChar(50), Volume)
                 .output('Success', sql.Bit, '0')
-                .output('Message', sql.VarChar(100))
+                .output('Message', sql.VarChar(sql.MAX))
                 .execute('SpAddOrUpdateDates');
 
             return {
@@ -37,27 +36,7 @@ module.exports = {
             }
         }
     },
-    GetSheduleTimes: async (OperationTypeId) => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('OperationTypeId', sql.Int, OperationTypeId)
-                .execute('SpGetSheduleTime');
 
-            return {
-                "success": true,
-                "message": "Horarios obtenidos correctamente.",
-                "data": result.recordset,
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los horarios.",
-                "info": error.message
-            }
-        }
-    },
     GetOperationTypes: async () => {
         try {
             let pool = await sql.connect(config);
@@ -78,6 +57,7 @@ module.exports = {
             }
         }
     },
+
     GetProducts: async () => {
         try {
             let pool = await sql.connect(config);
@@ -98,6 +78,7 @@ module.exports = {
             }
         }
     },
+
     GetTransportLines: async (userId) => {
         try {
             let pool = await sql.connect(config);
@@ -119,6 +100,7 @@ module.exports = {
             }
         }
     },
+
     GetTransports: async (userId) => {
         try {
             let pool = await sql.connect(config);
@@ -140,6 +122,7 @@ module.exports = {
             }
         }
     },
+
     GetDrivers: async (userId) => {
         try {
             let pool = await sql.connect(config);
@@ -161,6 +144,7 @@ module.exports = {
             }
         }
     },
+
     GetDates: async (userId, StartDate, EndDate, Status) => {
         try {
             let pool = await sql.connect(config);
@@ -185,6 +169,7 @@ module.exports = {
             }
         }
     },
+
     GetTransportsByType: async (UserId, TransportTypeId) => {
         try {
             let pool = await sql.connect(config);
@@ -207,49 +192,7 @@ module.exports = {
             }
         }
     },
-    IsAppointmentTimeAvailable: async () => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .output('IsTimeAvailable', sql.Bit)
-                .execute('SpIsAppointmentTimeAvailable');
 
-            return {
-                "success": true,
-                "message": "Consulta obtenida correctamente.",
-                "data": result.output
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los datos.",
-                "info": error.message
-            }
-        }
-    },
-    ScheduleAvailables: async (OperationTypeId, TransportTypeId) => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('OperationTypeId', sql.Int, OperationTypeId)
-                .input('TransportTypeId', sql.Int, TransportTypeId)
-                .execute('SpSchedulesAvailables');
-
-            return {
-                "success": true,
-                "message": "Consulta obtenida correctamente.",
-                "data": result.recordset
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los datos.",
-                "info": error.message
-            }
-        }
-    },
     CancelDate: async (DateId) => {
         try {
             let pool = await sql.connect(config);
@@ -273,48 +216,7 @@ module.exports = {
             }
         }
     },
-    GetSchedules: async () => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .execute('SpGetSchedules');
 
-            return {
-                "success": true,
-                "message": "Consulta obtenida correctamente.",
-                "data": result.recordset
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los datos.",
-                "info": error.message
-            }
-        }
-    },
-
-    GetAllHoursOfSchedule: async (ScheduleId) => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('ScheduleId', sql.Int, ScheduleId)
-                .execute('SpGetAllHoursOfSchedule');
-
-            return {
-                "success": true,
-                "message": "Consulta obtenida correctamente.",
-                "data": result.recordset
-            }
-
-        } catch (error) {
-            return {
-                "success": false,
-                "message": "Error al obtener los datos.",
-                "info": error.message
-            }
-        }
-    },
     AssignDateHour: async (DateId, Hour, Minutes) => {
         try {
             let pool = await sql.connect(config);
@@ -325,6 +227,53 @@ module.exports = {
                 .output('Success', sql.Bit)
                 .output('Message', sql.VarChar(sql.MAX))
                 .execute('SpAssignDateHour');
+
+            return {
+                "success": result.output.Success,
+                "message": result.output.Message,
+                "data": result.recordset
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los datos.",
+                "info": error.message
+            }
+        }
+    },
+
+    GetClientInfoByFolio: async (Folio) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('Folio', sql.VarChar(sql.MAX), Folio)
+                .execute('SpGetClientInfoByFolio');
+
+            return {
+                "success": true,
+                "message": "Consulta obtenida correctamente.",
+                "data": result.recordset
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los datos.",
+                "info": error.message
+            }
+        }
+    },
+
+    UpdateDateStatus: async (DateId, NewStatus) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('DateId', sql.Int, DateId)
+                .input('NewStatus', sql.VarChar(sql.MAX), NewStatus)
+                .output('Success', sql.Bit)
+                .output('Message', sql.VarChar(sql.MAX))
+                .execute('SpUpdateDateStatus');
 
             return {
                 "success": result.output.Success,

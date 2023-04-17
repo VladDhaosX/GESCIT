@@ -99,7 +99,7 @@ const RegisterAccessButton = async () => {
             toastPlacement = 'Top right';
             await ToastsNotification("Arribo Registrado", Response.message, toastType, toastPlacement);
         }
-        else if(!Response.success){
+        else if (!Response.success) {
             toastType = 'Danger';
             toastPlacement = 'Top right';
             await ToastsNotification("Arribo Negado", Response.message, toastType, toastPlacement);
