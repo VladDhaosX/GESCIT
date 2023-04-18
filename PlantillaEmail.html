@@ -33,9 +33,11 @@
             padding: 10px;
             color: black;
         }
-
-        b{
+        .TableTitle{
             font-size: 1.2em;
+        }
+        b{
+            font-size: 1.1em;
         }
 
         .customTable {
@@ -69,24 +71,24 @@
                         <td class="BlueRows"></td>
                         <td class="BlueRows"></td>
                         <td class="BlueRows"></td>
-                        <td class="BlueRows">Información de Cita</td>
+                        <td class="BlueRows"><b class="TableTitle">Información de Cita</b></td>
                         <td class="BlueRows"></td>
                         <td class="BlueRows"></td>
                         <td class="BlueRows"></td>
                         <td class="BlueRows"></td>
                         <td class="BlueRows"></td>                    </tr>
                     <tr>
-                        <td><b>Fecha:</b></td>
-                        <td><b>Horario:</b></td>
-                        <td><b>Operación:</b></td>
-                        <td><b>Línea de Transporte:</b></td>
-                        <td><b>Transporte:</b></td>
-                        <td><b>Placa del Transporte:</b></td>
-                        <td><b>Placa Caja 1:</b></td>
-                        <td><b>Placa Caja 2:</b></td>
-                        <td><b>Chofer:</b></td>
-                        <td><b>Producto:</b></td>
-                        <td><b>Volumen:</b></td>
+                        <td><b>Fecha</b></td>
+                        <td><b>Horario</b></td>
+                        <td><b>Operación</b></td>
+                        <td><b>Línea de Transporte</b></td>
+                        <td><b>Transporte</b></td>
+                        <td><b>Placa del Transporte</b></td>
+                        <td><b>Placa Caja 1</b></td>
+                        <td><b>Placa Caja 2</b></td>
+                        <td><b>Chofer</b></td>
+                        <td><b>Producto</b></td>
+                        <td><b>Volumen</b></td>
                     </tr>
                     <tr> 	     
                         <td> ${AssignedDate} </td>
@@ -110,9 +112,9 @@
                 <p>&nbsp;</p>
                 <h4>Estimado/a cliente ${ClientName}, </h4>
                 <p>&nbsp;</p>
-                <p>Le avisamos que hemos asignado su cita para la línea de transporte ${TransportLine} a las ${AssignedTime} horas del día ${AssignedDate}. </p>
+                <p>Le avisamos que hemos asignado su cita para la línea de transporte ${TransportLine} a las <b>${AssignedTime}</b> horas del día <b>${AssignedDate}</b>. </p>
                 <p>&nbsp;</p>
-                <p>Folio de Cita: ${Folio}</p>
+                <p>Folio de Cita: <b>${Folio}</b></p>
                 <p>&nbsp;</p>
                 <p>Agradecemos su preferencia y quedamos a su disposición para cualquier consulta o requerimiento adicional. </p>
                 <p>&nbsp;</p>
