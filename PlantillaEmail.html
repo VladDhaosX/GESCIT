@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <title></title>
+    <!--[if mso]> 
+<noscript> 
+<xml> 
+<o:OfficeDocumentSettings> 
+<o:PixelsPerInch>96</o:PixelsPerInch> 
+</o:OfficeDocumentSettings> 
+</xml> 
+</noscript> 
+<![endif]-->
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            font-size: 0.95em;
+            color:#083D65;
+        }
+    
+
+        table,
+        td {
+            border: 0px;
+            padding: 10px;
+            color: black;
+        }
+
+        b{
+            font-size: 1.2em;
+        }
+
+        .customTable {
+            font-size: 1.1em;
+            color:#083D65;
+        }
+
+        .BlueRows{
+            background-color:#083D65;
+            color:white;
+        }
+
+        
+    </style>
+</head>
+
+<body style="margin:0;padding:0;">
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+        <tr>
+            <td id="AlmerLogo" align="center" style="padding:40px 0 30px 0;">
+                <img src="/emailHeader.png" alt="" width="300" style="height:auto;display:block;" />
+            </td>
+        </tr>
+        <tr>
+            <td id="InformationTable">
+                <!-- La tabla se insertará aquí -->
+                <table id="DateInfoTable" style="padding:15px;width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:center;width:100%;"> 	
+                    <tr>
+                        <td class="BlueRows"></td>
+                        <td class="BlueRows"></td>
+                        <td class="BlueRows"></td>
+                        <td class="BlueRows"></td>
+                        <td class="BlueRows"></td>
+                        <td class="BlueRows">Información de Cita</td>
+                        <td class="BlueRows"></td>
+                        <td class="BlueRows"></td>
+                        <td class="BlueRows"></td>
+                        <td class="BlueRows"></td>
+                        <td class="BlueRows"></td>                    </tr>
+                    <tr>
+                        <td><b>Fecha:</b></td>
+                        <td><b>Horario:</b></td>
+                        <td><b>Operación:</b></td>
+                        <td><b>Línea de Transporte:</b></td>
+                        <td><b>Transporte:</b></td>
+                        <td><b>Placa del Transporte:</b></td>
+                        <td><b>Placa Caja 1:</b></td>
+                        <td><b>Placa Caja 2:</b></td>
+                        <td><b>Chofer:</b></td>
+                        <td><b>Producto:</b></td>
+                        <td><b>Volumen:</b></td>
+                    </tr>
+                    <tr> 	     
+                        <td> ${AssignedDate} </td>
+                        <td> ${AssignedTime} </td>
+                        <td> ${OperationType} </td>
+                        <td> ${TransportLine} </td>
+                        <td> ${Transport} </td>
+                        <td> ${TransportPlate} </td>
+                        <td> ${TransportBox1Plate} </td>
+                        <td> ${TransportBox2Plate} </td>
+                        <td> ${DriverName} </td>
+                        <td> ${ProductType} </td>
+                        <td> ${ProductVolume} </td>
+    
+                    </tr> 
+                </table> 
+            </td>
+        </tr>
+        <tr>
+            <td id="BodyText" style="padding:0;" class="customTable">
+                <p>&nbsp;</p>
+                <h4>Estimado/a cliente ${ClientName}, </h4>
+                <p>&nbsp;</p>
+                <p>Le avisamos que hemos asignado su cita para la línea de transporte ${TransportLine} a las ${AssignedTime} horas del día ${AssignedDate}. </p>
+                <p>&nbsp;</p>
+                <p>Folio de Cita: ${Folio}</p>
+                <p>&nbsp;</p>
+                <p>Agradecemos su preferencia y quedamos a su disposición para cualquier consulta o requerimiento adicional. </p>
+                <p>&nbsp;</p>
+                <p>Atentamente,</p>
+                <p>Almacenadora Mercader S.A.</p>
+                <p>&nbsp;</p>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
