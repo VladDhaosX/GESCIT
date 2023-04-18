@@ -107,10 +107,10 @@ const ConfirmIdButton = async () => {
                         await ToastsNotification("Cita Vencida", "No es posible dar acceso a citas vencidas.", toastType, toastPlacement);
                     }
                     else if (Status == "Cancelada") {
-                        await ToastsNotification("Cita cancelada", "No es posible dar acceso a citas que han sido canceladas.", toastType, toastPlacement);
+                        await ToastsNotification("Cita Cancelada", "No es posible dar acceso a citas que han sido canceladas.", toastType, toastPlacement);
                     }
                     else if (Status == "Arribo") {
-                        await ToastsNotification("Cita ya registrada", "La cita cuya llegada intenta registrar ya pasó por caseta anteriormente.", toastType, toastPlacement);
+                        await ToastsNotification("Cita ya Registrada", "La cita cuya llegada intenta registrar ya pasó por caseta anteriormente.", toastType, toastPlacement);
                     }
                 } else {
                     document.getElementById('RegisterAccess').style.display = 'block';
