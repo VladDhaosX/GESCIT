@@ -60,9 +60,12 @@ const ConfirmIdButton = async () => {
                 const Transport = $(Date).attr('Tipo de Transporte');
                 const TransportPlate = $(Date).attr('Placa de Transporte');
                 const AssignedDate = $(Date).attr('Dia');
-                const AssignedTime = $(Date).attr('Horario');
+                const AssignedSchedule = $(Date).attr('Horario');
                 const TransportPlateOne = $(Date).attr('Placa de Caja #1');
                 const TransportPlateTwo = $(Date).attr('Placa de Caja #2');
+                const Status = $(Date).attr('Estatus');
+                const AssignedTime = $(Date).attr('Hora');
+
 
                 sessionStorage.setItem("Id", DateId);
                 sessionStorage.setItem("Folio", Folio);
@@ -73,6 +76,8 @@ const ConfirmIdButton = async () => {
                 document.getElementById('TransportPlates').innerHTML = "<p>" + TransportPlate + "</p>";
                 document.getElementById('Date').innerHTML = "<p>" + AssignedDate + "</p>";
                 document.getElementById('Time').innerHTML = "<p>" + AssignedTime + "</p>";
+                document.getElementById('Schedule').innerHTML = "<p>" + AssignedSchedule + "</p>";
+                document.getElementById('Status').innerHTML = "<p>" + Status + "</p>";
                 document.getElementById('OptionalPlatesRow').innerHTML = "";
 
                 if (TransportPlateOne != "") {
@@ -88,6 +93,27 @@ const ConfirmIdButton = async () => {
                     `);
                     document.getElementById('PlateOne').innerHTML = "<p>" + TransportPlateOne + "</p>";
                     document.getElementById('PlateTwo').innerHTML = "<p>" + TransportPlateTwo + "</p>";
+                }
+
+                if (Status != "Asignada") {
+                    document.getElementById('RegisterAccess').style.display = 'none';
+                    toastType = 'Danger';
+                    toastPlacement = 'Top right';
+                    if (Status == "Pendiente") {
+
+                        await ToastsNotification("Cita Pendiente", "No es posible dar acceso a citas sin programar.", toastType, toastPlacement);
+                    }
+                    else if (Status === "Vencida") {
+                        await ToastsNotification("Cita Vencida", "No es posible dar acceso a citas vencidas.", toastType, toastPlacement);
+                    }
+                    else if (Status == "Cancelada") {
+                        await ToastsNotification("Cita cancelada", "No es posible dar acceso a citas que han sido canceladas.", toastType, toastPlacement);
+                    }
+                    else if (Status == "Arribo") {
+                        await ToastsNotification("Cita ya registrada", "La cita cuya llegada intenta registrar ya pasó por caseta anteriormente.", toastType, toastPlacement);
+                    }
+                } else {
+                    document.getElementById('RegisterAccess').style.display = 'block';
                 }
 
                 $('#DateInformationModal').modal('show');
