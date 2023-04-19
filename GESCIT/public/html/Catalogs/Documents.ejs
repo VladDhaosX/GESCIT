@@ -1,0 +1,61 @@
+<div class="nav-align-top mb-4">
+    <ul id="DocumentsModalNavs" class="nav nav-pills  nav-fill" role="tablist">
+        <li class="nav-item">
+            <button id="PendingTabButton" type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#pendingTab"
+                aria-controls="navs-top-home" aria-selected="true">
+                Pendientes
+            </button>
+        </li>
+        <li class="nav-item">
+            <button id="ApprovedTabButton" type="button" class="nav-link" role="tab" data-bs-toggle="tab"
+                data-bs-target="#approvedTab" aria-controls="navs-top-profile" aria-selected="false">
+                Aprobados
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="pendingTab" role="tabpanel">
+            <div id="ActionsButtons" class="demo-inline-spacing" style="padding: 0px 50px;">
+            </div>
+            <div class="text-nowrap" style="margin: 25px 50px;">
+                <table id="pendingTable" class="table">
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="approvedTab" role="tabpanel">
+            <div id="ActionsButtons" class="demo-inline-spacing" style="padding: 0px 50px;">
+            </div>
+            <div class="text-nowrap" style="margin: 25px 50px;">
+                <table id="approvedTable" class="table">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Documentos-->
+<div class="modal fade" id="Documents" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Documentos</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="table-responsive">
+                        <div class="" style="margin: 25px 25px;">
+                            <table id="DocumentsTable" class="table">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
