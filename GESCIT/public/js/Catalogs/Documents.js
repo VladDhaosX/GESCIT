@@ -868,6 +868,10 @@ const initButtons = async () => {
             await ApprovedTable();
         });
 
+        $('#PendingTabButton').on('shown.bs.tab', async function () {
+            await UnreviewedTable();
+        });
+
         $('#Documents').on('shown.bs.modal', async function () {
             let AccountNum = sessionStorage.getItem('AccountNum');
             let DocumentType = sessionStorage.getItem('DocumentType');
