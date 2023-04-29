@@ -12,4 +12,6 @@ router.get('/GetSchedules', ScheduleController.GetSchedulesHandler);
 
 router.post('/GetAllHoursOfSchedule', ScheduleController.GetAllHoursOfScheduleHandler);
 
+router.post('/GetAvailableScheduleTimesWActualSchedule', ScheduleController.GetAvailableScheduleTimesWActualScheduleHandler);
+
 module.exports = router;

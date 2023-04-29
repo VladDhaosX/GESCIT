@@ -4,9 +4,10 @@ $(document).ready(async function () {
     sessionStorage.setItem("CLientId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
 
-    await UnreviewedTable();
+    // await UnreviewedTable();
     await initButtons();
     //await ApprovedTable();
+    await EmptyTable();
 
 });
 
@@ -60,6 +61,28 @@ const GetClientsUnreviewed = async () => {
 const GetClientsApproved = async () => {
     try {
         const Status = "approved";
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/catalogs/GetClientsByStatusDocs`, type: 'POST', data: {
+                Status
+            },
+            dataType: 'json'
+        });
+        return response;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const GetClientsEmpty = async () => {
+    try {
+        const Status = "empty";
         const response = await $.ajax({
             async: true,
             beforeSend: function () {
@@ -206,7 +229,7 @@ const UnreviewedTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
             $('#UnreviewedDriversModalButton').on('shown.bs.modal', async function () {
@@ -282,7 +305,66 @@ const ApprovedTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
+                }
+            });
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
+const EmptyTable = async () => {
+    try {
+        if ($.fn.DataTable.isDataTable('#emptyTable')) {
+            $('#emptyTable').DataTable().destroy();
+            var div = document.getElementById('emptyTable');
+            div.innerHTML = "";
+        }
+
+        const data = await GetClientsEmpty();
+        if (data.length > 0) {
+            // Crea el arreglo de objetos para las columnas del DataTable
+            const columns = [
+                {
+                    title: 'Ver',
+                    data: 'AccountNum',
+                    "render": function (data, type, row) {
+                        return `
+                                    <button 
+                                        class="btn btn-primary dropdown-toggle" 
+                                        type="button" 
+                                        id="ViewDocumentDropdown"
+                                        data='${JSON.stringify(row)}'
+                                        title='Documentos'
+                                        data-bs-toggle="dropdown"
+                                        data-bs-placement="top"
+                                    >
+                                        <span class="tf-icons bx bx-file"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item" 
+                                            onclick= 'TransportLinesDocumentsModal(this, "empty")';
+                                            data='${JSON.stringify(row)}'
+                                            >
+                                            Linea Transportista</button>
+                                        </li>
+                                    </ul>
+                                `
+                    }
+                },
+                ...Object.keys(data[0]).map(propName => ({
+                    title: propName,
+                    data: propName,
+                    visible: !propName.includes('Id'),
+
+                }))
+            ];
+            $('#emptyTable').DataTable({
+                data: data,
+                columns: columns,
+                language: {
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -358,7 +440,7 @@ const UnreviewedTransportLinesTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -440,7 +522,7 @@ const UnreviewedDriversTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -522,7 +604,7 @@ const UnreviewedTransportsTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -581,7 +663,39 @@ const ApprovedTransportLinesTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
+                }
+            });
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+const EmptyTransportLineTable = async (AccountNum) => {
+    try {
+        if ($.fn.DataTable.isDataTable('#DocumentsTable')) {
+            $('#DocumentsTable').DataTable().destroy();
+            var div = document.getElementById('DocumentsTable');
+            div.innerHTML = "";
+        }
+
+        const data = await GetDocumentsByClient(AccountNum, "empty", "Linea Transportista");
+        if (data.length > 0) {
+            // Crea el arreglo de objetos para las columnas del DataTable
+            const columns = [
+                ...Object.keys(data[0]).map(propName => ({
+                    title: propName,
+                    data: propName,
+                    visible: !propName.includes('Id'),
+
+                }))
+            ];
+            $('#DocumentsTable').DataTable({
+                data: data,
+                columns: columns,
+                language: {
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -634,7 +748,7 @@ const ApprovedDriversTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -687,7 +801,7 @@ const ApprovedTransportsTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -868,6 +982,15 @@ const initButtons = async () => {
             await ApprovedTable();
         });
 
+        $('#EmptyTabButton').on('shown.bs.tab', async function () {
+            await EmptyTable();
+        });
+
+        //PendingTabButton
+        $('#PendingTabButton').on('shown.bs.tab', async function () {
+            await UnreviewedTable();
+        });
+
         $('#Documents').on('shown.bs.modal', async function () {
             let AccountNum = sessionStorage.getItem('AccountNum');
             let DocumentType = sessionStorage.getItem('DocumentType');
@@ -896,6 +1019,9 @@ const initButtons = async () => {
                 else if (Status == 'unreviewed') {
                     await UnreviewedTransportLinesTable(AccountNum);
                 }
+                else if (Status == 'empty') {
+                    await EmptyTransportLineTable(AccountNum);
+                };
             }
             else {
                 console.log("No se encontró el tipo de documento pedido.")
@@ -904,6 +1030,8 @@ const initButtons = async () => {
 
         $('#Documents').on('hidden.bs.modal', async function () {
             await UnreviewedTable();
+            await ApprovedTable();
+            await EmptyTable();
         });
 
     } catch (error) {

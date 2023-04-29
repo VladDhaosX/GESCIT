@@ -1,30 +1,42 @@
+import * as Utils from '/js/Utils.js';
+await Utils.ValidatePath();
 const UrlApi = window.__env.UrlApi;
+const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+$.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
+    await Utils.createMenu();
     await initPage();
 });
 
 //#region Controllers
 const initPage = async () => {
     sessionStorage.setItem("DateId", 0);
+
     $('#ActionsButtons').append(`
     <div class="row">
-        <button id="btnNewDateModal" type="button" title="Registrar Cita" 
-            class="btn rounded-pill btn-icon btn-outline-primary" 
-            data-bs-toggle="tooltip" data-bs-placement="top">
-            <span class="tf-icons bx bx-plus"></span>
-        </button>
-        <div class="col mb-3">
+        <div class="col-2">
+            <label class="form-label">Fecha Inicio</label>
             <input type="date" id="txtStartDate" class="form-control"/>
         </div>
-        <div class="col mb-3">
+        <div class="col-2">
+            <label class="form-label">Fecha Fin</label>
             <input type="date" id="txtEndDate" class="form-control"/>
         </div>
-        <button id="btnSearch" type="button" title="Buscar" 
-            class="btn rounded-pill btn-icon btn-outline-primary" 
-            data-bs-toggle="tooltip" data-bs-placement="top">
-            <span class="tf-icons bx bx-search"></span>
-        </button>
+        <div class="col-2">
+            <button id="btnSearch" type="button" title="Buscar" 
+                class="btn rounded-pill btn-icon btn-outline-primary" 
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                style="margin-top:28px;">
+                <span class="tf-icons bx bx-search"></span>
+            </button>
+            ${permissions.CREAR ? `<button id="btnNewDateModal" type="button" title="Registrar Cita" 
+                class="btn rounded-pill btn-icon btn-outline-primary" 
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                style="margin-top:28px;">
+                <span class="tf-icons bx bx-plus"></span>
+            </button>` : ''}
+        </div>
     </div>
     `);
 
@@ -50,12 +62,12 @@ const initPage = async () => {
     });
 
     $('#OperationsSelect').change(async function (e) {
-        await FillSelectScheduleAvailable();
+        await FillSelectWAvailablesScheduleAActualSchedule(0);
     });
 
     $('#TransportTypeSelect').change(async function (e) {
         await onTransportTypeSelectChange();
-        await FillSelectScheduleAvailable();
+        await FillSelectWAvailablesScheduleAActualSchedule(0);
     });
 
     $('#TransportPlate2 , #TransportPlate3').attr('disabled', 'disabled');
@@ -77,7 +89,7 @@ const initPage = async () => {
     await FillSelectTransportType();
     await FillSelectDrivers();
 
-    tooltipTrigger();
+    await Utils.tooltipTrigger();
 };
 
 const FillSelectAllScheduleTimes = async () => {
@@ -269,36 +281,41 @@ const ExistsScheduleAvailable = async () => {
 
 const newDateModal = async () => {
 
-    const IsAvailableResponse = await IsAppointmentTimeAvailable();
-    const IsAvailable = IsAvailableResponse.IsTimeAvailable;
-    if (!IsAvailable) {
-        await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
-        return;
-    };
+    sessionStorage.setItem('DateId', 0);
 
-    const ExistsScheduleAvailablesResult = await ExistsScheduleAvailables();
-    if (!ExistsScheduleAvailablesResult) {
-        await ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
-        return;
-    };
-
-    // sessionStorage.setItem('DateId', 0);
-    // $('#SheduleTimesSelect').val(0);
-    // $('#OperationsSelect').val(0);
-    // $('#ProductsSelect').val(0);
-    // $('#TransportLineTypeSelect').val(0);
-    // $('#TransportPlate1Select').val(0);
-    // $('#TransportPlate1').val('');
-    // $('#TransportPlate2').val('');
-    // $('#TransportPlate3').val('');
-    // $('#DriversSelect').val(0);
-    // $('#txtVolume').val('');
-    // $('#TransportTypeSelect').val(0);
-    // $('#TransportPlate2 , #TransportPlate3').parent().hide();
+    $('#SheduleTimesSelect').val(0);
+    $('#OperationsSelect').val(0);
+    $('#ProductsSelect').val(0);
+    $('#TransportLineTypeSelect').val(0);
+    $('#TransportPlate1Select').val(0);
+    $('#TransportPlate1').val('');
+    $('#TransportPlate2').val('');
+    $('#TransportPlate3').val('');
+    $('#DriversSelect').val(0);
+    $('#txtVolume').val('');
+    $('#TransportTypeSelect').val(0);
+    $('#ScheduleTimesSelect').val(0);
+    $('#TransportPlate2 , #TransportPlate3').parent().hide();
 
     $('#ModalDatesTitle').text('Nueva Cita');
 
-    $('#ModalDates').modal('show');
+    //set time out
+    await setTimeout(async function () {
+        const IsAvailableResponse = await IsAppointmentTimeAvailable();
+        const IsAvailable = IsAvailableResponse.IsTimeAvailable;
+        if (!IsAvailable) {
+            await Utils.ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+            return;
+        };
+
+        const ExistsScheduleAvailablesResult = await ExistsScheduleAvailables();
+        if (!ExistsScheduleAvailablesResult) {
+            await Utils.ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
+            return;
+        };
+
+        $('#ModalDates').modal('show');
+    });
 };
 
 const newDate = async () => {
@@ -307,7 +324,7 @@ const newDate = async () => {
         const IsAvailableResponse = await IsAppointmentTimeAvailable();
         const IsAvailable = IsAvailableResponse.IsTimeAvailable;
         if (!IsAvailable) {
-            await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+            await Utils.ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
             return;
         };
 
@@ -331,11 +348,11 @@ const newDate = async () => {
 
         if (response.success) {
             $('#ModalDates').modal('hide');
-            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+            await Utils.ToastsNotification("Citas", response.message, toastType, toastPlacement);
         } else {
             toastType = "Danger";
             toastPlacement = "Middle center";
-            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+            await Utils.ToastsNotification("Citas", response.message, toastType, toastPlacement);
             await FillSelectScheduleAvailable();
         }
         await initDatesDataTable();
@@ -349,21 +366,21 @@ const initDatesDataTable = async () => {
         if ($.fn.DataTable.isDataTable('#DatesTable')) {
             $('#DatesTable').DataTable().destroy();
             $('#DatesTable').empty();
-        }
+        };
 
         const userId = sessionStorage.getItem('userId');
         const StartDate = $('#txtStartDate').val();
         const EndDate = $('#txtEndDate').val();
         const data = await GetDates(userId, StartDate, EndDate);
-        if (data.length > 0) {
-            const columns = [
-                {
-                    title: 'Acciones',
-                    data: 'Id',
-                    render: function (data, type, row) {
-                        let buttons = '';
-                        if (row.Estatus == 'Pendiente') {
-                            buttons += `
+        const dtcolumns = ['Cliente', 'Folio', 'Estatus', 'Fecha de Cita', 'Horario', 'Hora de Cita', 'Hora de Ingreso', 'Operacion', 'Línea de Transporte', 'Tipo de Transporte', 'Placa de Transporte ', 'Placa de Caja #1', 'Placa de Caja #2 ', 'Chofer', 'Producto', 'Volumen en Toneladas']
+        const columns = [
+            {
+                title: 'Acciones',
+                data: 'Id',
+                render: function (data, type, row) {
+                    let buttons = '';
+                    if (row.IsEditable && permissions.EDITAR == 1) {
+                        buttons += `
                             <button
                                 class="btn rounded-pill btn-icon btn-outline-primary" 
                                 type="button" 
@@ -371,15 +388,14 @@ const initDatesDataTable = async () => {
                                 title='Editar'
                                 data-bs-toggle="tooltip"
                                 data-bs-placement="top"
-                                onclick='ShowEditModal(this)'
-                            >
+                                action='ShowEditModal'>
                                 <span class="tf-icons bx bx-edit-alt"></span>
                             </button>
                         `;
-                        }
+                    };
 
-                        if (row.IsCancelable && row.Estatus != 'Cancelada') {
-                            buttons += `
+                    if (row.IsCancelable && permissions.CANCELAR == 1) {
+                        buttons += `
                             <button
                                 class="btn rounded-pill btn-icon btn-outline-danger" 
                                 type="button" 
@@ -387,97 +403,48 @@ const initDatesDataTable = async () => {
                                 title='Cancelar'
                                 data-bs-toggle="tooltip"
                                 data-bs-placement="top"
-                                onclick='ShowCancelateDateModal(this)'
+                                action='ShowCancelateDateModal'
                             >
                                 <span class="tf-icons bx bx-x bx-md"></span>
                             </button>
                             `;
-                        };
-                        return buttons;
-                    }
-                },
-                {
-                    title: 'Cliente',
-                    data: 'Cliente'
-                },
-                {
-                    title: 'Folio',
-                    data: 'Folio'
-                },
-                {
-                    title: 'Estatus',
-                    data: 'Estatus'
-                },
-                {
-                    title: 'Fecha de Cita',
-                    data: 'Fecha de Cita'
-                },
-                {
-                    title: 'Horario',
-                    data: 'Horario'
-                },
-                {
-                    title: 'Hora de Cita',
-                    data: 'Hora de Cita'
-                },
-                {
-                    title: 'Operacion',
-                    data: 'Operacion'
-                },
-                {
-                    title: 'Línea de Transporte',
-                    data: 'Línea de Transporte'
-                },
-                {
-                    title: 'Tipo de Transporte',
-                    data: 'Tipo de Transporte'
-                },
-                {
-                    title: 'Placa de Transporte ',
-                    data: 'Placa de Transporte'
-                },
-                {
-                    title: 'Placa de Caja #1',
-                    data: 'Placa de Caja #1'
-                },
-                {
-                    title: 'Placa de Caja #2 ',
-                    data: 'Placa de Caja #2'
-                },
-                {
-                    title: 'Chofer',
-                    data: 'Chofer'
-                },
-                {
-                    title: 'Producto',
-                    data: 'Producto'
-                },
-                {
-                    title: 'Volumen en Toneladas',
-                    data: 'Volumen en Toneladas'
+                    };
+                    return buttons;
                 }
-                // ...Object.keys(data[0]).map(propName => ({
-                //     title: propName,
-                //     data: propName,
-                //     visible: !propName.includes('Id') && !propName.includes('IsCancelable')
-                // }
-                // ))
-            ];
-            $('#DatesTable').DataTable({
-                data: data,
-                columns: columns,
-                "order": [],
-                language: {
-                    url: './js/datatable-esp.json'
-                },
-                "columnDefs": [
-                    { "type": "num", "targets": 11 }
-                ]
-            }).on('draw', function () {
-                tooltipTrigger();
-            });;
+            }];
 
-        };
+        dtcolumns.forEach((item) => {
+            columns.push({
+                title: item, data: item,
+                render: function (data, type, row) {
+                    if (item == 'Estatus' || item == 'Hora de Ingreso') return `<strong>${row[item] ? row[item] : ''}</strong>`;
+                    return data;
+                }
+            });
+        });
+
+        $('#DatesTable').DataTable({
+            data: data,
+            columns: columns,
+            order: [],
+            language: {
+                url: '/js/datatable-esp.json'
+            },
+            columnDefs: [{
+                className: 'bolded',
+                targets: 6,
+                defaultContent: "",
+                targets: "_all"
+            }]
+        }).on('draw', async function () {
+            await Utils.tooltipTrigger();
+            $('button[action="ShowEditModal"]').on('click', async function () {
+                await ShowEditModal(this);
+            });
+            $('button[action="ShowCancelateDateModal"]').on('click', async function () {
+                await ShowCancelateDateModal(this);
+            });
+        });;
     } catch (error) {
         console.error(error);
     };
@@ -489,7 +456,7 @@ const ShowEditModal = async (element) => {
         const IsAvailableResponse = await IsAppointmentTimeAvailable();
         const IsAvailable = IsAvailableResponse.IsTimeAvailable;
         if (!IsAvailable) {
-            await ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
+            await Utils.ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
             return;
         };
 
@@ -499,7 +466,7 @@ const ShowEditModal = async (element) => {
         $('#TransportTypeSelect').val(data.TransportTypeId);
         await onTransportTypeSelectChange();
         $('#TransportPlate1Select').val(data.TransportId);
-        await FillSelectAllScheduleTimes();
+        await FillSelectWAvailablesScheduleAActualSchedule(data.Id);
         $('#ScheduleTimesSelect').val(data.ScheduleTimeId);
         $('#TransportLineTypeSelect').val(data.TransportLineId);
         $('#TransportPlate1').val(data['Placa de Transporte']);
@@ -534,11 +501,11 @@ const CancelDateButton = async () => {
         let toastPlacement = "Top right";
         if (response.success) {
             $('#ModalCancelateDate').modal('hide');
-            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+            await Utils.ToastsNotification("Citas", response.message, toastType, toastPlacement);
         } else {
             toastType = "Danger";
             toastPlacement = "Middle center";
-            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+            await Utils.ToastsNotification("Citas", response.message, toastType, toastPlacement);
         }
         await initDatesDataTable();
     } catch (error) {
@@ -560,7 +527,7 @@ const onTransportTypeSelectChange = async (e) => {
     };
 };
 
-const onTransportPlate1SelectChange = (e) => {
+const onTransportPlate1SelectChange = async (e) => {
     $('#TransportPlate2 , #TransportPlate3').parent().hide();
     const select = $(e);
     const data = select.find(':selected').attr('data');
@@ -599,6 +566,31 @@ const ExistsScheduleAvailables = async () => {
     }
 };
 
+const FillSelectWAvailablesScheduleAActualSchedule = async (DateId) => {
+    try {
+        const OperationTypeId = $('#OperationsSelect').val();
+        const TransportTypeId = $('#TransportTypeSelect').val();
+
+        if (OperationTypeId == 0) {
+            const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona un Tipo de Operación y Tipo de Transporte");
+            $('#ScheduleTimesSelect').empty().append($SeleccionaUnaopción);
+            return;
+        };
+
+        const data = await GetAvailableScheduleTimesWActualSchedule(OperationTypeId, TransportTypeId, DateId);
+        const $options = data.map(function (value) {
+            const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
+            return $option;
+        });
+
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una Opción");
+        $options.unshift($SeleccionaUnaopción);
+
+        $('#ScheduleTimesSelect').empty().append($options);
+    } catch (error) {
+        console.error(error);
+    }
+};
 //#endregion
 
 //#region Fetchs
@@ -880,6 +872,30 @@ const GetScheduleAvailables = async (OperationTypeId, TransportTypeId) => {
             data: {
                 OperationTypeId,
                 TransportTypeId
+            },
+            dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
+
+const GetAvailableScheduleTimesWActualSchedule = async (OperationTypeId, TransportTypeId, DateId) => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/schedule/GetAvailableScheduleTimesWActualSchedule`, type: 'POST', data: {
+                OperationTypeId,
+                TransportTypeId,
+                DateId,
             },
             dataType: 'json'
         });

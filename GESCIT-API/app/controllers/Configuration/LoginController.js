@@ -3,6 +3,7 @@ const LoginDao = require('../../models/Configuration/LoginDao');
 const ADController = require('./ActiveDirectoryAuthController');
 const MailController = require('./MailController');
 const CryptoController = require('./CryptoController');
+const RolesDao = require('../../models/Configuration/RolesDao');
 
 module.exports = {
   async validateUser(req, res) {
@@ -99,11 +100,12 @@ module.exports = {
   getUserData: async (req, res) => {
     // #swagger.tags = ['Configuración/Usuario']
     try {
-      const { userId } = req.body;
+      const { userId, ModuleId } = req.body;
       const userRole = await LoginDao.getUserRole(userId);
       const userCategories = await LoginDao.getUserCategories(userId);
       const userModules = await LoginDao.getUserModules(userId);
       const userData = await LoginDao.getUserData(userId);
+      const userPermissions = await RolesDao.GetRolesActionsByUserIdModuleId(userId, ModuleId);
 
       const response = {
         userRol: {
@@ -114,7 +116,8 @@ module.exports = {
         },
         userCategories: userCategories,
         userModules: userModules,
-        userData: userData
+        userData: userData,
+        userPermissions: userPermissions
       };
 
       res.json(response);

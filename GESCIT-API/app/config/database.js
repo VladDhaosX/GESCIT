@@ -5,10 +5,10 @@ const config = {
   password: process.env.DB_PASSWORD,
   server: process.env.DB_SERVER,
   database: process.env.DB_DATABASE,
-  options:{
-      trustedconnection: false,
-      enableArithAbort: true,
-      encrypt: false
+  options: {
+    trustedconnection: false,
+    enableArithAbort: true,
+    encrypt: false
   }
 };
 

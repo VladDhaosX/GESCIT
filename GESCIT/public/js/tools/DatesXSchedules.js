@@ -30,6 +30,11 @@ const initPage = async () => {
         await initDatesXSchedulesDataTable();
     });
 
+    let today = new Date();
+    today.setDate(today.getDate() + 1);
+    $('#txtDate').val(today.toISOString().split('T')[0]);
+    await initDatesXSchedulesDataTable();
+
     tooltipTrigger();
 };
 
@@ -56,7 +61,7 @@ const initDatesXSchedulesDataTable = async () => {
                 columns: columns,
                 "order": [],
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         };

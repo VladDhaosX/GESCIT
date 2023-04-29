@@ -1,6 +1,11 @@
+import * as Utils from '/js/Utils.js';
+await Utils.ValidatePath();
 const UrlApi = window.__env.UrlApi;
+const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+$.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
+    await Utils.createMenu();
     await initPage();
 });
 
@@ -51,6 +56,14 @@ const initPage = async () => {
         await initDatesDataTable('assigned', 'Today');
     });
 
+    $('#NavTodayExpiredDates').on('shown.bs.tab', async function (e) {
+        await initDatesDataTable('expired', 'Today');
+    });
+
+    $('#NavTodayArrivalDates').on('shown.bs.tab', async function (e) {
+        await initDatesDataTable('arrival', 'Today');
+    });
+
     // btnSendSms ONCLICK
     $('#btnSendSms').on('click', async function () {
         const PhoneNumber = $('#txtPhoneNumber').val();
@@ -79,6 +92,33 @@ const initPage = async () => {
         };
     });
 
+    $('#selectHour').on('change', function () {
+        $('#selectMinutes').empty();
+        const latest_value = $(this).closest('select').find('option')
+            .filter(':last').val();
+        const first_value = $(this)[0].options[1].value;
+        const value = $(this).val();
+
+        console.log(first_value);
+        let initMinute = 1;
+        if (value == latest_value) {
+            initMinute = 0;
+            for (let i = initMinute; i <= 30; i++) {
+                $('#selectMinutes').append(`<option value="${i}">${i}</option>`);
+            };
+        } else {
+            if (value == 1 || value != first_value) {
+                initMinute = 0;
+            } else {
+                initMinute = 1;
+            }
+            for (let i = initMinute; i < 60; i++) {
+                $('#selectMinutes').append(`<option value="${i}">${i}</option>`);
+            };
+        };
+        //alert(latest_value)
+    });
+
     await initDatesDataTable('pending', 'Tomorrow');
 
     tooltipTrigger();
@@ -91,7 +131,7 @@ const initDatesDataTable = async (Status, Day) => {
         const EndDate = $('#txtDate').val();
         const getDatesData = await GetDates(userId, StartDate, EndDate, Status);
 
-        const titles = ['01:00 AM a 08:00 AM', '08:00 AM a 12:00 PM', '12:00 PM a 04:00 PM', '04:00 PM a 08:00 PM'];
+        const titles = ['01:00 AM a 08:00 AM', '08:01 AM a 12:00 PM', '12:01 PM a 04:00 PM', '04:01 PM a 08:00 PM'];
 
         const $DatesTab = $(`#${Status}${Day}DatesTab`);
         const $responsiveDiv = $(`<div class="text-nowrap table-responsive" style="margin: 25px 50px;"></div>`);
@@ -113,7 +153,8 @@ const initDatesDataTable = async (Status, Day) => {
                     $($table).empty();
                 };
 
-                const data = getDatesData.filter(x => x.ScheduleTimeId == i || x.ScheduleTimeId == i + 4);
+                let data = getDatesData.filter(x => x.ScheduleTimeId == i || x.ScheduleTimeId == i + 4);
+                data = data.filter(x => x.EstatusKey == Status);
                 $table.DataTable({
                     paging: false,
                     data: data,
@@ -128,7 +169,7 @@ const initDatesDataTable = async (Status, Day) => {
                     ],
                     dom: '',
                     language: {
-                        url: './js/datatable-esp.json'
+                        url: '/js/datatable-esp.json'
                     },
                     columnDefs: [{
                         defaultContent: "",
@@ -155,8 +196,10 @@ const ViewDateData = async (element) => {
         $('#txtLineaTransporte').val(data['Línea de Transporte']);
         $('#txtVolumen').val(data['Volumen en Toneladas']);
         await FillSelectHour(data.ScheduleTimeId);
+        $('#ModalDateInfoTitle').text(`Información de la cita - ${data.Folio}`);
         $('#selectMinutes').empty();
         $('#selectMinutes').append(`<option value="">Seleccione los minutos</option>`);
+
         for (let i = 1; i < 60; i++) {
             $('#selectMinutes').append(`<option value="${i}">${i}</option>`);
         };
@@ -175,7 +218,27 @@ const ViewDateData = async (element) => {
             $('#txtMail').parent().show();
             $('#btnSendSms').show();
             $('#btnSendMail').show();
-        } else {
+            $('#divHoraArribo').hide();
+        } else if (data.Estatus == 'Arribo') {
+            $('#divHoraAsignada').hide();
+            $('#divHoraArribo').show();
+            $('#txtHoraArribo').val(data['Hora de Ingreso']);
+            $('#txtPhoneNumber').parent().hide();
+            $('#txtMail').parent().hide();
+            $('#btnSendSms').hide();
+            $('#btnSendMail').hide();
+        } else if (data.Estatus == 'Vencida') {
+            $('#divHoraAsignada').show();
+            $('#divHoraArribo').hide();
+            $('#selectHour').attr('disabled', true);
+            $('#selectMinutes').attr('disabled', true);
+            $('#btnAssignDateHour').hide();
+            $('#txtPhoneNumber').parent().hide();
+            $('#txtMail').parent().hide();
+            $('#btnSendSms').hide();
+            $('#btnSendMail').hide();
+            $('#divHoraArribo').hide();
+        } else if (data.Estatus == 'Pendiente') {
             $('#selectHour').attr('disabled', false);
             $('#selectMinutes').attr('disabled', false);
             $('#btnAssignDateHour').show();
@@ -183,7 +246,9 @@ const ViewDateData = async (element) => {
             $('#txtMail').parent().hide();
             $('#btnSendSms').hide();
             $('#btnSendMail').hide();
+            $('#divHoraArribo').hide();
         };
+
 
         $('#ModalDateInfo').modal('show');
     } catch (error) {
@@ -213,8 +278,18 @@ const AssignDateHour = async () => {
         let toastType = "Primary";
         let toastPlacement = "Top right";
 
-        if (response.success) {
+        const assignResponse = response.response;
+        const sendSmsResponse = response.smsResponse;
+        const sendMailResponse = response.mailResponse;
+
+        if (response.success != undefined && response.success == false) {
+            toastType = "Danger";
+            toastPlacement = "Middle center";
             await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+        };
+
+        if (assignResponse.success) {
+            await ToastsNotification("Citas", assignResponse.message, toastType, toastPlacement);
             $('#ModalDateInfo').modal('hide');
 
             const $activeTab = $('#UlScheduleNavs .active');
@@ -225,12 +300,27 @@ const AssignDateHour = async () => {
             } else {
                 $activeTab.trigger('click');
             };
-
         } else {
             console.log(response.message);
+        };
+
+        toastType = "Primary";
+        toastPlacement = "Top right";
+        if (sendSmsResponse.returnCodeInformation.success) {
+            console.log("Mensaje enviado de forma exitosa.");
+            // await ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
+        } else {
             toastType = "Danger";
-            toastPlacement = "Middle center";
-            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+            await ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
+        };
+
+        toastType = "Primary";
+        toastPlacement = "Top right";
+        if (sendMailResponse.returnCodeInformation.success) {
+            console.log("Mensaje enviado de forma exitosa.");
+            // await ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
+        } else {
+            await ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
         };
 
     } catch (error) {

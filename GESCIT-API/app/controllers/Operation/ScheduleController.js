@@ -66,5 +66,18 @@ module.exports = {
             res.status(500).json({ message: 'Error al obtener los horarios.', info: error });
         }
     },
-
+    
+    GetAvailableScheduleTimesWActualScheduleHandler: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
+        // #swagger.summary = 'Obtener horarios disponibles por el Tipo de Operación'
+        // #swagger.description = 'Endpoint que obtiene las horas que hay dentro de un horario dependiendo el Tipo de Operación.'
+        try {
+            const { OperationTypeId,TransportTypeId,DateId } = req.body;
+            const result = await ScheduleDao.SpGetAvailableScheduleTimesWActualSchedule(OperationTypeId,TransportTypeId,DateId);
+            res.json(result);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Error al obtener los horarios.', info: error });
+        }
+    },
 };

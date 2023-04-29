@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default"
-    data-assets-path="../../assets/" data-template="vertical-menu-template-free">
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-assets-path="/assets/"
+    data-template="vertical-menu-template-free">
 
 <head>
     <%- include('Utils/head') %>
@@ -9,7 +9,7 @@
 <style>
     table.dataTable.hover tbody tr:hover,
     table.dataTable.display tbody tr:hover {
-        background-color: rgba(105, 108, 255, 0.1);
+        background-color: rgba(0, 85, 140, 0.1);
     }
 </style>
 
@@ -38,7 +38,7 @@
             </div>
         </div>
     </main>
-    <footer>
+    <footer style="background-color: #F07D1A;">
         <script async defer>
             window.__env = {
                 UrlApi: '<%= UrlApi %>'
@@ -47,8 +47,8 @@
         <!-- Menú inferior -->
         <%- include('Utils/footer') %>
             <%- include('Utils/toast') %>
-                <script async defer src="./js/utils.js"></script>
-                <script async defer src="<%= JSFile %>"></script>
+                <!-- <script async defer src="/js/utils.js"></script> -->
+                <script async defer type="module" src="<%= JSFile %>"></script>
     </footer>
 </body>
 

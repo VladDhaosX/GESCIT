@@ -311,7 +311,7 @@ const DriversDataTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -472,51 +472,39 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                     title: 'Acciones',
                     data: 'Id',
                     render: function (data, type, row) {
-                        const StatusId = row.StatusId;
-                        if (StatusId == 4) {
-                            return `
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary" 
-                                        type="button" 
-                                        id="DonwloadDriverDocument"
-                                        data='${JSON.stringify(row)}'
-                                        title='Descargar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='DonwloadDriverDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bxs-download"></span>
-                                    </button>`
+                        const Estatus = row.Estatus;
+                        let buttons = `
+                        <button 
+                            class="btn rounded-pill btn-icon btn-outline-primary" 
+                            type="button" 
+                            id="DonwloadDriverDocument"
+                            data='${JSON.stringify(row)}'
+                            title='Descargar'
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            onclick='DonwloadDriverDocument(this);'
+                        >
+                            <span class="tf-icons bx bxs-download"></span>
+                        </button>`;
+                        if (Estatus != "Aprobado") {
+                            buttons += `
+                            <button
+                                class="btn rounded-pill btn-icon btn-outline-danger" 
+                                type="button" 
+                                id="AddOrUpdateDriversTableButton"
+                                data='${JSON.stringify(row)}'
+                                title='Eliminar'
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                onclick='DeleteDocument(this);'
+                            >
+                                <span class="tf-icons bx bx-trash"></span>
+                            </button>
+                        `;
                         }
-                        else {
-                            return `
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary" 
-                                        type="button" 
-                                        id="DonwloadDriverDocument"
-                                        data='${JSON.stringify(row)}'
-                                        title='Descargar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='DonwloadDriverDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bxs-download"></span>
-                                    </button>
-                                    <button
-                                        class="btn rounded-pill btn-icon btn-outline-danger" 
-                                        type="button" 
-                                        id="AddOrUpdateDriversTableButton"
-                                        data='${JSON.stringify(row)}'
-                                        title='Eliminar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='DeleteDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bx-trash"></span>
-                                    </button>
-                                `
-                        }
-                    }
+                        return buttons;
+                    },
+                    width: "20%"
                 },
                 ...Object.keys(data[0]).map(propName => ({
                     title: propName,
@@ -528,7 +516,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }

@@ -124,7 +124,7 @@ const PermissionsDataTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }

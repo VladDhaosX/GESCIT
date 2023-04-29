@@ -5,10 +5,11 @@ module.exports = {
   AddOrUpdateUser: async (AccountNum, name, mail, userName, userTypeId, password) => {
     try {
       let pool = await sql.connect(config);
-      let Id = 0;
+      let UserId = 0;
       let success = false;
       let PrivacyNotice = 0;
       let message = "";
+      let Route = "";
 
       // Execute stored procedure to login user
       let result = await pool
@@ -20,23 +21,26 @@ module.exports = {
         .input("userTypeId", sql.Int, userTypeId)
         .input("password", sql.VarChar(50), password)
         .output("success", sql.Bit)
-        .output("Id", sql.Int)
+        .output("UserId", sql.Int)
         .output("PrivacyNotice", sql.Int)
         .output("successMessage", sql.VarChar(100))
         .output("errorMessage", sql.VarChar(100))
+        .output("Route", sql.VarChar(100))
         .execute("SpAddOrUpdateUser");
       // Check for success or error message
       if (result.output.successMessage) {
-        message = result.output.successMessage;
-        Id = result.output.Id;
-        PrivacyNotice = result.output.PrivacyNotice;
         success = result.output.success;
+        message = result.output.successMessage;
+        UserId = result.output.UserId;
+        PrivacyNotice = result.output.PrivacyNotice;
+        Route = result.output.Route;
       } else {
         message = result.output.errorMessage;
         success = result.output.success;
       }
 
-      return { success, Id, PrivacyNotice, message };
+      console.log(result.output);
+      return { success, UserId, PrivacyNotice, message, Route };
     } catch (error) {
       console.error(error.message);
     }

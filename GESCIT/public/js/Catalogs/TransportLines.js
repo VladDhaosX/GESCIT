@@ -286,21 +286,17 @@ const initButtons = async () => {
             await TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
         });
 
-        //On Close Modal 
         $('#AddOrUpdateTransportModal').on('hidden.bs.modal', function () {
             const TransportLineId = sessionStorage.getItem("TransportLineId");
             const DocumentType = "Transporte";
             NotDeleteDocuments(TransportLineId, DocumentType);
         });
 
-        //on TransportDocument change
         $('#TransportDocumentSelect').on('change', function () {
-            //AddOrUpdateTransportDocumentButton val 0
             $('#TransportDocument').val("").trigger('change');
         });
 
         $('#myModal').on('hidden.bs.modal', function (e) {
-            // do something...
         })
 
     } catch (error) {
@@ -352,7 +348,7 @@ const TransportLinesDataTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -406,6 +402,7 @@ const AddOrUpdateTransportLineModal = async (e) => {
         $('#DocumentLineSelect').val(0);
         $('#LineDocument').val("");
         $('#DocumentsModalNavs button:first').tab('show');
+        $('#TransportDocumentSelect').val(0);
 
         const userRolKey = sessionStorage.getItem('userRolKey');
         if (userRolKey === 'Juridico') {
@@ -424,11 +421,12 @@ const AddOrUpdateTransportLineModal = async (e) => {
             setTimeout(async function () {
                 await TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
             }, 500);
-
+            $('#AddOrUpdateTransportLineButton').hide();
         } else {
             $('#InfoNavButton').show();
             $('#DocumentsNavButton').hide();
             $('#DocumentsModalNavs button:first').tab('show');
+            $('#AddOrUpdateTransportLineButton').show();
         };
     } catch (error) {
         console.error(error);
@@ -520,10 +518,10 @@ const AddOrUpdateTransportDocumentButton = async () => {
             sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
             await ToastsNotification("Transportes", "Se subio el archivo con exito.", "Primary", "Top right");
             $('#TransportDocument').val("").trigger('change');
+            $('#TransportDocumentSelect').val(0);
         } else {
             await ToastsNotification("Transportes", response.message, "Danger", "Middle center");
         };
-
 
         TransportDocumentsDataTable(TransportLineId, TemporalDocumentId);
 
@@ -546,33 +544,40 @@ const TransportDocumentsDataTable = async (TransportLineId, TemporalDocumentId) 
                     title: 'Acciones',
                     data: 'Id',
                     "render": function (data, type, row) {
-                        return `
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary" 
-                                        type="button" 
-                                        id="DonwloadTransportDocument"
-                                        data='${JSON.stringify(row)}'
-                                        title='Descargar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='DonwloadTransportDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bxs-download"></span>
-                                    </button>
-                                    <button
-                                        class="btn rounded-pill btn-icon btn-outline-danger" 
-                                        type="button" 
-                                        id="AddOrUpdateTransportTableButton"
-                                        data='${JSON.stringify(row)}'
-                                        title='Eliminar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='DeleteDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bx-trash"></span>
-                                    </button>
-                                `
-                    }
+                        let buttons = ``;
+                        buttons += `
+                        <button 
+                            class="btn rounded-pill btn-icon btn-outline-primary" 
+                            type="button" 
+                            id="DonwloadTransportDocument"
+                            data='${JSON.stringify(row)}'
+                            title='Descargar'
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            onclick='DonwloadTransportDocument(this);'
+                        >
+                            <span class="tf-icons bx bxs-download"></span>
+                        </button>`;
+
+                        if (row.Estatus != 'Aprobado') {
+                            buttons += `
+                                <button
+                                    class="btn rounded-pill btn-icon btn-outline-danger" 
+                                    type="button" 
+                                    id="AddOrUpdateTransportTableButton"
+                                    data='${JSON.stringify(row)}'
+                                    title='Eliminar'
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    onclick='DeleteDocument(this);'
+                                >
+                                    <span class="tf-icons bx bx-trash"></span>
+                                </button>
+                            `;
+                        }
+                        return buttons;
+                    },
+                    width: "20%"
                 },
                 ...Object.keys(data[0]).map(propName => ({
                     title: propName,
@@ -584,7 +589,7 @@ const TransportDocumentsDataTable = async (TransportLineId, TemporalDocumentId) 
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }

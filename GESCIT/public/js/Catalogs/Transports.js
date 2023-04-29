@@ -346,7 +346,7 @@ const TransportsDataTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 },
                 "columnDefs": [
                     { "type": "num", "targets": 5 }
@@ -515,33 +515,36 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
                     title: 'Acciones',
                     data: 'Id',
                     "render": function (data, type, row) {
-                        return `
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary" 
-                                        type="button" 
-                                        id="DonwloadTransportDocument"
-                                        data='${JSON.stringify(row)}'
-                                        title='Descargar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='DonwloadTransportDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bxs-download"></span>
-                                    </button>
-                                    <button
-                                        class="btn rounded-pill btn-icon btn-outline-danger" 
-                                        type="button" 
-                                        id="AddOrUpdateTransportTableButton"
-                                        data='${JSON.stringify(row)}'
-                                        title='Eliminar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='DeleteDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bx-trash"></span>
-                                    </button>
-                                `
-                    }
+                        let buttons = ``;
+                        buttons = `<button 
+                                            class="btn rounded-pill btn-icon btn-outline-primary" 
+                                            type="button" 
+                                            id="DonwloadTransportDocument"
+                                            data='${JSON.stringify(row)}'
+                                            title='Descargar'
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            onclick='DonwloadTransportDocument(this);'
+                                        >
+                                            <span class="tf-icons bx bxs-download"></span>
+                                        </button>`;
+                        if  (row.Estatus != "Aprobado"){
+                            buttons += `<button 
+                                                class="btn rounded-pill btn-icon btn-outline-danger" 
+                                                type="button" 
+                                                id="DeleteTransportDocument"
+                                                data='${JSON.stringify(row)}'
+                                                title='Eliminar'
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                onclick='DeleteDocument(this);'
+                                            >
+                                                <span class="tf-icons bx bx-trash"></span>
+                                            </button>`;
+                        }
+                        return buttons;
+                    },
+                    width: "20%"
                 },
                 ...Object.keys(data[0]).map(propName => ({
                     title: propName,
@@ -553,7 +556,7 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
