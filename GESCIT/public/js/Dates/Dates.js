@@ -307,7 +307,7 @@ const newDateModal = async () => {
             return;
         };
 
-        const ExistsScheduleAvailablesResult = await DatesServices.ExistsScheduleAvailables();
+        const ExistsScheduleAvailablesResult = ExistsScheduleAvailables();
         if (!ExistsScheduleAvailablesResult) {
             await Utils.ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
             return;
@@ -341,7 +341,7 @@ const newDate = async () => {
         const driverId = $('#DriversSelect').val();
         const Volume = $('#txtVolume').val();
 
-        const response = await addOrUpdateDates(DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume);
+        const response = await DatesServices.addOrUpdateDates(DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume);
         let toastType = "Primary";
         let toastPlacement = "Top right";
 

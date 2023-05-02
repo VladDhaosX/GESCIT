@@ -1,10 +1,13 @@
 import * as Utils from '/js/Utils.js';
+import * as AssignDatesServices from '/js/Services/Dates/AssignDatesServices.js';
+
 await Utils.ValidatePath();
 const UrlApi = window.__env.UrlApi;
 const permissions = await Utils.GetRolesActionsByUserIdModuleId();
 $.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
+    console.log(permissions);
     await Utils.createMenu();
     await initPage();
 });
@@ -73,10 +76,10 @@ const initPage = async () => {
         let toastType = "Primary";
         let toastPlacement = "Top right";
         if (response.returnCodeInformation.success) {
-            await ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
+            await Utils.ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
         } else {
             toastType = "Danger";
-            await ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
+            await Utils.ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
         };
     });
 
@@ -86,9 +89,9 @@ const initPage = async () => {
         const DateId = sessionStorage.getItem('DateId');
         const response = await ReSendMail(DateId, Email);
         if (response.returnCodeInformation.success) {
-            await ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
+            await Utils.ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
         } else {
-            await ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
+            await Utils.ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
         };
     });
 
@@ -121,7 +124,7 @@ const initPage = async () => {
 
     await initDatesDataTable('pending', 'Tomorrow');
 
-    tooltipTrigger();
+    await Utils.tooltipTrigger();
 };
 
 const initDatesDataTable = async (Status, Day) => {
@@ -129,7 +132,7 @@ const initDatesDataTable = async (Status, Day) => {
         const userId = sessionStorage.getItem('userId');
         const StartDate = $('#txtDate').val();
         const EndDate = $('#txtDate').val();
-        const getDatesData = await GetDates(userId, StartDate, EndDate, Status);
+        const getDatesData = await AssignDatesServices.GetDates(userId, StartDate, EndDate, Status);
 
         const titles = ['01:00 AM a 08:00 AM', '08:01 AM a 12:00 PM', '12:01 PM a 04:00 PM', '04:01 PM a 08:00 PM'];
 
@@ -163,7 +166,7 @@ const initDatesDataTable = async (Status, Day) => {
                             title: titles[i - 1],
                             data: 'Folio',
                             render: function (data, type, row) {
-                                return `<label style="width: 100%" data='${JSON.stringify(row)}' onclick="ViewDateData(this);"><span class="tf-icons bx bx-time"></span> ${data}</label>`;
+                                return `<label style="width: 100%" data='${JSON.stringify(row)}'><span class="tf-icons bx bx-time"></span> ${data}</label>`;
                             }
                         }
                     ],
@@ -175,6 +178,11 @@ const initDatesDataTable = async (Status, Day) => {
                         defaultContent: "",
                         targets: "_all"
                     }]
+                }).on('draw', function () {
+                    $table.find('label').on('click', function () {
+                        ViewDateData(this);
+                    });
+                    Utils.tooltipTrigger();
                 });
             };
         };
@@ -216,8 +224,8 @@ const ViewDateData = async (element) => {
             $('#btnAssignDateHour').hide();
             $('#txtPhoneNumber').parent().show();
             $('#txtMail').parent().show();
-            $('#btnSendSms').show();
-            $('#btnSendMail').show();
+            permissions.CREAR ? $('#btnSendSms').show() : $('#btnSendSms').hide();
+            permissions.CREAR ? $('#btnSendMail').show() : $('#btnSendMail').hide();
             $('#divHoraArribo').hide();
         } else if (data.Estatus == 'Arribo') {
             $('#divHoraAsignada').hide();
@@ -249,7 +257,7 @@ const ViewDateData = async (element) => {
             $('#divHoraArribo').hide();
         };
 
-
+        permissions.CREAR ? $('#btnAssignDateHour').show() : $('#btnAssignDateHour').hide();
         $('#ModalDateInfo').modal('show');
     } catch (error) {
         console.error(error);
@@ -258,7 +266,7 @@ const ViewDateData = async (element) => {
 
 const FillSelectHour = async (ScheduleId) => {
     try {
-        const AllHoursOfSchedule = await GetAllHoursOfSchedule(ScheduleId);
+        const AllHoursOfSchedule = await AssignDatesServices.GetAllHoursOfSchedule(ScheduleId);
         $('#selectHour').empty();
         $('#selectHour').append(`<option value="0">Seleccione una hora</option>`);
         AllHoursOfSchedule.forEach(x => {
@@ -274,7 +282,7 @@ const AssignDateHour = async () => {
         const DateId = sessionStorage.getItem('DateId');
         const Hour = $('#selectHour').val();
         const Minutes = $('#selectMinutes').val();
-        const response = await PostAssignDateHour(DateId, Hour, Minutes);
+        const response = await AssignDatesServices.PostAssignDateHour(DateId, Hour, Minutes);
         let toastType = "Primary";
         let toastPlacement = "Top right";
 
@@ -285,11 +293,11 @@ const AssignDateHour = async () => {
         if (response.success != undefined && response.success == false) {
             toastType = "Danger";
             toastPlacement = "Middle center";
-            await ToastsNotification("Citas", response.message, toastType, toastPlacement);
+            await Utils.ToastsNotification("Citas", response.message, toastType, toastPlacement);
         };
 
         if (assignResponse.success) {
-            await ToastsNotification("Citas", assignResponse.message, toastType, toastPlacement);
+            await Utils.ToastsNotification("Citas", assignResponse.message, toastType, toastPlacement);
             $('#ModalDateInfo').modal('hide');
 
             const $activeTab = $('#UlScheduleNavs .active');
@@ -308,154 +316,21 @@ const AssignDateHour = async () => {
         toastPlacement = "Top right";
         if (sendSmsResponse.returnCodeInformation.success) {
             console.log("Mensaje enviado de forma exitosa.");
-            // await ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
+            // await Utils.ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
         } else {
             toastType = "Danger";
-            await ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
+            await Utils.ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
         };
 
         toastType = "Primary";
         toastPlacement = "Top right";
         if (sendMailResponse.returnCodeInformation.success) {
             console.log("Mensaje enviado de forma exitosa.");
-            // await ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
+            // await Utils.ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
         } else {
-            await ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
+            await Utils.ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
         };
 
-    } catch (error) {
-        console.error(error);
-    };
-};
-//#endregion
-
-//#region fetches
-const GetAllHoursOfSchedule = async (ScheduleId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/schedule/GetAllHoursOfSchedule`, type: 'POST', data: {
-                ScheduleId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-const GetDates = async (userId, StartDate, EndDate, Status) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/GetDates`, type: 'POST', data: {
-                userId,
-                StartDate,
-                EndDate,
-                Status
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-const GetSchedules = async () => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/schedule/GetSchedules`,
-            type: 'GET',
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-const PostAssignDateHour = async (DateId, Hour, Minutes) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/AssignDateHour`, type: 'POST', data: {
-                DateId,
-                Hour,
-                Minutes
-            },
-            dataType: 'json'
-        });
-        return response;
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    };
-};
-const ReSendSms = async (DateId, PhoneNumber) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/mail/ReSendSms`, type: 'POST', data: {
-                DateId,
-                PhoneNumber
-            },
-            dataType: 'json'
-        });
-        return response;
-    } catch (error) {
-        console.error(error);
-    };
-};
-const ReSendMail = async (DateId, Mail) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/mail/ReSendMail`, type: 'POST', data: {
-                DateId,
-                Mail
-            },
-            dataType: 'json'
-        });
-        return response;
     } catch (error) {
         console.error(error);
     };
