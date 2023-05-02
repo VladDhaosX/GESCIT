@@ -1,4 +1,8 @@
+import * as Utils from '/js/Utils.js';
+await Utils.ValidatePath();
 const UrlApi = window.__env.UrlApi;
+const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+$.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
     await initPage();
@@ -72,7 +76,7 @@ const initDatesXSchedulesDataTable = async () => {
 
 // #endregion
 
-//#region fetchs
+//#region fetches
 
 const GetDatesXSchedules = async (date) => {
     try {

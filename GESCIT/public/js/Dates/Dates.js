@@ -1,6 +1,7 @@
 import * as Utils from '/js/Utils.js';
+import * as DatesServices from '/js/Services/Dates/DatesServices.js';
+
 await Utils.ValidatePath();
-const UrlApi = window.__env.UrlApi;
 const permissions = await Utils.GetRolesActionsByUserIdModuleId();
 $.blockUI.defaults.baseZ = 4000;
 
@@ -9,7 +10,6 @@ $(document).ready(async function () {
     await initPage();
 });
 
-//#region Controllers
 const initPage = async () => {
     sessionStorage.setItem("DateId", 0);
 
@@ -102,7 +102,7 @@ const FillSelectAllScheduleTimes = async () => {
             return;
         };
 
-        const data = await GetScheduleTimes(OperationTypeId);
+        const data = await DatesServices.GetScheduleTimes(OperationTypeId);
         const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
             return $option;
@@ -128,7 +128,7 @@ const FillSelectScheduleAvailable = async () => {
             return;
         }
 
-        const data = await GetScheduleAvailable(OperationTypeId, TransportTypeId);
+        const data = await DatesServices.GetScheduleAvailable(OperationTypeId, TransportTypeId);
 
         const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
@@ -147,7 +147,7 @@ const FillSelectScheduleAvailable = async () => {
 const FillSelectOperationTimes = async () => {
     try {
         const userId = sessionStorage.getItem('userId');
-        const data = await GetOperationTypes(userId);
+        const data = await DatesServices.GetOperationTypes(userId);
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -167,7 +167,7 @@ const FillSelectOperationTimes = async () => {
 const FillSelectProducts = async () => {
     try {
         const userId = sessionStorage.getItem('userId');
-        const data = await GetProducts(userId);
+        const data = await DatesServices.GetProducts(userId);
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -187,7 +187,7 @@ const FillSelectProducts = async () => {
 const FillSelectTransportLines = async () => {
     try {
         const userId = sessionStorage.getItem('userId');
-        const data = await GetTransportLines(userId);
+        const data = await DatesServices.GetTransportLines(userId);
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -206,7 +206,7 @@ const FillSelectTransportLines = async () => {
 
 const FillSelectTransportType = async () => {
     try {
-        const data = await GetTransportType();
+        const data = await DatesServices.GetTransportType();
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -226,7 +226,7 @@ const FillSelectTransportType = async () => {
 const FillSelectTransportPlate1 = async (TransportTypeId) => {
     try {
         const userId = sessionStorage.getItem('userId');
-        const data = await GetTransportPlate1(userId, TransportTypeId);
+        const data = await DatesServices.GetTransportPlate1(userId, TransportTypeId);
 
         const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value['Placa de Transporte']).attr('data', JSON.stringify(value));
@@ -245,7 +245,7 @@ const FillSelectTransportPlate1 = async (TransportTypeId) => {
 const FillSelectDrivers = async () => {
     try {
         const userId = sessionStorage.getItem('userId');
-        const data = await GetDrivers(userId);
+        const data = await DatesServices.GetDrivers(userId);
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -266,7 +266,7 @@ const ExistsScheduleAvailable = async () => {
     try {
         const OperationTypeId = $('#OperationsSelect').val();
         const TransportTypeId = $('#TransportTypeSelect').val();
-        const data = await GetScheduleAvailable(OperationTypeId, TransportTypeId);
+        const data = await DatesServices.GetScheduleAvailable(OperationTypeId, TransportTypeId);
 
         if (data.length > 0) {
             return true;
@@ -299,16 +299,15 @@ const newDateModal = async () => {
 
     $('#ModalDatesTitle').text('Nueva Cita');
 
-    //set time out
     await setTimeout(async function () {
-        const IsAvailableResponse = await IsAppointmentTimeAvailable();
+        const IsAvailableResponse = await DatesServices.IsAppointmentTimeAvailable();
         const IsAvailable = IsAvailableResponse.IsTimeAvailable;
         if (!IsAvailable) {
             await Utils.ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
             return;
         };
 
-        const ExistsScheduleAvailablesResult = await ExistsScheduleAvailables();
+        const ExistsScheduleAvailablesResult = await DatesServices.ExistsScheduleAvailables();
         if (!ExistsScheduleAvailablesResult) {
             await Utils.ToastsNotification('Citas', 'No existen citas disponibles para mañana.', "Danger", "Middle center");
             return;
@@ -321,7 +320,7 @@ const newDateModal = async () => {
 const newDate = async () => {
     try {
 
-        const IsAvailableResponse = await IsAppointmentTimeAvailable();
+        const IsAvailableResponse = await DatesServices.IsAppointmentTimeAvailable();
         const IsAvailable = IsAvailableResponse.IsTimeAvailable;
         if (!IsAvailable) {
             await Utils.ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
@@ -371,7 +370,7 @@ const initDatesDataTable = async () => {
         const userId = sessionStorage.getItem('userId');
         const StartDate = $('#txtStartDate').val();
         const EndDate = $('#txtEndDate').val();
-        const data = await GetDates(userId, StartDate, EndDate);
+        const data = await DatesServices.GetDates(userId, StartDate, EndDate);
         const dtcolumns = ['Cliente', 'Folio', 'Estatus', 'Fecha de Cita', 'Horario', 'Hora de Cita', 'Hora de Ingreso', 'Operacion', 'Línea de Transporte', 'Tipo de Transporte', 'Placa de Transporte ', 'Placa de Caja #1', 'Placa de Caja #2 ', 'Chofer', 'Producto', 'Volumen en Toneladas']
         const columns = [
             {
@@ -438,13 +437,13 @@ const initDatesDataTable = async () => {
             }]
         }).on('draw', async function () {
             await Utils.tooltipTrigger();
-            $('button[action="ShowEditModal"]').on('click', async function () {
+            $('button[action="ShowEditModal"]').off().on('click', async function () {
                 await ShowEditModal(this);
             });
-            $('button[action="ShowCancelateDateModal"]').on('click', async function () {
+            $('button[action="ShowCancelateDateModal"]').off().on('click', async function () {
                 await ShowCancelateDateModal(this);
             });
-        });;
+        });
     } catch (error) {
         console.error(error);
     };
@@ -453,7 +452,7 @@ const initDatesDataTable = async () => {
 const ShowEditModal = async (element) => {
     try {
 
-        const IsAvailableResponse = await IsAppointmentTimeAvailable();
+        const IsAvailableResponse = await DatesServices.IsAppointmentTimeAvailable();
         const IsAvailable = IsAvailableResponse.IsTimeAvailable;
         if (!IsAvailable) {
             await Utils.ToastsNotification('Citas', 'No es posible solicitar una cita fuera del horario establecido de 00:00 hrs a 17:00 hrs.', "Danger", "Middle center");
@@ -496,7 +495,7 @@ const ShowCancelateDateModal = async (element) => {
 const CancelDateButton = async () => {
     try {
         const DateId = sessionStorage.getItem('DateId');
-        const response = await CancelDate(DateId);
+        const response = await DatesServices.CancelDate(DateId);
         let toastType = "Primary";
         let toastPlacement = "Top right";
         if (response.success) {
@@ -553,7 +552,7 @@ const ExistsScheduleAvailables = async () => {
     try {
         const OperationTypeId = $('#OperationsSelect').val();
         const TransportTypeId = $('#TransportTypeSelect').val();
-        const data = await GetScheduleAvailables(OperationTypeId, TransportTypeId);
+        const data = await DatesServices.GetScheduleAvailables(OperationTypeId, TransportTypeId);
         console.log(data);
         if (data.length > 0) {
             return true;
@@ -577,7 +576,7 @@ const FillSelectWAvailablesScheduleAActualSchedule = async (DateId) => {
             return;
         };
 
-        const data = await GetAvailableScheduleTimesWActualSchedule(OperationTypeId, TransportTypeId, DateId);
+        const data = await DatesServices.GetAvailableScheduleTimesWActualSchedule(OperationTypeId, TransportTypeId, DateId);
         const $options = data.map(function (value) {
             const $option = $('<option>').attr('value', value.Id).text(value.TimeRange);
             return $option;
@@ -591,318 +590,4 @@ const FillSelectWAvailablesScheduleAActualSchedule = async (DateId) => {
         console.error(error);
     }
 };
-//#endregion
 
-//#region Fetchs
-const GetScheduleTimes = async (OperationTypeId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/schedule/GetScheduleTimes`, type: 'POST', data: {
-                OperationTypeId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetScheduleAvailable = async (OperationTypeId, TransportTypeId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/schedule/ScheduleAvailable`,
-            type: 'POST',
-            data: {
-                OperationTypeId,
-                TransportTypeId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetOperationTypes = async (userId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/GetOperationTypes`, type: 'POST', data: {
-                userId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetProducts = async (userId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/GetProducts`, type: 'POST', data: {
-                userId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetTransportLines = async (userId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/GetTransportLines`, type: 'POST', data: {
-                userId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetTransportPlate1 = async (userId, TransportTypeId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/GetTransportsByType`, type: 'POST', data: {
-                userId, TransportTypeId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetTransportType = async () => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/GetTransportType`,
-            type: 'GET',
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetDrivers = async (userId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/GetDrivers`, type: 'POST', data: {
-                userId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetDates = async (userId, StartDate, EndDate) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/GetDates`, type: 'POST', data: {
-                userId,
-                StartDate,
-                EndDate
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume) => {
-    try {
-        return await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/addOrUpdateDates`, type: 'POST', data: { DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume },
-            dataType: 'json'
-        });
-    } catch (error) {
-        console.error(error.message);
-        $.unblockUI();
-    };
-};
-
-const IsAppointmentTimeAvailable = async () => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/schedule/IsAppointmentTimeAvailable`,
-            type: 'GET',
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error.message);
-        $.unblockUI();
-    };
-};
-
-const CancelDate = async (dateId) => {
-    try {
-        return await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/CancelDate`, type: 'POST', data: {
-                dateId
-            },
-            dataType: 'json'
-        });
-    } catch (error) {
-        console.error(error.message);
-        $.unblockUI();
-    };
-};
-
-const GetScheduleAvailables = async (OperationTypeId, TransportTypeId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/schedule/ScheduleAvailable`,
-            type: 'POST',
-            data: {
-                OperationTypeId,
-                TransportTypeId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetAvailableScheduleTimesWActualSchedule = async (OperationTypeId, TransportTypeId, DateId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/schedule/GetAvailableScheduleTimesWActualSchedule`, type: 'POST', data: {
-                OperationTypeId,
-                TransportTypeId,
-                DateId,
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-//#endregion

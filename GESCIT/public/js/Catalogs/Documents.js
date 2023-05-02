@@ -1,12 +1,16 @@
+import * as Utils from '/js/Utils.js';
+await Utils.ValidatePath();
 const UrlApi = window.__env.UrlApi;
+const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+$.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
+    await Utils.createMenu();
+
     sessionStorage.setItem("CLientId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
 
-    // await UnreviewedTable();
     await initButtons();
-    //await ApprovedTable();
     await EmptyTable();
 
 });
@@ -171,71 +175,76 @@ const UnreviewedTable = async () => {
             div.innerHTML = "";
         }
 
-        const data = await GetClientsUnreviewed();
-        if (data.length > 0) {
-            // Crea el arreglo de objetos para las columnas del DataTable
-            const columns = [
-                {
-                    title: 'Ver',
-                    data: 'AccountNum',
-                    "render": function (data, type, row) {
-                        return `
-                                    <button 
-                                        class="btn btn-primary dropdown-toggle" 
-                                        type="button" 
-                                        id="ViewDocumentDropdown"
-                                        data='${JSON.stringify(row)}'
-                                        title='Documentos'
-                                        data-bs-toggle="dropdown"
-                                        data-bs-placement="top"
+        const data = await GetClientsUnreviewed() || [];
+        const columns = [
+            {
+                title: 'Ver',
+                data: 'AccountNum',
+                "render": function (data, type, row) {
+                    return `
+                            <button 
+                                class="btn btn-primary dropdown-toggle" 
+                                type="button" 
+                                data='${JSON.stringify(row)}'
+                                title='Documentos'
+                                data-bs-toggle="dropdown"
+                                data-bs-placement="top"
+                            >
+                                <span class="tf-icons bx bx-file"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button class="dropdown-item" 
+                                    action='TransportLinesDocumentsModal'
+                                    data='${JSON.stringify(row)}'
                                     >
-                                        <span class="tf-icons bx bx-file"></span>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <button class="dropdown-item" 
-                                            id="UnreviewedTransportLinesModalButton"
-                                            onclick= 'TransportLinesDocumentsModal(this, "unreviewed")';
-                                            data='${JSON.stringify(row)}'
-                                            >
-                                            Linea Transportista</button>
-                                        </li>
-                                        <li>
-                                            <button class="dropdown-item" 
-                                            id="UnreviewedDriversModalButton"
-                                            onclick= 'DriversDocumentsModal(this, "unreviewed")';
-                                            data='${JSON.stringify(row)}'
-                                            >
-                                            Chofer</button></li>
-                                        <li>
-                                            <button class="dropdown-item" 
-                                            id="UnreviewedTransportsModalButton"
-                                            onclick= 'TransportsDocumentsModal(this, "unreviewed")';
-                                            data='${JSON.stringify(row)}'
-                                            >
-                                            Transporte</button></li>
-                                    </ul>
-                                `
-                    }
-                },
-                ...Object.keys(data[0]).map(propName => ({
-                    title: propName,
-                    data: propName,
-                    visible: !propName.includes('Id'),
-
-                }))
-            ];
-            $('#pendingTable').DataTable({
-                data: data,
-                columns: columns,
-                language: {
-                    url: '/js/datatable-esp.json'
+                                    Linea Transportista</button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" 
+                                    action='DriversDocumentsModal'
+                                    data='${JSON.stringify(row)}'
+                                    >
+                                    Chofer</button></li>
+                                <li>
+                                    <button class="dropdown-item" 
+                                    action='TransportsDocumentsModal'
+                                    data='${JSON.stringify(row)}'
+                                    >
+                                    Transporte</button></li>
+                            </ul>
+                        `
                 }
+            },
+            ...Object.keys(data[0]).map(propName => ({
+                title: propName,
+                data: propName,
+                visible: !propName.includes('Id'),
+
+            }))
+        ];
+        $('#pendingTable').DataTable({
+            data: data,
+            columns: columns,
+            language: {
+                url: '/js/datatable-esp.json'
+            },
+            columnDefs: [{
+                defaultContent: "",
+                targets: "_all"
+            }]
+        }).on('draw', async function () {
+            await Utils.tooltipTrigger();
+            $('button[action="TransportLinesDocumentsModal"]').off('click').on('click', async function () {
+                await TransportLinesDocumentsModal(this, "unreviewed");
             });
-            $('#UnreviewedDriversModalButton').on('shown.bs.modal', async function () {
-                await DriversDocumentsModal(this, "unreviewed")
+            $('button[action="DriversDocumentsModal"]').off('click').on('click', async function () {
+                await DriversDocumentsModal(this, "unreviewed");
             });
-        }
+            $('button[action="TransportsDocumentsModal"]').off('click').on('click', async function () {
+                await TransportsDocumentsModal(this, "unreviewed");
+            });
+        });
 
     } catch (error) {
         console.error(error);
@@ -262,7 +271,6 @@ const ApprovedTable = async () => {
                                     <button 
                                         class="btn btn-primary dropdown-toggle" 
                                         type="button" 
-                                        id="ViewDocumentDropdown"
                                         data='${JSON.stringify(row)}'
                                         title='Documentos'
                                         data-bs-toggle="dropdown"
@@ -273,20 +281,20 @@ const ApprovedTable = async () => {
                                     <ul class="dropdown-menu">
                                         <li>
                                             <button class="dropdown-item" 
-                                            onclick= 'TransportLinesDocumentsModal(this, "approved")';
+                                            action='TransportLinesDocumentsModal'
                                             data='${JSON.stringify(row)}'
                                             >
                                             Linea Transportista</button>
                                         </li>
                                         <li>
                                             <button class="dropdown-item" 
-                                            onclick= 'DriversDocumentsModal(this, "approved")';
+                                            action='DriversDocumentsModal'
                                             data='${JSON.stringify(row)}'
                                             >
                                             Chofer</button></li>
                                         <li>
                                             <button class="dropdown-item" 
-                                            onclick= 'TransportsDocumentsModal(this, "approved")';
+                                            action='TransportsDocumentsModal'
                                             data='${JSON.stringify(row)}'
                                             >
                                             Transporte</button></li>
@@ -306,13 +314,30 @@ const ApprovedTable = async () => {
                 columns: columns,
                 language: {
                     url: '/js/datatable-esp.json'
-                }
+                },
+                columnDefs: [{
+                    defaultContent: "",
+                    targets: "_all"
+                }]
+            }).on('draw', async function () {
+                await Utils.tooltipTrigger();
+
+                $('button[action="TransportLinesDocumentsModal"]').off('click').on('click', async function () {
+                    await TransportLinesDocumentsModal(this, "approved");
+                });
+                $('button[action="DriversDocumentsModal"]').off('click').on('click', async function () {
+                    await DriversDocumentsModal(this, "approved");
+                });
+                $('button[action="TransportsDocumentsModal"]').off('click').on('click', async function () {
+                    await TransportsDocumentsModal(this, "approved");
+                });
             });
-        }
+        };
     } catch (error) {
         console.error(error);
     }
 };
+
 const EmptyTable = async () => {
     try {
         if ($.fn.DataTable.isDataTable('#emptyTable')) {
@@ -330,27 +355,26 @@ const EmptyTable = async () => {
                     data: 'AccountNum',
                     "render": function (data, type, row) {
                         return `
-                                    <button 
-                                        class="btn btn-primary dropdown-toggle" 
-                                        type="button" 
-                                        id="ViewDocumentDropdown"
-                                        data='${JSON.stringify(row)}'
-                                        title='Documentos'
-                                        data-bs-toggle="dropdown"
-                                        data-bs-placement="top"
+                            <button 
+                                class="btn btn-primary dropdown-toggle" 
+                                type="button" 
+                                data='${JSON.stringify(row)}'
+                                title='Documentos'
+                                data-bs-toggle="dropdown"
+                                data-bs-placement="top"
+                            >
+                                <span class="tf-icons bx bx-file"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button class="dropdown-item"
+                                    action='TransportLinesDocumentsModal'
+                                    data='${JSON.stringify(row)}'
                                     >
-                                        <span class="tf-icons bx bx-file"></span>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <button class="dropdown-item" 
-                                            onclick= 'TransportLinesDocumentsModal(this, "empty")';
-                                            data='${JSON.stringify(row)}'
-                                            >
-                                            Linea Transportista</button>
-                                        </li>
-                                    </ul>
-                                `
+                                    Linea Transportista</button>
+                                </li>
+                            </ul>
+                        `;
                     }
                 },
                 ...Object.keys(data[0]).map(propName => ({
@@ -365,9 +389,19 @@ const EmptyTable = async () => {
                 columns: columns,
                 language: {
                     url: '/js/datatable-esp.json'
-                }
+                },
+                columnDefs: [{
+                    defaultContent: "",
+                    targets: "_all"
+                }]
+            }).on('draw', async function () {
+                await Utils.tooltipTrigger();
+
+                $('button[action="TransportLinesDocumentsModal"]').off('click').on('click', async function () {
+                    await TransportLinesDocumentsModal(this, "empty");
+                });
             });
-        }
+        };
     } catch (error) {
         console.error(error);
     }
@@ -379,81 +413,84 @@ const UnreviewedTransportLinesTable = async (AccountNum) => {
             $('#DocumentsTable').DataTable().destroy();
             var div = document.getElementById('DocumentsTable');
             div.innerHTML = "";
-        }
+        };
 
-        const data = await GetDocumentsByClient(AccountNum, "unreviewed", "Linea Transportista");
-        if (data.length > 0) {
-            // Crea el arreglo de objetos para las columnas del DataTable
-            const columns = [
-                {
-                    title: 'Acciones',
-                    data: 'Id',
-                    "render": function (data, type, row) {
-                        return `
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary"
-                                        type="button" 
-                                        id="DownloadDocumentButton"
-                                        data='${JSON.stringify(row)}'
-                                        title='Descargar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='DownloadDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bx-download"></span>
-                                    </button>
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary"
-                                        type="button" 
-                                        id="ApproveDocumentButton"
-                                        data='${JSON.stringify(row)}'
-                                        title='Aprobar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='ApproveDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bx-check"></span>
-                                    </button>
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary"
-                                        type="button" 
-                                        id="RejectDocumentButton"
-                                        data='${JSON.stringify(row)}'
-                                        title='Rechazar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='RejectDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bx-x">
-                                    </button>
-                                `
-                    }
-                },
-                ...Object.keys(data[0]).map(propName => ({
-                    title: propName,
-                    data: propName,
-                    visible: !propName.includes('Id'),
-
-                }))
-            ];
-            $('#DocumentsTable').DataTable({
-                data: data,
-                columns: columns,
-                language: {
-                    url: '/js/datatable-esp.json'
+        const data = await GetDocumentsByClient(AccountNum, "unreviewed", "Linea Transportista") || [];
+        const columns = [
+            {
+                title: 'Acciones',
+                data: 'Id',
+                render: function (data, type, row) {
+                    return `
+                        <button 
+                            class="btn rounded-pill btn-icon btn-outline-primary"
+                            type="button" 
+                            data='${JSON.stringify(row)}'
+                            title='Descargar'
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            action='DownloadDocument'
+                        >
+                            <span class="tf-icons bx bx-download"></span>
+                        </button>
+                        <button 
+                            class="btn rounded-pill btn-icon btn-outline-primary"
+                            type="button" 
+                            data='${JSON.stringify(row)}'
+                            title='Aprobar'
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            action='ApproveDocument'
+                        >
+                            <span class="tf-icons bx bx-check"></span>
+                        </button>
+                        <button 
+                            class="btn rounded-pill btn-icon btn-outline-primary"
+                            type="button" 
+                            data='${JSON.stringify(row)}'
+                            title='Rechazar'
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            action='RejectDocument'
+                        >
+                            <span class="tf-icons bx bx-x">
+                        </button>
+                    `;
                 }
+            },
+            ...Object.keys(data[0]).map(propName => ({
+                title: propName,
+                data: propName,
+                visible: !propName.includes('Id'),
+
+            }))
+        ];
+        $('#DocumentsTable').DataTable({
+            data: data,
+            columns: columns,
+            language: {
+                url: '/js/datatable-esp.json'
+            },
+            columnDefs: [{
+                defaultContent: "",
+                targets: "_all"
+            }]
+        }).on('draw', async function () {
+            await Utils.tooltipTrigger();
+            $('button[action="DownloadDocument"]').off('click').on('click', async function () {
+                await DownloadDocument(this);
             });
-        }
-        else {
-            $('#Documents').modal('hide');
-            toastType = 'Primary';
-            toastPlacement = 'Top right';
-            await ToastsNotification("Fin de la Revisión", "Actualmente no quedan documentos cargados en el sistema", toastType, toastPlacement);
-        }
+            $('button[action="ApproveDocument"]').off('click').on('click', async function () {
+                await ApproveDocument(this);
+            });
+            $('button[action="RejectDocument"]').off('click').on('click', async function () {
+                await RejectDocument(this);
+            });
+        });
     } catch (error) {
         console.error(error);
-    }
-}
+    };
+};
 
 const UnreviewedDriversTable = async (AccountNum) => {
     try {
@@ -461,80 +498,83 @@ const UnreviewedDriversTable = async (AccountNum) => {
             $('#DocumentsTable').DataTable().destroy();
             var div = document.getElementById('DocumentsTable');
             div.innerHTML = "";
-        }
+        };
 
-        const data = await GetDocumentsByClient(AccountNum, "unreviewed", "Chofer");
-        if (data.length > 0) {
-            // Crea el arreglo de objetos para las columnas del DataTable
-            const columns = [
-                {
-                    title: 'Acciones',
-                    data: 'Id',
-                    "render": function (data, type, row) {
-                        return `
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary"
-                                        type="button" 
-                                        id="DownloadDocumentButton"
-                                        data='${JSON.stringify(row)}'
-                                        title='Descargar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='DownloadDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bx-download"></span>
-                                    </button>
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary"
-                                        type="button" 
-                                        id="ApproveDocumentButton"
-                                        data='${JSON.stringify(row)}'
-                                        title='Aprobar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='ApproveDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bx-check"></span>
-                                    </button>
-                                    <button 
-                                        class="btn rounded-pill btn-icon btn-outline-primary"
-                                        type="button" 
-                                        id="RejectDocumentButton"
-                                        data='${JSON.stringify(row)}'
-                                        title='Rechazar'
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        onclick='RejectDocument(this);'
-                                    >
-                                        <span class="tf-icons bx bx-x">
-                                    </button>
-                                `
-                    }
-                },
-                ...Object.keys(data[0]).map(propName => ({
-                    title: propName,
-                    data: propName,
-                    visible: !propName.includes('Id'),
-
-                }))
-            ];
-            $('#DocumentsTable').DataTable({
-                data: data,
-                columns: columns,
-                language: {
-                    url: '/js/datatable-esp.json'
+        const data = await GetDocumentsByClient(AccountNum, "unreviewed", "Chofer") || [];
+        const columns = [
+            {
+                title: 'Acciones',
+                data: 'Id',
+                render: function (data, type, row) {
+                    return `
+                        <button 
+                            class="btn rounded-pill btn-icon btn-outline-primary"
+                            type="button" 
+                            data='${JSON.stringify(row)}'
+                            title='Descargar'
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            action='DownloadDocument'
+                        >
+                            <span class="tf-icons bx bx-download"></span>
+                        </button>
+                        <button 
+                            class="btn rounded-pill btn-icon btn-outline-primary"
+                            type="button" 
+                            data='${JSON.stringify(row)}'
+                            title='Aprobar'
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            action='ApproveDocument'
+                        >
+                            <span class="tf-icons bx bx-check"></span>
+                        </button>
+                        <button 
+                            class="btn rounded-pill btn-icon btn-outline-primary"
+                            type="button" 
+                            data='${JSON.stringify(row)}'
+                            title='Rechazar'
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            action='RejectDocument'
+                        >
+                            <span class="tf-icons bx bx-x">
+                        </button>
+                    `
                 }
+            },
+            ...Object.keys(data[0]).map(propName => ({
+                title: propName,
+                data: propName,
+                visible: !propName.includes('Id'),
+
+            }))
+        ];
+        $('#DocumentsTable').DataTable({
+            data: data,
+            columns: columns,
+            language: {
+                url: '/js/datatable-esp.json'
+            },
+            columnDefs: [{
+                defaultContent: "",
+                targets: "_all"
+            }]
+        }).on('draw', async function () {
+            await Utils.tooltipTrigger();
+            $('button[action="DownloadDocument"]').off('click').on('click', async function () {
+                await DownloadDocument(this);
             });
-        }
-        else {
-            $('#Documents').modal('hide');
-            toastType = 'Primary';
-            toastPlacement = 'Top right';
-            await ToastsNotification("Fin de la Revisión", "Actualmente no quedan documentos cargados en el sistema", toastType, toastPlacement);
-        }
+            $('button[action="ApproveDocument"]').off('click').on('click', async function () {
+                await ApproveDocument(this);
+            });
+            $('button[action="RejectDocument"]').off('click').on('click', async function () {
+                await RejectDocument(this);
+            });
+        });
     } catch (error) {
         console.error(error);
-    }
+    };
 }
 
 const UnreviewedTransportsTable = async (AccountNum) => {
@@ -543,80 +583,84 @@ const UnreviewedTransportsTable = async (AccountNum) => {
             $('#DocumentsTable').DataTable().destroy();
             var div = document.getElementById('DocumentsTable');
             div.innerHTML = "";
-        }
+        };
 
-        const data = await GetDocumentsByClient(AccountNum, "unreviewed", "Transporte");
-        if (data.length > 0) {
-            // Crea el arreglo de objetos para las columnas del DataTable
-            const columns = [
-                {
-                    title: 'Acciones',
-                    data: 'Id',
-                    "render": function (data, type, row) {
-                        return `
+        const data = await GetDocumentsByClient(AccountNum, "unreviewed", "Transporte") || [];
+        const columns = [
+            {
+                title: 'Acciones',
+                data: 'Id',
+                "render": function (data, type, row) {
+                    return `
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary"
                                         type="button" 
-                                        id="DownloadDocumentButton"
                                         data='${JSON.stringify(row)}'
                                         title='Descargar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='DownloadDocument(this);'
+                                        action='DownloadDocument'
                                     >
                                         <span class="tf-icons bx bx-download"></span>
                                     </button>
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary"
                                         type="button" 
-                                        id="ApproveDocumentButton"
                                         data='${JSON.stringify(row)}'
                                         title='Aprobar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='ApproveDocument(this);'
+                                        action='ApproveDocument'
                                     >
                                         <span class="tf-icons bx bx-check"></span>
                                     </button>
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary"
                                         type="button" 
-                                        id="RejectDocumentButton"
                                         data='${JSON.stringify(row)}'
                                         title='Rechazar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='RejectDocument(this);'
+                                        action='RejectDocument'
                                     >
                                         <span class="tf-icons bx bx-x">
                                     </button>
                                 `
-                    }
-                },
-                ...Object.keys(data[0]).map(propName => ({
-                    title: propName,
-                    data: propName,
-                    visible: !propName.includes('Id'),
-
-                }))
-            ];
-            $('#DocumentsTable').DataTable({
-                data: data,
-                columns: columns,
-                language: {
-                    url: '/js/datatable-esp.json'
                 }
+            },
+            ...Object.keys(data[0]).map(propName => ({
+                title: propName,
+                data: propName,
+                visible: !propName.includes('Id'),
+
+            }))
+        ];
+
+        $('#DocumentsTable').DataTable({
+            data: data,
+            columns: columns,
+            language: {
+                url: '/js/datatable-esp.json'
+            },
+            columnDefs: [{
+                defaultContent: "",
+                targets: "_all"
+            }]
+        }).on('draw', async function () {
+            await Utils.tooltipTrigger();
+            $('button[action="DownloadDocument"]').off('click').on('click', async function () {
+                await DownloadDocument(this);
             });
-        }
-        else {
-            $('#Documents').modal('hide');
-            toastType = 'Primary';
-            toastPlacement = 'Top right';
-            await ToastsNotification("Fin de la Revisión", "Actualmente no quedan documentos cargados en el sistema", toastType, toastPlacement);
-        }
+            $('button[action="ApproveDocument"]').off('click').on('click', async function () {
+                await ApproveDocument(this);
+            });
+            $('button[action="RejectDocument"]').off('click').on('click', async function () {
+                await RejectDocument(this);
+            });
+        });
     } catch (error) {
         console.error(error);
-    }
+    };
 }
 
 const ApprovedTransportLinesTable = async (AccountNum) => {
@@ -812,29 +856,25 @@ const ApprovedTransportsTable = async (AccountNum) => {
 
 const TransportLinesDocumentsModal = async (e, Status) => {
     try {
-        const DocumentType = 'Linea Transportista';
-        let Cliente = 0;
         const Client = $(e).attr('data');
         const ClientObj = JSON.parse(Client);
+        const DocumentType = 'Linea Transportista';
+        const Cliente = ClientObj?.Cliente || 0;
 
-        Cliente = ClientObj.Cliente;
-
-        data = await GetDocumentsByClient(Cliente, Status, DocumentType);
+        const data = await GetDocumentsByClient(Cliente, Status, DocumentType) || [];
 
         sessionStorage.setItem("AccountNum", Cliente);
         sessionStorage.setItem("DocumentType", DocumentType);
         sessionStorage.setItem("Status", Status);
 
+        if (data?.length <= 0) {
+            const toastType = 'Danger';
+            const toastPlacement = 'Top right';
+            await Utils.ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
+            return;
+        };
 
-        if (data.length > 0) {
-            $('#Documents').modal('show');
-        }
-        else {
-            toastType = 'Danger';
-            toastPlacement = 'Top right';
-            await ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
-        }
-
+        $('#Documents').modal('show');
     } catch (error) {
         console.error(error);
     }
@@ -842,6 +882,8 @@ const TransportLinesDocumentsModal = async (e, Status) => {
 
 const DriversDocumentsModal = async (e, Status) => {
     try {
+        console.log(e);
+        console.log(Status);
         const DocumentType = 'Chofer';
         let Cliente = 0;
         const Client = $(e).attr('data');
@@ -855,14 +897,14 @@ const DriversDocumentsModal = async (e, Status) => {
         sessionStorage.setItem("DocumentType", DocumentType);
         sessionStorage.setItem("Status", Status);
 
-        if (data.length > 0) {
-            $('#Documents').modal('show');
-        }
-        else {
+        if (data?.length <= 0) {
             toastType = 'Danger';
             toastPlacement = 'Top right';
-            await ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
-        }
+            await Utils.ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
+            return;
+        };
+
+        $('#Documents').modal('show');
 
     } catch (error) {
         console.error(error);
@@ -891,7 +933,7 @@ const TransportsDocumentsModal = async (e, Status) => {
         else {
             toastType = 'Danger';
             toastPlacement = 'Top right';
-            await ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
+            await Utils.ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
         }
 
     } catch (error) {
@@ -915,14 +957,15 @@ const ApproveDocument = async (e) => {
         const dataObj = JSON.parse(data);
         const DocumentFileId = dataObj.Id;
         const AccountNum = sessionStorage.getItem('AccountNum');
-
+        let toastType = '';
+        let toastPlacement = '';
         const response = await UpdateDocumentStatus(DocumentFileId, 'approved');
 
         if (response.Success) {
             const DocumentType = sessionStorage.getItem('DocumentType');
             toastType = 'Primary';
             toastPlacement = 'Top right';
-            await ToastsNotification("Documento Aprobado", "El documento ha sido aprobado correctamente.", toastType, toastPlacement);
+            await Utils.ToastsNotification("Documento Aprobado", "El documento ha sido aprobado correctamente.", toastType, toastPlacement);
             if (DocumentType == 'Chofer') {
                 await UnreviewedDriversTable(AccountNum);
             }
@@ -936,44 +979,43 @@ const ApproveDocument = async (e) => {
         else {
             toastType = 'Danger';
             toastPlacement = 'Top right';
-            await ToastsNotification("Falla en Aprobación", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
+            await Utils.ToastsNotification("Falla en Aprobación", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
         }
     }
-}
+};
 
 const RejectDocument = async (e) => {
-    if (e) {
-        const data = $(e).attr('data');
-        const dataObj = JSON.parse(data);
-        const DocumentFileId = dataObj.Id;
-        const AccountNum = sessionStorage.getItem('AccountNum');
+    if (!e) {
+        toastType = 'Danger';
+        toastPlacement = 'Top right';
+        await Utils.ToastsNotification("Falla en Rechazo", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
+        return;
+    };
 
-        const response = await UpdateDocumentStatus(DocumentFileId, 'rejected');
+    const data = $(e).attr('data');
+    const dataObj = JSON.parse(data);
+    const DocumentFileId = dataObj.Id;
+    const AccountNum = sessionStorage.getItem('AccountNum');
 
-        if (response.Success) {
-            const DocumentType = sessionStorage.getItem('DocumentType');
-            toastType = 'Primary';
-            toastPlacement = 'Top right';
-            await ToastsNotification("Documento Rechazado", "El documento ha sido rechazado correctamente.", toastType, toastPlacement);
+    const response = await UpdateDocumentStatus(DocumentFileId, 'rejected');
 
-            if (DocumentType == 'Chofer') {
-                await UnreviewedDriversTable(AccountNum);
-            }
-            else if (DocumentType == 'Linea Transportista') {
-                await UnreviewedTransportLinesTable(AccountNum);
-            }
-            else if (DocumentType == 'Transporte') {
-                await UnreviewedTransportsTable(AccountNum);
-            }
+    if (response?.Success) {
+        const DocumentType = sessionStorage.getItem('DocumentType');
+        const toastType = 'Primary';
+        const toastPlacement = 'Top right';
+        await Utils.ToastsNotification("Documento Rechazado", "El documento ha sido rechazado correctamente.", toastType, toastPlacement);
 
+        if (DocumentType == 'Chofer') {
+            await UnreviewedDriversTable(AccountNum);
         }
-        else {
-            toastType = 'Danger';
-            toastPlacement = 'Top right';
-            await ToastsNotification("Falla en Rechazo", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
+        else if (DocumentType == 'Linea Transportista') {
+            await UnreviewedTransportLinesTable(AccountNum);
         }
-    }
-}
+        else if (DocumentType == 'Transporte') {
+            await UnreviewedTransportsTable(AccountNum);
+        };
+    };
+};
 
 const initButtons = async () => {
     try {
@@ -1029,9 +1071,15 @@ const initButtons = async () => {
         });
 
         $('#Documents').on('hidden.bs.modal', async function () {
-            await UnreviewedTable();
-            await ApprovedTable();
-            await EmptyTable();
+            // get active tab
+            let activeTab = $('.nav-link.active').attr('id');
+            if (activeTab == 'PendingTabButton') {
+                await UnreviewedTable();
+            } else if (activeTab == 'ApprovedTabButton') {
+                await ApprovedTable();
+            } else if (activeTab == 'EmptyTabButton') {
+                await EmptyTable();
+            };
         });
 
     } catch (error) {

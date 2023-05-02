@@ -21,7 +21,7 @@ router.get('/Asignar', (req, res) => {
         Page: 'Dates/AssignDates',
         Categoría: 'Gestor',
         Modulo: 'Asignar Citas',
-        JSFile: 'js/Dates/AssignDates.js',
+        JSFile: '/js/Dates/AssignDates.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
     };
@@ -33,7 +33,7 @@ router.get('/Seguridad', (req, res) => {
         Page: 'Dates/Security',
         Categoría: 'Gestor',
         Modulo: 'Seguridad',
-        JSFile: 'js/Dates/Security.js',
+        JSFile: '/js/Dates/Security.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
     };

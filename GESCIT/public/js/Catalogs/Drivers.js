@@ -1,14 +1,19 @@
+import * as Utils from '/js/Utils.js';
+await Utils.ValidatePath();
 const UrlApi = window.__env.UrlApi;
+const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+$.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
+    await Utils.createMenu();
+
     sessionStorage.setItem("DriverId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
 
     await initButtons();
     await DriversDataTable(true);
     await FillSelectDocumentList();
-    await tooltipTrigger();
-
+    await Utils.tooltipTrigger();
 });
 
 //#region fetchs 
@@ -273,16 +278,14 @@ const DriversDataTable = async () => {
             $('#DriversTable').DataTable().destroy();
         }
 
-        const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
-        const data = await GetDrivers(userId);
-        if (data.length > 0) {
-            // Crea el arreglo de objetos para las columnas del DataTable
-            const columns = [
-                {
-                    title: 'Acciones',
-                    data: 'Id',
-                    "render": function (data, type, row) {
-                        return `
+        const userId = sessionStorage.getItem('userId');
+        const data = await GetDrivers(userId) || [];
+        const columns = [
+            {
+                title: 'Acciones',
+                data: 'Id',
+                render: function (data, type, row) {
+                    return `
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary" 
                                         type="button" 
@@ -291,30 +294,40 @@ const DriversDataTable = async () => {
                                         title='Editar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='AddOrUpdateDriverModal(this);'
+                                        action='AddOrUpdateDriverModal'
                                     >
                                         <span class="tf-icons bx bx-edit-alt"></span>
                                     </button>
                                 `
-                    }
-                },
-                ...Object.keys(data[0]).map(propName => ({
-                    title: propName,
-                    data: propName,
-                    visible: !propName.includes('Id'),
-                    render: function (data) {
-                        return propName === "Capacidad" ? data + " Toneladas" : data
-                    }
-                }))
-            ];
-            $('#DriversTable').DataTable({
-                data: data,
-                columns: columns,
-                language: {
-                    url: '/js/datatable-esp.json'
                 }
+            },
+            ...Object.keys(data[0]).map(propName => ({
+                title: propName,
+                data: propName,
+                visible: !propName.includes('Id'),
+                render: function (data) {
+                    return propName === "Capacidad" ? data + " Toneladas" : data
+                }
+            }))
+        ];
+        $('#DriversTable').DataTable({
+            data: data,
+            columns: columns,
+            language: {
+                url: '/js/datatable-esp.json'
+            },
+            columnDefs: [{
+                className: 'bolded',
+                targets: 6,
+                defaultContent: "",
+                targets: "_all"
+            }]
+        }).on('draw', async function () {
+            await Utils.tooltipTrigger();
+            $('button[action="AddOrUpdateDriverModal"]').off().on('click', async function () {
+                await AddOrUpdateDriverModal(this);
             });
-        }
+        });
     } catch (error) {
         console.error(error);
     }
@@ -408,7 +421,7 @@ const AddOrUpdateDriverButton = async () => {
             toastPlacement = 'Middle center';
         };
 
-        await ToastsNotification("Choferes", response.message, toastType, toastPlacement);
+        await Utils.ToastsNotification("Choferes", response.message, toastType, toastPlacement);
 
     } catch (error) {
         console.error(error);
@@ -422,7 +435,7 @@ const AddOrUpdateDriverDocumentButton = async () => {
         const DriverDocumentFile = DriverDocumentInput.files[0];
 
         if (DriverDocumentFile.size > 10485760) {
-            await ToastsNotification("Choferes", "Tamaño máximo permitido: 10 MB", "Danger", "Middle center");
+            await Utils.ToastsNotification("Choferes", "Tamaño máximo permitido: 10 MB", "Danger", "Middle center");
             return;
         };
 
@@ -436,24 +449,21 @@ const AddOrUpdateDriverDocumentButton = async () => {
 
         const response = await AddOrUpdateDriverDocument(DriverDocument);
 
-        if (response.success) {
-            TemporalDocumentId = response.TemporalDocumentId;
-            sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
-            await ToastsNotification("Chofer", "Se subio el archivo con exito.", "Primary", "Top right");
-            $('#DocumentDriverSelect').val(0).trigger('change');
-            $('#DriverDocument').val("").trigger('change');
-        } else {
-            await ToastsNotification("Chofer", response.message, "Danger", "Middle center");
+        if (!response?.success) {
+            await Utils.ToastsNotification("Chofer", response.message, "Danger", "Middle center");
+            return;
         };
 
-        DriverDocumentsDataTable(DriverId, TemporalDocumentId);
+        const TemporalDocumentId = response.TemporalDocumentId;
+        sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
+        await Utils.ToastsNotification("Chofer", "Se subió el archivo con éxito.", "Primary", "Top right");
+        $('#DocumentDriverSelect').val(0).trigger('change');
+        $('#DriverDocument').val("").trigger('change');
+        await DriverDocumentsDataTable(DriverId, TemporalDocumentId);
 
     } catch (error) {
         console.error(error);
     }
-};
-
-const GetDriverDocumentButton = async () => {
 };
 
 const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
@@ -477,12 +487,11 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                         <button 
                             class="btn rounded-pill btn-icon btn-outline-primary" 
                             type="button" 
-                            id="DonwloadDriverDocument"
                             data='${JSON.stringify(row)}'
                             title='Descargar'
                             data-bs-toggle="tooltip"
                             data-bs-placement="top"
-                            onclick='DonwloadDriverDocument(this);'
+                            action='DownloadDriverDocument'
                         >
                             <span class="tf-icons bx bxs-download"></span>
                         </button>`;
@@ -491,12 +500,11 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                             <button
                                 class="btn rounded-pill btn-icon btn-outline-danger" 
                                 type="button" 
-                                id="AddOrUpdateDriversTableButton"
                                 data='${JSON.stringify(row)}'
                                 title='Eliminar'
                                 data-bs-toggle="tooltip"
                                 data-bs-placement="top"
-                                onclick='DeleteDocument(this);'
+                                action='DeleteDocument'
                             >
                                 <span class="tf-icons bx bx-trash"></span>
                             </button>
@@ -517,7 +525,21 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                 columns: columns,
                 language: {
                     url: '/js/datatable-esp.json'
-                }
+                },
+                columnDefs: [{
+                    className: 'bolded',
+                    targets: 6,
+                    defaultContent: "",
+                    targets: "_all"
+                }]
+            }).on('draw', async function () {
+                await Utils.tooltipTrigger();
+                $('button[action="DownloadDriverDocument"]').off().on('click', async function () {
+                    await DownloadDriverDocument(this);
+                });
+                $('button[action="DeleteDocument"]').off().on('click', async function () {
+                    await DeleteDocument(this);
+                });
             });
         }
     } catch (error) {
@@ -525,7 +547,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
     };
 };
 
-const DonwloadDriverDocument = async (e) => {
+const DownloadDriverDocument = async (e) => {
     if (e) {
         const data = $(e).attr('data');
         const dataObj = JSON.parse(data);
@@ -554,7 +576,7 @@ const DeleteDocument = async (e) => {
             toastPlacement = 'Middle center';
         };
 
-        await ToastsNotification("Chofer", response.message, toastType, toastPlacement);
+        await Utils.ToastsNotification("Chofer", response.message, toastType, toastPlacement);
 
     } catch (error) {
         console.error(error);

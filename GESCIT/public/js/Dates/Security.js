@@ -1,6 +1,11 @@
+import * as Utils from '/js/Utils.js';
+await Utils.ValidatePath();
 const UrlApi = window.__env.UrlApi;
+const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+$.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
+    await Utils.createMenu();
     await initButtons();
 });
 
@@ -96,20 +101,20 @@ const ConfirmIdButton = async () => {
 
                 if (Status != "Asignada") {
                     document.getElementById('RegisterAccess').style.display = 'none';
-                    toastType = 'Danger';
-                    toastPlacement = 'Top right';
+                    let toastType = 'Danger';
+                    let toastPlacement = 'Top right';
                     if (Status == "Pendiente") {
 
-                        await ToastsNotification("Cita Pendiente", "No es posible dar acceso a citas sin programar.", toastType, toastPlacement);
+                        await Utils.ToastsNotification("Cita Pendiente", "No es posible dar acceso a citas sin programar.", toastType, toastPlacement);
                     }
                     else if (Status === "Vencida") {
-                        await ToastsNotification("Cita Vencida", "No es posible dar acceso a citas vencidas.", toastType, toastPlacement);
+                        await Utils.ToastsNotification("Cita Vencida", "No es posible dar acceso a citas vencidas.", toastType, toastPlacement);
                     }
                     else if (Status == "Cancelada") {
-                        await ToastsNotification("Cita Cancelada", "No es posible dar acceso a citas que han sido canceladas.", toastType, toastPlacement);
+                        await Utils.ToastsNotification("Cita Cancelada", "No es posible dar acceso a citas que han sido canceladas.", toastType, toastPlacement);
                     }
                     else if (Status == "Arribo") {
-                        await ToastsNotification("Cita ya Registrada", "La cita cuya llegada intenta registrar ya pasó por caseta anteriormente.", toastType, toastPlacement);
+                        await Utils.ToastsNotification("Cita ya Registrada", "La cita cuya llegada intenta registrar ya pasó por caseta anteriormente.", toastType, toastPlacement);
                     }
                 } else {
                     document.getElementById('RegisterAccess').style.display = 'block';
@@ -118,15 +123,15 @@ const ConfirmIdButton = async () => {
                 $('#DateInformationModal').modal('show');
             }
             else {
-                toastType = 'Danger';
-                toastPlacement = 'Top right';
-                await ToastsNotification("Folio no encontrado", "La cita no concuerda con ninguna cita del día de hoy.", toastType, toastPlacement);
+                let toastType = 'Danger';
+                let toastPlacement = 'Top right';
+                await Utils.ToastsNotification("Folio no encontrado", "La cita no concuerda con ninguna cita del día de hoy.", toastType, toastPlacement);
             }
         }
         else {
-            toastType = 'Danger';
-            toastPlacement = 'Top right';
-            await ToastsNotification("Campo Vacío", "Favor de insertar un folio.", toastType, toastPlacement);
+            let toastType = 'Danger';
+            let toastPlacement = 'Top right';
+            await Utils.ToastsNotification("Campo Vacío", "Favor de insertar un folio.", toastType, toastPlacement);
         }
     } catch (error) {
         console.error(error);
@@ -138,14 +143,14 @@ const RegisterAccessButton = async () => {
         Folio = sessionStorage.getItem('Id');
         const Response = await UpdateDateStatusArrival(Folio, "arrival");
         if (Response.success) {
-            toastType = 'Primary';
-            toastPlacement = 'Top right';
-            await ToastsNotification("Arribo Registrado", Response.message, toastType, toastPlacement);
+            let toastType = 'Primary';
+            let toastPlacement = 'Top right';
+            await Utils.ToastsNotification("Arribo Registrado", Response.message, toastType, toastPlacement);
         }
         else if (!Response.success) {
-            toastType = 'Danger';
-            toastPlacement = 'Top right';
-            await ToastsNotification("Arribo Negado", Response.message, toastType, toastPlacement);
+            let toastType = 'Danger';
+            let toastPlacement = 'Top right';
+            await Utils.ToastsNotification("Arribo Negado", Response.message, toastType, toastPlacement);
         }
 
         $('#DateInformationModal').modal('hide');
