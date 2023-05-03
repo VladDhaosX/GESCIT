@@ -219,6 +219,31 @@
             "description": "Internal Server Error"
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Configuración"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "Status": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/configuration/getUserData": {
@@ -297,6 +322,72 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/configuration/GetRolId": {
+      "post": {
+        "tags": [
+          "Configuración"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "RolId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/configuration/UpdateRol": {
+      "post": {
+        "tags": [
+          "Configuración"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "RolId": {
+                  "example": "any"
+                },
+                "Key": {
+                  "example": "any"
+                },
+                "Name": {
+                  "example": "any"
+                },
+                "Description": {
+                  "example": "any"
+                },
+                "StatusId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -1387,6 +1478,43 @@
               "type": "object",
               "properties": {
                 "ScheduleId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/schedule/GetAvailableScheduleTimesWActualSchedule": {
+      "post": {
+        "tags": [
+          "Operaciones"
+        ],
+        "summary": "Obtener horarios disponibles por el Tipo de Operación",
+        "description": "Endpoint que obtiene las horas que hay dentro de un horario dependiendo el Tipo de Operación.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "OperationTypeId": {
+                  "example": "any"
+                },
+                "TransportTypeId": {
+                  "example": "any"
+                },
+                "DateId": {
                   "example": "any"
                 }
               }

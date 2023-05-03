@@ -10,7 +10,7 @@ const swaggerRoutes = require('./swaggerRoutes');
 const scheduleRoutes = require('./ScheduleRoutes');
 const mailRoutes = require('./MailRoutes');
 
-router.use(`/swagger`, swaggerRoutes);
+router.use(`/`, swaggerRoutes);
 
 router.use(`/configuration`, configurationRoutes);
 

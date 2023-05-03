@@ -124,7 +124,7 @@ const PermissionsDataTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         }
@@ -164,7 +164,7 @@ const UpdatePermissionModal = async (e) => {
 
             sessionStorage.setItem("Permissions_UserId", PermissionObj.UserId);
             $('#RolSelect').val(PermissionObj.RolId);
-   
+
             $('#UpdatePermissionModal').modal('show');
         }
     } catch (error) {

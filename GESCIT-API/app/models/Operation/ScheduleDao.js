@@ -1,7 +1,6 @@
 const sql = require('mssql');
 const config = require('../../config/database');
 
-
 module.exports = {
 
     IsAppointmentTimeAvailable: async () => {
@@ -114,4 +113,27 @@ module.exports = {
         }
     },
 
+    SpGetAvailableScheduleTimesWActualSchedule: async (OperationTypeId, TransportTypeId, DateId) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('OperationTypeId', sql.Int, OperationTypeId)
+                .input('TransportTypeId', sql.Int, TransportTypeId)
+                .input('DateId', sql.Int, DateId)
+                .execute('SpGetAvailableScheduleTimesWActualSchedule');
+
+            return {
+                "success": true,
+                "message": "Consulta obtenida correctamente.",
+                "data": result.recordset
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los datos.",
+                "info": error.message
+            }
+        }
+    },
 };

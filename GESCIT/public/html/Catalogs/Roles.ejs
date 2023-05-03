@@ -1,0 +1,83 @@
+<div id="ActionsButtons" class="demo-inline-spacing">
+</div>
+<div class="text-nowrap table-responsive" style="margin: 25px 0px;">
+    <table id="RolesDataTable" class="table hover">
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="ModalRol" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalTittle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="nav-align-top mb-4">
+                    <ul id="btnNavRolInfo" class="nav nav-pills  nav-fill" role="tablist">
+                        <li class="nav-item">
+                            <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab"
+                                data-bs-target="#navRolInfo" aria-controls="navs-top-home" aria-selected="true">
+                                Rol
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button id="btnNavRolPermissions" type="button" class="nav-link" role="tab"
+                                data-bs-toggle="tab" data-bs-target="#navRolPermissions"
+                                aria-controls="navs-top-profile" aria-selected="false">
+                                Permisos
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="navRolInfo" role="tabpanel">
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="txtKey" class="form-label">Llave</label>
+                                    <input type="text" id="txtKey" class="form-control" placeholder="Nombre clave" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="txtName" class="form-label">Nombre</label>
+                                    <input type="text" id="txtName" class="form-control" placeholder="Nombre" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="txtDescription" class="form-label">Descripción</label>
+                                    <input type="text" id="txtDescription" class="form-control"
+                                        placeholder="Descripción" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="ckStatusId"
+                                            checked />
+                                        <label class="form-check-label" for="ckStatusId"> Activo </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="navRolPermissions" role="tabpanel">
+                            <div class="row">
+                                <div class="col-12 table-responsive">
+                                    <table id="ModulesActionsDataTable" class="table hover">
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+                <button id="btnUpdRol" type="button" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

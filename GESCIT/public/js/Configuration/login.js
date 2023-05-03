@@ -101,15 +101,6 @@ const fetchChangePassword = async (token, user, email, NewPassword, ConfirmedNew
 };
 
 const login = async () => {
-    // let blockedUntil = localStorage.getItem('blockedUntil');
-    // if (blockedUntil && Date.now() < blockedUntil) {
-    //     ErrorLoginNotification();
-    //     return;
-    // } else if (blockedUntil && Date.now() > blockedUntil) {
-    //     localStorage.setItem('loginAttempts', 0);
-    //     localStorage.setItem('blockedUntil', null);
-    // };
-
     sessionStorage.removeItem('userId');
     const username = $(`#user`).val();
     const password = $(`#password`).val();
@@ -128,14 +119,11 @@ const login = async () => {
 
     const response = await fetchLogin(username, password);
     if (response.success) {
-        sessionStorage.setItem('userId', response.Id);
+        sessionStorage.setItem('userId', response.UserId);
         if (response.PrivacyNotice == 1) {
             toastType = 'Primary';
             toastPlacement = 'Top right';
-            setTimeout(() => {
-                window.location.href = `Dates`;
-            }, 2500);
-            await ToastsNotification(`Login`, response.message, toastType, toastPlacement);
+            window.location.href = response.Route;
         } else {
             PrivacyNoticeModal();
         };
@@ -183,7 +171,7 @@ const ChangePassword = async () => {
     let toastPlacement = 'Top right';
     if (response.success) {
         setTimeout(() => {
-            window.location.href = `/login`;
+            window.location.href = `/Configuracion/login`;
         }, 2500);
     } else {
         toastType = 'Danger';
@@ -243,7 +231,6 @@ const blockLogin = async () => {
     await ErrorLoginNotification();
 };
 
-
 const ErrorLoginNotification = async () => {
     let loginAttempts = localStorage.getItem('loginAttempts');
     let blockedUntil = localStorage.getItem('blockedUntil');
@@ -251,7 +238,6 @@ const ErrorLoginNotification = async () => {
     let message = loginAttempts < 3 ? `${loginAttempts} de 3 intentos fallidos.` : ` Favor de esperar ${remainingTime} segundos, ha excedido los tres intentos permitidos`;
     await ToastsNotification(`Login`, message, 'Danger', 'Middle center');
 };
-
 
 $(`#btn-login`).click(async function () {
     await login();

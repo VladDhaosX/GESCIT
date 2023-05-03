@@ -4,11 +4,26 @@ const pathname = window.location.pathname;
 
 const fetchUserData = async () => {
     try {
-        const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
+        const userId = sessionStorage.getItem('userId');
+        const ModuleId = sessionStorage.getItem('ModuleId');
         const response = await $.ajax({
             url: `${UtilUrlApi}/configuration/GetUserData`,
             type: 'POST',
-            data: { userId },
+            data: { userId, ModuleId },
+            dataType: 'json'
+        });
+        return response;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const fetchGetRolesActionsByUserIdModuleId = async (UserId,ModuleId) => {
+    try {
+        const response = await $.ajax({
+            url: `${UtilUrlApi}/configuration/GetRolesActionsByUserIdModuleId`,
+            type: 'POST',
+            data: { UserId, ModuleId },
             dataType: 'json'
         });
         return response;
@@ -32,29 +47,37 @@ const createMenu = async () => {
 
     userCategories.forEach((category) => {
         const $categoryHeader = $('<li>').addClass('menu-header small text-uppercase')
-            .append($('<span>').addClass('menu-header-text').text(category.Name));
+            .append($('<span>').addClass('menu-header-text').text(category.Name).attr('style', 'color: #F07D1A'));
 
         $menu.append($categoryHeader);
 
         userData.userModules.filter(module => module.ModuleCategoriesId === category.Id)
             .forEach((module) => {
-                const $moduleItem = $('<li>').addClass('menu-item')
-                    .append($('<a>').attr('href', module.Key).addClass('menu-link')
-                        .append($('<i>').addClass(`menu-icon tf-icons bx ${module.Icon}`))
-                        .append($('<div>').attr('data-i18n', module.Name).text(module.Name)));
+                const $moduleItem = $('<li>')
+                    .addClass('menu-item')
+                    .append($('<a>')
+                        .attr('href', module.Route)
+                        .addClass('menu-link')
+                        .append($('<i>').addClass(`menu-icon tf-icons bx ${module.Icon}`).attr('style', 'color: #00558C'))
+                        .append($('<div>').attr('data-i18n', module.Name).text(module.Name).attr('style', 'color: #00558C'))
+                        .click(function () {
+                            sessionStorage.setItem('ModuleId', module.Id);
+                        })
+                    );
                 $menu.append($moduleItem);
             });
     });
 };
 
-const tooltipTrigger = () => {
+const tooltipTrigger = async () => {
+    $('.tooltip.fade.show').remove();
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 };
 
-const ToastsNotification = async (titulo, message, type, placement) => {
+const ToastsNotification = async (titulo, message, type, placement) =>  {
     try {
         const placementList = {
             'Top left': 'top-0 start-0',
@@ -96,8 +119,36 @@ const ToastsNotification = async (titulo, message, type, placement) => {
     }
 };
 
-if (pathname !== BasePath + '/login') {
-    const userId = sessionStorage.getItem('userId');
-    if (!userId) window.location.href = './login';
-    createMenu();
-}
+const GetRolesActionsByUserIdModuleId = async () => {
+    try {
+        const userId = sessionStorage.getItem('userId');
+        const ModuleId = sessionStorage.getItem('ModuleId');
+        const response = await fetchGetRolesActionsByUserIdModuleId(userId,ModuleId);
+        const permissions = {};
+        response.forEach((perm) => {
+            const Permission = perm.Permission;
+            const ActionKey = perm.ActionKey;
+            if (Permission === 1) {
+                permissions[ActionKey] = true;
+            };
+        });
+        return permissions;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const ValidatePath = () => {
+    if (pathname !== BasePath + '/Configuracion/login') {
+        const userId = sessionStorage.getItem('userId');
+        if (!userId) window.location.href = '/Configuracion/login';
+    };
+};
+
+export { 
+    createMenu, 
+    tooltipTrigger, 
+    ToastsNotification,
+    ValidatePath,
+    GetRolesActionsByUserIdModuleId
+};

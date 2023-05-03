@@ -1,4 +1,8 @@
+import * as Utils from '/js/Utils.js';
+await Utils.ValidatePath();
 const UrlApi = window.__env.UrlApi;
+const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+$.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
     await initPage();
@@ -30,6 +34,11 @@ const initPage = async () => {
         await initDatesXSchedulesDataTable();
     });
 
+    let today = new Date();
+    today.setDate(today.getDate() + 1);
+    $('#txtDate').val(today.toISOString().split('T')[0]);
+    await initDatesXSchedulesDataTable();
+
     tooltipTrigger();
 };
 
@@ -56,7 +65,7 @@ const initDatesXSchedulesDataTable = async () => {
                 columns: columns,
                 "order": [],
                 language: {
-                    url: './js/datatable-esp.json'
+                    url: '/js/datatable-esp.json'
                 }
             });
         };
@@ -67,7 +76,7 @@ const initDatesXSchedulesDataTable = async () => {
 
 // #endregion
 
-//#region fetchs
+//#region fetches
 
 const GetDatesXSchedules = async (date) => {
     try {

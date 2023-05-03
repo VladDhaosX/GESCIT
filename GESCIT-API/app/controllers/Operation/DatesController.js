@@ -61,9 +61,11 @@ module.exports = {
                 const ClientInfoResponse = await MailController.GetClientInfo(DateId);
                 const Client = ClientInfoResponse.data[0];
                 const recipientsList = [Client.Mail];
-                const subject = 'Cita Almer';
-                const body = `Estimado/a cliente ${Client.Cliente}. Le informamos que hemos asignado su cita para la línea de transporte ${Client['Línea de Transporte']} a la(s) ${Client.Hora} del día ${Client.Dia}. Folio de cita: [${Client.Folio}] Agradecemos su preferencia y quedamos a su disposición para cualquier consulta o requerimiento adicional.`;
-                const isBodyHtml = false;
+                const subject = 'Cita Almer ' + Client.Folio;
+                // const body = `Estimado/a cliente ${Client.Cliente}. Le informamos que hemos asignado su cita para la línea de transporte ${Client['Línea de Transporte']} a la(s) ${Client.Hora} del día ${Client.Dia}. Folio de cita: [${Client.Folio}] Agradecemos su preferencia y quedamos a su disposición para cualquier consulta o requerimiento adicional.`;
+                const html = MailController.plantilla(Client.Dia, Client.Hora, Client['Operación'], Client['Línea de Transporte'], Client['Tipo de Transporte'], Client['Placa de Transporte'], Client['Placa de Caja #1'], Client['Placa de Caja #2'], Client['Chófer'], Client['Producto'], Client['Volumen'], Client.Cliente, Client.Folio);
+                const body = html;
+                const isBodyHtml = true;
                 const mailResponse = await MailController.sendMail(recipientsList, subject, body, isBodyHtml);
 
                 const smsMessage = `Almacenadora Mercader S.A. le informa que hemos asignado su cita para la línea de transporte ${Client['Línea de Transporte']} a la(s) ${Client.Hora} del día ${Client.Dia} con el folio  [${Client.Folio}]. Agradecemos su preferencia.`;

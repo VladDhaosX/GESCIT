@@ -12,7 +12,7 @@ module.exports = {
     LOCAL: {
       BasePath: '',
       publicPath: '',
-      urlApi: 'https://portalesdemo.almer.com.mx/GecitApiDev'
+      urlApi: 'http://localhost:8090'
     }
   };
   
