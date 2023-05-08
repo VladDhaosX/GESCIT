@@ -87,6 +87,7 @@ const initPage = async () => {
     await FillSelectTransportType();
     await FillSelectDrivers();
     await FillSelectClient();
+    await FillSelectProductPresentations();
 
     tooltipTrigger();
 
@@ -181,6 +182,25 @@ const FillSelectProducts = async () => {
 
         $('#ProductsSelect').empty();
         $('#ProductsSelect').append($options);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const FillSelectProductPresentations = async () => {
+    try {
+        const data = await GetProductPresentations();
+        console.log(data);
+        var $options = $();
+        const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
+        $options = $options.add($SeleccionaUnaopción);
+        data.forEach(function (value) {
+            const $option = $('<option>').attr('value', value.Id).text(value.Name);
+            $options = $options.add($option);
+        });
+
+        $('#Presentation').empty();
+        $('#Presentation').append($options);
     } catch (error) {
         console.error(error);
     }
@@ -319,6 +339,7 @@ const newDateModal = async () => {
     $('#TransportTypeSelect').val(0);
     $('#ScheduleTimesSelect').val(0);
     $('#TransportPlate2 , #TransportPlate3').parent().hide();
+    $('#Presentation').val(0);
 
     $('#ModalDatesTitle').text('Nueva Cita');
 
@@ -367,9 +388,10 @@ const newDate = async () => {
         const TransportPlate3 = $('#TransportPlate3').val();
         const driverId = $('#DriversSelect').val();
         const Volume = $('#txtVolume').val();
+        const PresentationId =$('#Presentation').val();
 
         const response = await addOrUpdateDates(DateId, userId, ScheduleTimeId, operationTypeId, productId,
-            transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume, Date, Client);
+            transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume, Date, Client, PresentationId);
         let toastType = "Primary";
         let toastPlacement = "Top right";
 
@@ -521,6 +543,7 @@ const ShowEditModal = async (element) => {
         $('#DriversSelect').val(data.DriverId);
         $('#ProductsSelect').val(data.ProductId);
         $('#txtVolume').val(data['Volumen en Toneladas']);
+        $('#Presentation').val(data.PresentationId);
 
         const FechaSolicitud = new Date(data['Fecha de Solicitud']);
         $('#txtDate').val(FechaSolicitud.toISOString().split('T')[0]).attr('disabled', true);

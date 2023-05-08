@@ -91,6 +91,28 @@ const GetProducts = async (userId) => {
     }
 };
 
+const GetProductPresentations = async () =>{
+    try{
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/catalogs/GetPresentation`, type: 'POST', data: {
+                StatusId: 1
+            },
+            dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    }catch (error){
+        console.error(error);
+        $.unblockUI();
+    }
+};
+
 const GetTransportLines = async (userId) => {
     try {
         const response = await $.ajax({
@@ -202,7 +224,7 @@ const GetDates = async (userId, StartDate, EndDate) => {
     }
 };
 
-const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume, Date, AccountNum) => {
+const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume, Date, AccountNum, PresentationId) => {
     try {
         return await $.ajax({
             async: true,
@@ -227,7 +249,8 @@ const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId,
                 driverId,
                 Volume,
                 Date,
-                AccountNum
+                AccountNum,
+                PresentationId
             },
             dataType: 'json'
         });
