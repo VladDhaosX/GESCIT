@@ -317,11 +317,21 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                     },
                     width: "20%"
                 },
-                ...Object.keys(data[0]).map(propName => ({
+                ...Object.keys(data[0]).slice(0, -2).map(propName => ({
                     title: propName,
                     data: propName,
                     visible: !propName.includes('Id')
-                }))
+                })),
+                {
+                    title: 'Fecha de Emisión',
+                    data: 'Fecha de Emisión',
+                    visible: true
+                },
+                {
+                    title: 'Vigencia',
+                    data: 'Vigencia',
+                    visible: true
+                }                
             ];
             $('#DriverDocuments').DataTable({
                 data: data,

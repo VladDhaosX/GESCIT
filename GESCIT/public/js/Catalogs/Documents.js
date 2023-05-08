@@ -458,7 +458,7 @@ const UnreviewedTransportLinesTable = async (AccountNum) => {
                     ` : '';
                 }
             },
-            ...Object.keys(data[0]).map(propName => ({
+            ...Object.keys(data[0]).slice(0, -2).map(propName => ({
                 title: propName,
                 data: propName,
                 visible: !propName.includes('Id'),
@@ -628,7 +628,7 @@ const UnreviewedTransportsTable = async (AccountNum) => {
                                 ` : '';
                 }
             },
-            ...Object.keys(data[0]).map(propName => ({
+            ...Object.keys(data[0]).slice(0, -2).map(propName => ({
                 title: propName,
                 data: propName,
                 visible: !propName.includes('Id'),
@@ -695,7 +695,7 @@ const ApprovedTransportLinesTable = async (AccountNum) => {
                                 ` : '';
                     }
                 },
-                ...Object.keys(data[0]).map(propName => ({
+                ...Object.keys(data[0]).slice(0, -2).map(propName => ({
                     title: propName,
                     data: propName,
                     visible: !propName.includes('Id'),
@@ -831,7 +831,7 @@ const ApprovedTransportsTable = async (AccountNum) => {
                                 ` : '';
                     }
                 },
-                ...Object.keys(data[0]).map(propName => ({
+                ...Object.keys(data[0]).slice(0, -2).map(propName => ({
                     title: propName,
                     data: propName,
                     visible: !propName.includes('Id'),
