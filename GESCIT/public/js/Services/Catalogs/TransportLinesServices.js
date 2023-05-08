@@ -1,6 +1,6 @@
 const UrlApi = window.__env.UrlApi;
 
-const GetTransports = async (userId) => {
+const GetTransportLines = async (userId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -10,7 +10,7 @@ const GetTransports = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/getTransports`, type: 'POST', data: {
+            url: `${UrlApi}/catalogs/getTransportLines`, type: 'POST', data: {
                 userId
             }, // Enviar userId en el cuerpo de la solicitud
             dataType: 'json'
@@ -22,7 +22,7 @@ const GetTransports = async (userId) => {
     }
 };
 
-const GetTransportType = async () => {
+const GetTransportLineType = async () => {
     try {
         const response = await $.ajax({
             async: true,
@@ -31,7 +31,7 @@ const GetTransportType = async () => {
             },
             complete: function () {
                 $.unblockUI();
-            }, url: `${UrlApi}/catalogs/getTransportType`, type: 'GET', dataType: 'json'
+            }, url: `${UrlApi}/catalogs/getTransportLineTypes`, type: 'GET', dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
@@ -40,7 +40,25 @@ const GetTransportType = async () => {
     }
 };
 
-const AddOrUpdateTransport = async (Transport) => {
+const GetTransportLineDocuments = async () => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            }, url: `${UrlApi}/catalogs/getTransportLineDocuments`, type: 'GET', dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
+
+const AddOrUpdateTransportLine = async (TransportLine) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -50,9 +68,11 @@ const AddOrUpdateTransport = async (Transport) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/addOrUpdateTransport`, type: 'POST', data: {
-                Transport
-            }, // Enviar Transport en el cuerpo de la solicitud
+            url: `${UrlApi}/catalogs/addOrUpdateTransportLine`,
+            type: 'POST',
+            data: {
+                TransportLine
+            }, // Enviar TransportLine en el cuerpo de la solicitud
             dataType: 'json'
         });
         return response;
@@ -79,12 +99,11 @@ const GetDocumentsList = async (DocumentType) => {
                 DocumentType: DocumentType
             }
         });
-
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
         console.error(error);
         $.unblockUI();
-    };
+    }
 };
 
 const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
@@ -93,7 +112,7 @@ const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
 
         formData.append('userId', TransportDocumentObj.userId);
         formData.append('TemporalDocumentId', TransportDocumentObj.TemporalDocumentId);
-        formData.append('ModuleId', TransportDocumentObj.TransportId);
+        formData.append('ModuleId', TransportDocumentObj.TransportLineId);
         formData.append('image', TransportDocumentObj.TransportDocumentFile);
         formData.append('DocumentId', TransportDocumentObj.DocumentId);
 
@@ -110,12 +129,11 @@ const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
             processData: false,
             contentType: false
         });
-
         return response;
     } catch (error) {
         console.error(error);
         $.unblockUI();
-    };
+    }
 };
 
 const GetTransportDocument = async (DocumentType, ModuleId, TemporalDocumentId) => {

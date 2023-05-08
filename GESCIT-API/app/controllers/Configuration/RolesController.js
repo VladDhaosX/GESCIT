@@ -15,11 +15,10 @@ module.exports = {
     },
     updateRol: async (req, res) => {
         // #swagger.tags = ['Configuración']
-        const { RolId, Key, Name, Description, StatusKey, Permissions } = req.body;
-        const result = await RolesDao.UpdateRol(RolId, Key, Name, Description, StatusKey, Permissions);
+        const { RolId, Key, Name, Description, StatusKey, Permissions, SubPermissions } = req.body;
+        const result = await RolesDao.UpdateRol(RolId, Key, Name, Description, StatusKey, Permissions, SubPermissions);
         res.json(result);
     },
-    //GetModuleCategoriesByRolId: async (RolId) => {
     getModuleCategoriesByRolId: async (req, res) => {
         // #swagger.tags = ['Configuración']
         const { RolId } = req.body;
@@ -36,6 +35,18 @@ module.exports = {
         // #swagger.tags = ['Configuración']
         const { UserId, ModuleId } = req.body;
         const result = await RolesDao.GetRolesActionsByUserIdModuleId(UserId, ModuleId);
+        res.json(result);
+    },
+    getRolesSubModulesActionsPermissionsByRolId: async (req, res) => {
+        // #swagger.tags = ['Configuración']
+        const { RolId, jsonActionsPermissions } = req.body;
+        const result = await RolesDao.GetRolesSubModulesActionsPermissionsByRolId(RolId, jsonActionsPermissions);
+        res.json(result);
+    },
+    getSubModulesPermissions: async (req, res) => {
+        // #swagger.tags = ['Configuración']
+        const { UserId, ModuleId } = req.body;
+        const result = await RolesDao.GetSubModulesPermissions(UserId, ModuleId);
         res.json(result);
     },
 };

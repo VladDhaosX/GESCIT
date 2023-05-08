@@ -28,4 +28,6 @@ router.post('/GetClientInfoByFolio', DatesController.GetClientInfoByFolioHandler
 
 router.post('/UpdateDateStatus', DatesController.UpdateDateStatusHandler);
 
+router.get('/GetClients', DatesController.GetClientsHandler);
+
 module.exports = router;

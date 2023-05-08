@@ -2,7 +2,7 @@ const sql = require('mssql');
 const config = require('../../config/database');
 
 module.exports = {
-    addOrUpdateDate: async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume) => {
+    addOrUpdateDate: async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume, PresentationId, Date, AccountNum) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -18,6 +18,9 @@ module.exports = {
                 .input('TransportPlate3', sql.VarChar(50), TransportPlate3)
                 .input('DriverId', sql.Int, driverId)
                 .input('Volume', sql.VarChar(50), Volume)
+                .input('PresentationId', sql.Int, PresentationId)
+                .input('DateV', sql.VarChar(sql.MAX), Date)
+                .input('AccountNum', sql.VarChar(sql.MAX), AccountNum)
                 .output('Success', sql.Bit, '0')
                 .output('Message', sql.VarChar(sql.MAX))
                 .execute('SpAddOrUpdateDates');
@@ -290,4 +293,24 @@ module.exports = {
         }
     },
 
+    GetClients: async () => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .execute('SpGetClients');
+
+            return {
+                "success": true,
+                "message": "Clientes obtenidos correctamente.",
+                "data": result.recordset,
+            }
+
+        } catch (error) {
+            return {
+                "success": false,
+                "message": "Error al obtener los Clientes.",
+                "info": error.message
+            }
+        }
+    }
 };

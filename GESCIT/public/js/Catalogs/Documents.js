@@ -1,11 +1,11 @@
-import * as Utils from '/js/Utils.js';
-await Utils.ValidatePath();
 const UrlApi = window.__env.UrlApi;
-const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+let permissions;
 $.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
-    await Utils.createMenu();
+    await ValidatePath();
+    permissions = await GetRolesActionsByUserIdModuleId();
+    await createMenu();
 
     sessionStorage.setItem("CLientId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
@@ -227,14 +227,14 @@ const UnreviewedTable = async () => {
             data: data,
             columns: columns,
             language: {
-                url: '/js/datatable-esp.json'
+                url: '../js/datatable-esp.json'
             },
             columnDefs: [{
                 defaultContent: "",
                 targets: "_all"
             }]
         }).on('draw', async function () {
-            await Utils.tooltipTrigger();
+            tooltipTrigger();
             $('button[action="TransportLinesDocumentsModal"]').off('click').on('click', async function () {
                 await TransportLinesDocumentsModal(this, "unreviewed");
             });
@@ -313,14 +313,14 @@ const ApprovedTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: '/js/datatable-esp.json'
+                    url: '../js/datatable-esp.json'
                 },
                 columnDefs: [{
                     defaultContent: "",
                     targets: "_all"
                 }]
             }).on('draw', async function () {
-                await Utils.tooltipTrigger();
+                tooltipTrigger();
 
                 $('button[action="TransportLinesDocumentsModal"]').off('click').on('click', async function () {
                     await TransportLinesDocumentsModal(this, "approved");
@@ -388,14 +388,14 @@ const EmptyTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: '/js/datatable-esp.json'
+                    url: '../js/datatable-esp.json'
                 },
                 columnDefs: [{
                     defaultContent: "",
                     targets: "_all"
                 }]
             }).on('draw', async function () {
-                await Utils.tooltipTrigger();
+                tooltipTrigger();
 
                 $('button[action="TransportLinesDocumentsModal"]').off('click').on('click', async function () {
                     await TransportLinesDocumentsModal(this, "empty");
@@ -421,7 +421,7 @@ const UnreviewedTransportLinesTable = async (AccountNum) => {
                 title: 'Acciones',
                 data: 'Id',
                 render: function (data, type, row) {
-                    return `
+                    return permissions.EDITAR ? `
                         <button 
                             class="btn rounded-pill btn-icon btn-outline-primary"
                             type="button" 
@@ -455,7 +455,7 @@ const UnreviewedTransportLinesTable = async (AccountNum) => {
                         >
                             <span class="tf-icons bx bx-x">
                         </button>
-                    `;
+                    ` : '';
                 }
             },
             ...Object.keys(data[0]).map(propName => ({
@@ -469,14 +469,14 @@ const UnreviewedTransportLinesTable = async (AccountNum) => {
             data: data,
             columns: columns,
             language: {
-                url: '/js/datatable-esp.json'
+                url: '../js/datatable-esp.json'
             },
             columnDefs: [{
                 defaultContent: "",
                 targets: "_all"
             }]
         }).on('draw', async function () {
-            await Utils.tooltipTrigger();
+            tooltipTrigger();
             $('button[action="DownloadDocument"]').off('click').on('click', async function () {
                 await DownloadDocument(this);
             });
@@ -506,7 +506,7 @@ const UnreviewedDriversTable = async (AccountNum) => {
                 title: 'Acciones',
                 data: 'Id',
                 render: function (data, type, row) {
-                    return `
+                    return permissions.EDITAR ? `
                         <button 
                             class="btn rounded-pill btn-icon btn-outline-primary"
                             type="button" 
@@ -540,7 +540,7 @@ const UnreviewedDriversTable = async (AccountNum) => {
                         >
                             <span class="tf-icons bx bx-x">
                         </button>
-                    `
+                    ` : '';
                 }
             },
             ...Object.keys(data[0]).map(propName => ({
@@ -554,14 +554,14 @@ const UnreviewedDriversTable = async (AccountNum) => {
             data: data,
             columns: columns,
             language: {
-                url: '/js/datatable-esp.json'
+                url: '../js/datatable-esp.json'
             },
             columnDefs: [{
                 defaultContent: "",
                 targets: "_all"
             }]
         }).on('draw', async function () {
-            await Utils.tooltipTrigger();
+            tooltipTrigger();
             $('button[action="DownloadDocument"]').off('click').on('click', async function () {
                 await DownloadDocument(this);
             });
@@ -591,7 +591,7 @@ const UnreviewedTransportsTable = async (AccountNum) => {
                 title: 'Acciones',
                 data: 'Id',
                 "render": function (data, type, row) {
-                    return `
+                    return permissions.EDITAR ? `
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary"
                                         type="button" 
@@ -625,7 +625,7 @@ const UnreviewedTransportsTable = async (AccountNum) => {
                                     >
                                         <span class="tf-icons bx bx-x">
                                     </button>
-                                `
+                                ` : '';
                 }
             },
             ...Object.keys(data[0]).map(propName => ({
@@ -640,14 +640,14 @@ const UnreviewedTransportsTable = async (AccountNum) => {
             data: data,
             columns: columns,
             language: {
-                url: '/js/datatable-esp.json'
+                url: '../js/datatable-esp.json'
             },
             columnDefs: [{
                 defaultContent: "",
                 targets: "_all"
             }]
         }).on('draw', async function () {
-            await Utils.tooltipTrigger();
+            tooltipTrigger();
             $('button[action="DownloadDocument"]').off('click').on('click', async function () {
                 await DownloadDocument(this);
             });
@@ -679,7 +679,7 @@ const ApprovedTransportLinesTable = async (AccountNum) => {
                     title: 'Acciones',
                     data: 'Id',
                     "render": function (data, type, row) {
-                        return `
+                        return permissions.EDITAR ? `
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary"
                                         type="button" 
@@ -692,8 +692,7 @@ const ApprovedTransportLinesTable = async (AccountNum) => {
                                     >
                                         <span class="tf-icons bx bx-download"></span>
                                     </button>
-                                    
-                                `
+                                ` : '';
                     }
                 },
                 ...Object.keys(data[0]).map(propName => ({
@@ -707,7 +706,7 @@ const ApprovedTransportLinesTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: '/js/datatable-esp.json'
+                    url: '../js/datatable-esp.json'
                 }
             });
         }
@@ -739,7 +738,7 @@ const EmptyTransportLineTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: '/js/datatable-esp.json'
+                    url: '../js/datatable-esp.json'
                 }
             });
         }
@@ -764,7 +763,7 @@ const ApprovedDriversTable = async (AccountNum) => {
                     title: 'Acciones',
                     data: 'Id',
                     "render": function (data, type, row) {
-                        return `
+                        return permissions.EDITAR ? `
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary"
                                         type="button" 
@@ -777,8 +776,7 @@ const ApprovedDriversTable = async (AccountNum) => {
                                     >
                                         <span class="tf-icons bx bx-download"></span>
                                     </button>
-                                    
-                                `
+                                ` : '';
                     }
                 },
                 ...Object.keys(data[0]).map(propName => ({
@@ -792,7 +790,7 @@ const ApprovedDriversTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: '/js/datatable-esp.json'
+                    url: '../js/datatable-esp.json'
                 }
             });
         }
@@ -817,7 +815,7 @@ const ApprovedTransportsTable = async (AccountNum) => {
                     title: 'Acciones',
                     data: 'Id',
                     "render": function (data, type, row) {
-                        return `
+                        return permissions.EDITAR ? `
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary"
                                         type="button" 
@@ -830,8 +828,7 @@ const ApprovedTransportsTable = async (AccountNum) => {
                                     >
                                         <span class="tf-icons bx bx-download"></span>
                                     </button>
-                                    
-                                `
+                                ` : '';
                     }
                 },
                 ...Object.keys(data[0]).map(propName => ({
@@ -845,7 +842,7 @@ const ApprovedTransportsTable = async (AccountNum) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: '/js/datatable-esp.json'
+                    url: '../js/datatable-esp.json'
                 }
             });
         }
@@ -870,7 +867,7 @@ const TransportLinesDocumentsModal = async (e, Status) => {
         if (data?.length <= 0) {
             const toastType = 'Danger';
             const toastPlacement = 'Top right';
-            await Utils.ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
+            ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
             return;
         };
 
@@ -900,7 +897,7 @@ const DriversDocumentsModal = async (e, Status) => {
         if (data?.length <= 0) {
             toastType = 'Danger';
             toastPlacement = 'Top right';
-            await Utils.ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
+            ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
             return;
         };
 
@@ -933,7 +930,7 @@ const TransportsDocumentsModal = async (e, Status) => {
         else {
             toastType = 'Danger';
             toastPlacement = 'Top right';
-            await Utils.ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
+            ToastsNotification("No Existen Documentos", "El apartado que está intentando consultar se encuentra vacío.", toastType, toastPlacement);
         }
 
     } catch (error) {
@@ -965,7 +962,7 @@ const ApproveDocument = async (e) => {
             const DocumentType = sessionStorage.getItem('DocumentType');
             toastType = 'Primary';
             toastPlacement = 'Top right';
-            await Utils.ToastsNotification("Documento Aprobado", "El documento ha sido aprobado correctamente.", toastType, toastPlacement);
+            ToastsNotification("Documento Aprobado", "El documento ha sido aprobado correctamente.", toastType, toastPlacement);
             if (DocumentType == 'Chofer') {
                 await UnreviewedDriversTable(AccountNum);
             }
@@ -979,7 +976,7 @@ const ApproveDocument = async (e) => {
         else {
             toastType = 'Danger';
             toastPlacement = 'Top right';
-            await Utils.ToastsNotification("Falla en Aprobación", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
+            ToastsNotification("Falla en Aprobación", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
         }
     }
 };
@@ -988,7 +985,7 @@ const RejectDocument = async (e) => {
     if (!e) {
         toastType = 'Danger';
         toastPlacement = 'Top right';
-        await Utils.ToastsNotification("Falla en Rechazo", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
+        ToastsNotification("Falla en Rechazo", "El documento no pudo ser actualizado (400).", toastType, toastPlacement);
         return;
     };
 
@@ -1003,7 +1000,7 @@ const RejectDocument = async (e) => {
         const DocumentType = sessionStorage.getItem('DocumentType');
         const toastType = 'Primary';
         const toastPlacement = 'Top right';
-        await Utils.ToastsNotification("Documento Rechazado", "El documento ha sido rechazado correctamente.", toastType, toastPlacement);
+        ToastsNotification("Documento Rechazado", "El documento ha sido rechazado correctamente.", toastType, toastPlacement);
 
         if (DocumentType == 'Chofer') {
             await UnreviewedDriversTable(AccountNum);

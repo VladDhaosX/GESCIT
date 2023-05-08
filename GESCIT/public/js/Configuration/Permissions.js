@@ -1,11 +1,16 @@
 const UrlApi = window.__env.UrlApi;
+let permissions;
+$.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
+    await ValidatePath();
+    permissions = await GetRolesActionsByUserIdModuleId();
+    await createMenu();
     await initButtons();
     await PermissionsDataTable(true);
     await FillSelectRol();
 
-    await tooltipTrigger();
+    tooltipTrigger();
 });
 
 const GetPermissions = async () => {
@@ -28,6 +33,7 @@ const GetPermissions = async () => {
         $.unblockUI();
     }
 };
+
 const GetRoles = async () => {
     try {
         const response = await $.ajax({
@@ -45,6 +51,7 @@ const GetRoles = async () => {
         $.unblockUI();
     }
 };
+
 const UpdatePermission = async (permissionUserId, RolId) => {
     try {
         const response = await $.ajax({
@@ -79,36 +86,36 @@ const initButtons = async () => {
         console.error(error);
     }
 };
+
 const PermissionsDataTable = async () => {
     try {
         if ($.fn.DataTable.isDataTable('#PermissionTable')) {
-            // Si la tabla está inicializada, destruye la instancia de DataTables asociada al elemento HTML
             $('#PermissionTable').DataTable().destroy();
         }
 
-        const userId = sessionStorage.getItem('userId'); // Obtener userId de la variable de sesión
+        const userId = sessionStorage.getItem('userId');
         const data = await GetPermissions(userId);
         if (data.length > 0) {
-            // Crea el arreglo de objetos para las columnas del DataTable
             const columns = [
                 {
                     title: 'Acciones',
                     data: 'Id',
                     "render": function (data, type, row) {
-                        return `
+                        let buttons = '';
+                        permissions.EDITAR ? buttons += `<button
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary" 
                                         type="button" 
-                                        id="UpdatePermissionTableButton"
                                         data='${JSON.stringify(row)}'
                                         title='Editar'
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
-                                        onclick='UpdatePermissionModal(this);'
+                                        action='UpdatePermissionModal'
                                     >
                                         <span class="tf-icons bx bx-edit-alt"></span>
                                     </button>
-                                `
+                                ` : '';
+                        return buttons;
                     }
                 },
                 ...Object.keys(data[0]).map(propName => ({
@@ -124,14 +131,20 @@ const PermissionsDataTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: '/js/datatable-esp.json'
+                    url: '../js/datatable-esp.json'
                 }
+            }).on('draw', function () {
+                tooltipTrigger();
+                $('[action="UpdatePermissionModal"]').click(function () {
+                    UpdatePermissionModal(this);
+                });
             });
         }
     } catch (error) {
         console.error(error);
     }
 };
+
 const FillSelectRol = async () => {
     try {
         const data = await GetRoles();
@@ -139,7 +152,7 @@ const FillSelectRol = async () => {
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
         $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
-            const $option = $('<option>').attr('value', value.Id).text(value.Rol);
+            const $option = $('<option>').attr('value', value.RolId).text(value.Nombre);
             $options = $options.add($option);
         });
 
@@ -149,18 +162,12 @@ const FillSelectRol = async () => {
         console.error(error);
     }
 };
+
 const UpdatePermissionModal = async (e) => {
     try {
         if (e) {
             const Permission = $(e).attr('data');
             const PermissionObj = JSON.parse(Permission);
-
-            if (PermissionObj.RolId == 4) {
-                $('#UpdatePermissionButton').hide();
-            }
-            else {
-                $('#UpdatePermissionButton').show();
-            };
 
             sessionStorage.setItem("Permissions_UserId", PermissionObj.UserId);
             $('#RolSelect').val(PermissionObj.RolId);
@@ -171,6 +178,7 @@ const UpdatePermissionModal = async (e) => {
         console.error(error);
     }
 };
+
 const UpdatePermissionButton = async () => {
     try {
         const Permissions_UserId = sessionStorage.getItem("Permissions_UserId");
@@ -184,7 +192,7 @@ const UpdatePermissionButton = async () => {
             $('#UpdatePermissionModal').modal('hide');
         }
 
-        await ToastsNotification("Permissiones", response.message, toastType, toastPlacement);
+        ToastsNotification("Permissiones", response.message, toastType, toastPlacement);
         await PermissionsDataTable(false);
         await createMenu();
     } catch (error) {

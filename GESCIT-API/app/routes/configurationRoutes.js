@@ -32,4 +32,8 @@ router.post('/GetRolesActionsPermissionsByRolId', RolesController.getRolesAction
 
 router.post('/GetRolesActionsByUserIdModuleId', RolesController.getRolesActionsByUserIdModuleId);
 
+router.post('/GetRolesSubModulesActionsPermissionsByRolId', RolesController.getRolesSubModulesActionsPermissionsByRolId);
+
+router.post('/GetSubModulesPermissions', RolesController.getSubModulesPermissions);
+
 module.exports = router;

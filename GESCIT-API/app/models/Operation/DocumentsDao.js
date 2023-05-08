@@ -3,30 +3,7 @@ const config = require('../../config/database');
 
 module.exports = {
 
-    GetTransportDocument: async (TransportId, TemporalDocumentId) => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('TransportId', sql.Int, TransportId)
-                .input('TemporalDocumentId', sql.Int, TemporalDocumentId)
-                .execute('SpGetTransportDocument');
-
-            return {
-                success: true,
-                message: "Consulta realizada con exito.",
-                data: result.recordset
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message,
-                error: error,
-            };
-        }
-    },
-
-    // <--- TRANSPORT LINES ROUTES ---> 
-    AddOrUpdateLineDocuments: async (fileContent, userId, temporalDocumentId, documentId, moduleId, fieldName, originalName, mimetype, size) => {
+    AddDocumentFile: async (fileContent, userId, temporalDocumentId, documentId, moduleId, fieldName, originalName, mimetype, size, ExpiredDate, IssueDate) => {
         try {
             const fileData = Buffer.from(fileContent);
             let pool = await sql.connect(config);
@@ -40,114 +17,8 @@ module.exports = {
                 .input('Mimetype', sql.VarChar(255), mimetype)
                 .input('FileData', sql.VarBinary(sql.MAX), fileData)
                 .input('Size', sql.INT, size)
-                .output('Success', sql.BIT)
-                .output('Message', sql.VarChar(sql.MAX))
-                .execute('SpAddOrUpdateLineDocuments');
-            return {
-                success: result.output.Success,
-                message: result.output.Message,
-                TemporalDocumentId: result.output.TemporalDocumentId
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message,
-                error: error,
-            };
-        }
-    },
-
-    GetLineDocuments: async (TransportLineId, TemporalDocumentId) => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('TransportLineId', sql.Int, TransportLineId)
-                .input('TemporalDocumentId', sql.Int, TemporalDocumentId)
-                .execute('SpGetLineDocuments');
-
-            return {
-                success: true,
-                message: "Consulta realizada con exito.",
-                data: result.recordset
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message,
-                error: error,
-            };
-        }
-    },
-
-    // <--- DRIVERS ROUTES ---> 
-    AddOrUpdateDriverDocument: async (fileContent, userId, temporalDocumentId, documentId, moduleId, fieldName, originalName, mimetype, size) => {
-        try {
-            const fileData = Buffer.from(fileContent);
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('UserId', sql.INT, userId)
-                .output('TemporalDocumentId', sql.INT, temporalDocumentId)
-                .input('DocumentId', sql.INT, documentId)
-                .input('ModuleId', sql.INT, moduleId)
-                .input('FieldName', sql.VarChar(255), fieldName)
-                .input('OriginalName', sql.VarChar(255), originalName)
-                .input('Mimetype', sql.VarChar(255), mimetype)
-                .input('FileData', sql.VarBinary(sql.MAX), fileData)
-                .input('Size', sql.INT, size)
-                .output('Success', sql.BIT)
-                .output('Message', sql.VarChar(sql.MAX))
-                .execute('SpAddOrUpdateDriverDocument');
-
-            return {
-                success: result.output.Success,
-                message: result.output.Message,
-                TemporalDocumentId: result.output.TemporalDocumentId
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message,
-                error: error,
-            };
-        }
-    },
-
-    GetDriverDocuments: async (DriverId, TemporalDocumentId) => {
-        try {
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('DriverId', sql.Int, DriverId)
-                .input('TemporalDocumentId', sql.Int, TemporalDocumentId)
-                .execute('SpGetDriverDocuments');
-
-            return {
-                success: true,
-                message: "Consulta realizada con exito.",
-                data: result.recordset
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: error.message,
-                error: error,
-            };
-        }
-    },
-
-    AddDocumentFile: async (fileContent, userId, temporalDocumentId, documentId, moduleId, fieldName, originalName, mimetype, size) => {
-        try {
-            const fileData = Buffer.from(fileContent);
-            let pool = await sql.connect(config);
-            let result = await pool.request()
-                .input('UserId', sql.INT, userId)
-                .output('TemporalDocumentId', sql.INT, temporalDocumentId)
-                .input('DocumentId', sql.INT, documentId)
-                .input('ModuleId', sql.INT, moduleId)
-                .input('FieldName', sql.VarChar(255), fieldName)
-                .input('OriginalName', sql.VarChar(255), originalName)
-                .input('Mimetype', sql.VarChar(255), mimetype)
-                .input('FileData', sql.VarBinary(sql.MAX), fileData)
-                .input('Size', sql.INT, size)
+                .input('ExpiredDate', sql.DateTime, ExpiredDate)
+                .input('IssueDate', sql.DateTime, IssueDate)
                 .output('Success', sql.BIT)
                 .output('Message', sql.VarChar(sql.MAX))
                 .execute('SpAddDocumentFile');
@@ -177,7 +48,7 @@ module.exports = {
 
             return {
                 success: true,
-                message: "Consulta realizada con exito.",
+                message: "Consulta realizada con éxito.",
                 data: result.recordset
             };
         }
@@ -277,5 +148,53 @@ module.exports = {
                 error: error,
             };
         }
-    }
+    },
+
+    SaveDriverPhoto: async (DateId, fileContent, fieldname, originalname, mimetype, size) => {
+        try {
+            const fileData = Buffer.from(fileContent);
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('DateId', sql.Int, DateId)
+                .input('FieldName', sql.VarChar(255), fieldname)
+                .input('OriginalName', sql.VarChar(255), originalname)
+                .input('Mimetype', sql.VarChar(255), mimetype)
+                .input('FileData', sql.VarBinary(sql.MAX), fileData)
+                .input('Size', sql.INT, size)
+                .output('Success', sql.BIT)
+                .output('Message', sql.VarChar(sql.MAX))
+                .execute('SpSaveDriverPhoto');
+
+            return {
+                success: result.output.Success,
+                message: result.output.Message,
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: error.message,
+                error: error,
+            };
+        }
+    },
+    GetDriverPhoto: async (DateId) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('DateId', sql.Int, DateId)
+                .execute('SpGetDriverPhoto');
+
+            return {
+                success: true,
+                message: "Consulta realizada con exito.",
+                data: result.recordset[0]
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: error.message,
+                error: error,
+            };
+        }
+    },
 };

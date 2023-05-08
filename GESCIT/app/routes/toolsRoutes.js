@@ -9,9 +9,10 @@ router.get('/CitasPorHorario', (req, res) => {
         Page: 'tools/DatesXSchedules',
         Categoría: 'Herramientas',
         Modulo: 'Numero de Citas por Horario',
-        JSFile: '/js/tools/DatesXSchedules.js',
+       JSFile: config.BasePath + '/js/tools/DatesXSchedules.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
+        ServiceFile: config.BasePath + '/js/Services/tools/DatesXSchedulesServices.js',
     };
     res.render('views', data);
 });

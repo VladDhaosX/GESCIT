@@ -202,7 +202,7 @@ const GetDates = async (userId, StartDate, EndDate) => {
     }
 };
 
-const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume) => {
+const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume, Date, AccountNum) => {
     try {
         return await $.ajax({
             async: true,
@@ -212,7 +212,23 @@ const addOrUpdateDates = async (DateId, userId, ScheduleTimeId, operationTypeId,
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/addOrUpdateDates`, type: 'POST', data: { DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, transportTypeId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume },
+            url: `${UrlApi}/dates/addOrUpdateDates`, type: 'POST', data: {
+                DateId,
+                userId,
+                ScheduleTimeId,
+                operationTypeId,
+                productId,
+                transportLineId,
+                transportId,
+                transportTypeId,
+                TransportPlate,
+                TransportPlate2,
+                TransportPlate3,
+                driverId,
+                Volume,
+                Date,
+                AccountNum
+            },
             dataType: 'json'
         });
     } catch (error) {
@@ -312,19 +328,53 @@ const GetAvailableScheduleTimesWActualSchedule = async (OperationTypeId, Transpo
     }
 };
 
-export { 
-    GetScheduleTimes
-    , GetScheduleAvailable
-    , GetOperationTypes
-    , GetProducts
-    , GetTransportLines
-    , GetTransportPlate1
-    , GetTransportType
-    , GetDrivers
-    , GetDates
-    , addOrUpdateDates
-    , IsAppointmentTimeAvailable
-    , CancelDate
-    , GetScheduleAvailables
-    , GetAvailableScheduleTimesWActualSchedule
+const GetDriverPhoto = async (DateId) => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/documents/GetDriverPhoto`, type: 'POST', data: {
+                DateId
+            },
+            dataType: 'binary',
+            xhrFields: {
+                responseType: 'blob'
+            }
+        });
+
+        return new Promise((resolve, reject) => {
+            if (response.size == 0) return reject(false);
+            const reader = new FileReader();
+            reader.readAsDataURL(response);
+
+            reader.onload = () => {
+                const base64Img = reader.result;
+                resolve(base64Img);
+            };
+            reader.onerror = () => {
+                reject('Error al leer el archivo');
+            };
+        });
+    } catch (error) {
+        $.unblockUI();
+    }
+};
+
+const GetClients = async () => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            url: `${UrlApi}/dates/GetClients`,
+            type: 'GET',
+            dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+    }
 };

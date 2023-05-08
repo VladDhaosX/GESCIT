@@ -1,6 +1,6 @@
 const UrlApi = window.__env.UrlApi;
 
-const GetAllHoursOfSchedule = async (ScheduleId) => {
+const GetRoles = async (Status) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -10,31 +10,9 @@ const GetAllHoursOfSchedule = async (ScheduleId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/schedule/GetAllHoursOfSchedule`, type: 'POST', data: {
-                ScheduleId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-const GetDates = async (userId, StartDate, EndDate, Status) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/dates/GetDates`, type: 'POST', data: {
-                userId,
-                StartDate,
-                EndDate,
+            url: `${UrlApi}/configuration/GetRoles`,
+            type: 'POST',
+            data: {
                 Status
             },
             dataType: 'json'
@@ -45,7 +23,8 @@ const GetDates = async (userId, StartDate, EndDate, Status) => {
         $.unblockUI();
     }
 };
-const GetSchedules = async () => {
+
+const GetRolId = async (RolId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -55,8 +34,11 @@ const GetSchedules = async () => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/schedule/GetSchedules`,
-            type: 'GET',
+            url: `${UrlApi}/configuration/GetRolId`,
+            type: 'POST',
+            data: {
+                RolId
+            },
             dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
@@ -65,7 +47,8 @@ const GetSchedules = async () => {
         $.unblockUI();
     }
 };
-const PostAssignDateHour = async (DateId, Hour, Minutes) => {
+
+const UpdateRol = async (RolId, Name, Description, StatusKey, Permissions, SubPermissions) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -75,10 +58,15 @@ const PostAssignDateHour = async (DateId, Hour, Minutes) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/dates/AssignDateHour`, type: 'POST', data: {
-                DateId,
-                Hour,
-                Minutes
+            url: `${UrlApi}/configuration/UpdateRol`,
+            type: 'POST',
+            data: {
+                RolId,
+                Name,
+                Description,
+                StatusKey,
+                Permissions,
+                SubPermissions
             },
             dataType: 'json'
         });
@@ -86,9 +74,10 @@ const PostAssignDateHour = async (DateId, Hour, Minutes) => {
     } catch (error) {
         console.error(error);
         $.unblockUI();
-    };
+    }
 };
-const ReSendSms = async (DateId, PhoneNumber) => {
+
+const GetModuleCategoriesByRolId = async (RolId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -98,18 +87,21 @@ const ReSendSms = async (DateId, PhoneNumber) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/mail/ReSendSms`, type: 'POST', data: {
-                DateId,
-                PhoneNumber
+            url: `${UrlApi}/configuration/GetModuleCategoriesByRolId`,
+            type: 'POST',
+            data: {
+                RolId
             },
             dataType: 'json'
         });
-        return response;
+        return response.success ? response.data : console.log(response.message);
     } catch (error) {
         console.error(error);
-    };
+        $.unblockUI();
+    }
 };
-const ReSendMail = async (DateId, Mail) => {
+
+const GetRolesActionsPermissionsByRolId = async (RolId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -119,14 +111,41 @@ const ReSendMail = async (DateId, Mail) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/mail/ReSendMail`, type: 'POST', data: {
-                DateId,
-                Mail
+            url: `${UrlApi}/configuration/GetRolesActionsPermissionsByRolId`,
+            type: 'POST',
+            data: {
+                RolId
             },
             dataType: 'json'
         });
-        return response;
+        return response.success ? response.data : console.log(response.message);
     } catch (error) {
         console.error(error);
-    };
+        $.unblockUI();
+    }
+};
+
+const GetRolesSubModulesActionsPermissionsByRolId = async (RolId, jsonActionsPermissions) => {
+    try {
+        const response = await $.ajax({
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
+            },
+            complete: function () {
+                $.unblockUI();
+            },
+            url: `${UrlApi}/configuration/GetRolesSubModulesActionsPermissionsByRolId`,
+            type: 'POST',
+            data: {
+                RolId,
+                jsonActionsPermissions
+            },
+            dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
 };

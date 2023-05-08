@@ -8,8 +8,9 @@ module.exports = {
         // #swagger.summary = 'Agregar o actualizar una cita.'
         // #swagger.description = 'Endpoint que recibe los datos de una cita, valida cada dato y si el horario está disponible, crea o actualiza la cita.'
         try {
-            const { DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume } = req.body;
-            const result = await DatesDao.addOrUpdateDate(DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume);
+            const { DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume, PresentationId, Date, AccountNum } = req.body;
+            console.log(req.body);
+            const result = await DatesDao.addOrUpdateDate(DateId, userId, ScheduleTimeId, operationTypeId, productId, transportLineId, transportId, TransportPlate, TransportPlate2, TransportPlate3, driverId, Volume, PresentationId, Date, AccountNum);
             res.json(result);
         } catch (error) {
             console.error(error);
@@ -186,4 +187,14 @@ module.exports = {
             res.status(500).json({ message: error.message, info: error });
         }
     },
+
+    GetClientsHandler: async (req, res) => {
+        // #swagger.tags = ['Operaciones']
+        try {
+            const response = await DatesDao.GetClients();
+            res.json(response);
+        } catch (error) {
+            res.status(500).json({ message: error.message, info: error });
+        }
+    }
 };

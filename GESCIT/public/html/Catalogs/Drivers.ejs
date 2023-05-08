@@ -4,7 +4,6 @@
     <table id="DriversTable" class="table hover">
     </table>
 </div>
-<!-- Modal -->
 <div class="modal fade" id="AddOrUpdateDriverModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
@@ -56,30 +55,33 @@
                             </div>
                         </div>
                         <div class="tab-pane fade" id="navsDocsModal" role="tabpanel">
-                            <div class="row">
-                                <div class="col mb-3">
-                                    <label for="DocumentDriverSelect" class="form-label">Tipo de Documento</label>
-                                    <select id="DocumentDriverSelect" class="form-select">
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-11">
-                                    <label for="formFile" class="form-label">Documento</label>
-                                    <input class="form-control" type="file" id="DriverDocument"
-                                        style="color: transparent" />
-                                    <div id="defaultFormControlHelp" class="form-text">
-                                        <label for="defaultFormControlHelp" style="padding-left: 60%;">
-                                            Tamaño máximo permitido: 10 MB
-                                        </label>
+                            <div id="divCreateDocument">
+                                <div class="row">
+                                    <div class="col mb-3">
+                                        <label for="DocumentDriverSelect" class="form-label">Tipo de Documento</label>
+                                        <select id="DocumentDriverSelect" class="form-select">
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="col-md-1" style="padding-top: 30px;">
-                                    <button id="AddOrUpdateDriverDocumentButton" type="button" title="Guardar Documento"
-                                        class="btn rounded-pill btn-icon btn-outline-primary" data-bs-toggle="tooltip"
-                                        data-bs-placement="top">
-                                        <span class="tf-icons bx bx-plus"></span>
-                                    </button>
+                                <div class="row">
+                                    <div class="col-md-11">
+                                        <label for="formFile" class="form-label">Documento</label>
+                                        <input class="form-control" type="file" id="DriverDocument"
+                                            style="color: transparent" />
+                                        <div id="defaultFormControlHelp" class="form-text">
+                                            <label for="defaultFormControlHelp" style="padding-left: 60%;">
+                                                Tamaño máximo permitido: 10 MB
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1" style="padding-top: 30px;">
+                                        <button id="AddOrUpdateDriverDocumentButton" type="button"
+                                            title="Guardar Documento"
+                                            class="btn rounded-pill btn-icon btn-outline-primary"
+                                            data-bs-toggle="tooltip" data-bs-placement="top">
+                                            <span class="tf-icons bx bx-plus"></span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">

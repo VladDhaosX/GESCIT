@@ -1,14 +1,11 @@
-import * as Utils from '/js/Utils.js';
-import * as AssignDatesServices from '/js/Services/Dates/AssignDatesServices.js';
 
-await Utils.ValidatePath();
-const UrlApi = window.__env.UrlApi;
-const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+let permissions;
 $.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
-    console.log(permissions);
-    await Utils.createMenu();
+    await ValidatePath();
+    permissions = await GetRolesActionsByUserIdModuleId();
+    await createMenu();
     await initPage();
 });
 
@@ -67,6 +64,10 @@ const initPage = async () => {
         await initDatesDataTable('arrival', 'Today');
     });
 
+    $('#NavTodayNotAssigned').on('shown.bs.tab', async function (e) {
+        await initDatesDataTable('notassigned', 'Today');
+    });
+
     // btnSendSms ONCLICK
     $('#btnSendSms').on('click', async function () {
         const PhoneNumber = $('#txtPhoneNumber').val();
@@ -76,10 +77,10 @@ const initPage = async () => {
         let toastType = "Primary";
         let toastPlacement = "Top right";
         if (response.returnCodeInformation.success) {
-            await Utils.ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
+            ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
         } else {
             toastType = "Danger";
-            await Utils.ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
+            ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
         };
     });
 
@@ -89,9 +90,9 @@ const initPage = async () => {
         const DateId = sessionStorage.getItem('DateId');
         const response = await ReSendMail(DateId, Email);
         if (response.returnCodeInformation.success) {
-            await Utils.ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
+            ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
         } else {
-            await Utils.ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
+            ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
         };
     });
 
@@ -124,7 +125,7 @@ const initPage = async () => {
 
     await initDatesDataTable('pending', 'Tomorrow');
 
-    await Utils.tooltipTrigger();
+    tooltipTrigger();
 };
 
 const initDatesDataTable = async (Status, Day) => {
@@ -132,7 +133,7 @@ const initDatesDataTable = async (Status, Day) => {
         const userId = sessionStorage.getItem('userId');
         const StartDate = $('#txtDate').val();
         const EndDate = $('#txtDate').val();
-        const getDatesData = await AssignDatesServices.GetDates(userId, StartDate, EndDate, Status);
+        const getDatesData = await GetDates(userId, StartDate, EndDate, Status);
 
         const titles = ['01:00 AM a 08:00 AM', '08:01 AM a 12:00 PM', '12:01 PM a 04:00 PM', '04:01 PM a 08:00 PM'];
 
@@ -172,7 +173,7 @@ const initDatesDataTable = async (Status, Day) => {
                     ],
                     dom: '',
                     language: {
-                        url: '/js/datatable-esp.json'
+                        url: '../js/datatable-esp.json'
                     },
                     columnDefs: [{
                         defaultContent: "",
@@ -182,7 +183,7 @@ const initDatesDataTable = async (Status, Day) => {
                     $table.find('label').on('click', function () {
                         ViewDateData(this);
                     });
-                    Utils.tooltipTrigger();
+                    tooltipTrigger();
                 });
             };
         };
@@ -255,6 +256,15 @@ const ViewDateData = async (element) => {
             $('#btnSendSms').hide();
             $('#btnSendMail').hide();
             $('#divHoraArribo').hide();
+        } else if (data.Estatus == 'No asignada') {
+            $('#selectHour').attr('disabled', false);
+            $('#selectMinutes').attr('disabled', false);
+            $('#btnAssignDateHour').show();
+            $('#txtPhoneNumber').parent().hide();
+            $('#txtMail').parent().hide();
+            $('#btnSendSms').hide();
+            $('#btnSendMail').hide();
+            $('#divHoraArribo').hide();
         };
 
         permissions.CREAR ? $('#btnAssignDateHour').show() : $('#btnAssignDateHour').hide();
@@ -266,7 +276,7 @@ const ViewDateData = async (element) => {
 
 const FillSelectHour = async (ScheduleId) => {
     try {
-        const AllHoursOfSchedule = await AssignDatesServices.GetAllHoursOfSchedule(ScheduleId);
+        const AllHoursOfSchedule = await GetAllHoursOfSchedule(ScheduleId);
         $('#selectHour').empty();
         $('#selectHour').append(`<option value="0">Seleccione una hora</option>`);
         AllHoursOfSchedule.forEach(x => {
@@ -282,7 +292,7 @@ const AssignDateHour = async () => {
         const DateId = sessionStorage.getItem('DateId');
         const Hour = $('#selectHour').val();
         const Minutes = $('#selectMinutes').val();
-        const response = await AssignDatesServices.PostAssignDateHour(DateId, Hour, Minutes);
+        const response = await PostAssignDateHour(DateId, Hour, Minutes);
         let toastType = "Primary";
         let toastPlacement = "Top right";
 
@@ -293,11 +303,11 @@ const AssignDateHour = async () => {
         if (response.success != undefined && response.success == false) {
             toastType = "Danger";
             toastPlacement = "Middle center";
-            await Utils.ToastsNotification("Citas", response.message, toastType, toastPlacement);
+            ToastsNotification("Citas", response.message, toastType, toastPlacement);
         };
 
         if (assignResponse.success) {
-            await Utils.ToastsNotification("Citas", assignResponse.message, toastType, toastPlacement);
+            ToastsNotification("Citas", assignResponse.message, toastType, toastPlacement);
             $('#ModalDateInfo').modal('hide');
 
             const $activeTab = $('#UlScheduleNavs .active');
@@ -316,19 +326,19 @@ const AssignDateHour = async () => {
         toastPlacement = "Top right";
         if (sendSmsResponse.returnCodeInformation.success) {
             console.log("Mensaje enviado de forma exitosa.");
-            // await Utils.ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
+            // ToastsNotification("Citas", "Mensaje enviado de forma exitosa.", toastType, toastPlacement);
         } else {
             toastType = "Danger";
-            await Utils.ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
+            ToastsNotification("Citas", "Ocurrió un error al enviar el mensaje.", toastType, toastPlacement);
         };
 
         toastType = "Primary";
         toastPlacement = "Top right";
         if (sendMailResponse.returnCodeInformation.success) {
             console.log("Mensaje enviado de forma exitosa.");
-            // await Utils.ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
+            // ToastsNotification("Citas", "Correo enviado de forma exitosa.", "Primary", "Top right");
         } else {
-            await Utils.ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
+            ToastsNotification("Citas", "Ocurrió un error al enviar el correo.", "Danger", "Top right");
         };
 
     } catch (error) {
