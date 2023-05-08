@@ -321,7 +321,7 @@ const TransportDocumentsDataTable = async (TransportLineId, TemporalDocumentId) 
                 },
                 width: "20%"
             },
-            ...Object.keys(data[0]).map(propName => ({
+            ...Object.keys(data[0]).slice(0, -2).map(propName => ({
                 title: propName,
                 data: propName,
                 visible: !propName.includes('Id')
