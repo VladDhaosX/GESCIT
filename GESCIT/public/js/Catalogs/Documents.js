@@ -879,8 +879,6 @@ const TransportLinesDocumentsModal = async (e, Status) => {
 
 const DriversDocumentsModal = async (e, Status) => {
     try {
-        console.log(e);
-        console.log(Status);
         const DocumentType = 'Chofer';
         let Cliente = 0;
         const Client = $(e).attr('data');

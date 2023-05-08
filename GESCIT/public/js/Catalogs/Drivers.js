@@ -244,7 +244,9 @@ const AddOrUpdateDriverDocumentButton = async () => {
             TemporalDocumentId: sessionStorage.getItem('TemporalDocumentId'),
             DriverId: DriverId,
             DriverDocumentFile: DriverDocumentFile,
-            DocumentId: $('#DocumentDriverSelect').val()
+            DocumentId: $('#DocumentDriverSelect').val(),
+            ExpiredDate: $('#DocumentExpiredDate').val(),
+            IssueDate: $('#DocumentEmittedDate').val()
         };
 
         const response = await AddOrUpdateDriverDocument(DriverDocument);
@@ -259,6 +261,8 @@ const AddOrUpdateDriverDocumentButton = async () => {
         ToastsNotification("Chofer", "Se subió el archivo con éxito.", "Primary", "Top right");
         $('#DocumentDriverSelect').val(0).trigger('change');
         $('#DriverDocument').val("").trigger('change');
+        $('#DocumentExpiredDate').val("").trigger('change');
+        $('#DocumentEmittedDate').val("").trigger('change');
         await DriverDocumentsDataTable(DriverId, TemporalDocumentId);
 
     } catch (error) {
@@ -275,6 +279,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
 
         const DocumentType = "Chofer";
         const data = await GetDriverDocument(DocumentType, DriverId, TemporalDocumentId);
+        console.log(data);
         if (data.length > 0) {
             const columns = [
                 {

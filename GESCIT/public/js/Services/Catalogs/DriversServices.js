@@ -100,6 +100,8 @@ const AddOrUpdateDriverDocument = async (DriverDocument) => {
         formData.append('ModuleId', DriverDocument.DriverId);
         formData.append('image', DriverDocument.DriverDocumentFile);
         formData.append('DocumentId', DriverDocument.DocumentId);
+        formData.append('ExpiredDate', DriverDocument.ExpiredDate);
+        formData.append('IssueDate', DriverDocument.IssueDate);
 
         const response = await $.ajax({
             beforeSend: async function (xhr) {
