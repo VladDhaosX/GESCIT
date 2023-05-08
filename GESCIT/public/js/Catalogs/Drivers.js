@@ -77,7 +77,7 @@ const DriversDataTable = async () => {
         if ($.fn.DataTable.isDataTable('#DriversTable')) {
             $('#DriversTable').DataTable().destroy();
         };
-
+        const userRolKey = sessionStorage.getItem('userRolKey');
         const userId = sessionStorage.getItem('userId');
         const data = await GetDrivers(userId) || [];
         const columns = [
@@ -104,7 +104,7 @@ const DriversDataTable = async () => {
             ...Object.keys(data[0]).map(propName => ({
                 title: propName,
                 data: propName,
-                visible: !propName.includes('Id'),
+                visible: (propName !== 'Cliente' && propName !== 'Id') || (userRolKey === 'Admin') && !propName.includes('Id'),
                 render: function (data) {
                     return propName === "Capacidad" ? data + " Toneladas" : data
                 }

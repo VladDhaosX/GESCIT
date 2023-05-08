@@ -86,6 +86,7 @@ const TransportLinesDataTable = async () => {
 
         const userId = sessionStorage.getItem('userId');
         const data = await GetTransportLines(userId) || [];
+        const userRolKey = sessionStorage.getItem('userRolKey');
         const columns = [
             {
                 title: 'Acciones',
@@ -109,7 +110,7 @@ const TransportLinesDataTable = async () => {
             ...Object.keys(data[0]).map(propName => ({
                 title: propName,
                 data: propName,
-                visible: !propName.includes('Id'),
+                visible: (propName !== 'Cliente' && propName !== 'Id' && propName !== ('LineTypeId')) || (userRolKey === 'Admin') && !propName.includes('Id'),
                 render: function (data) {
                     return propName === "Capacidad" ? data + " Toneladas" : data
                 }

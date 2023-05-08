@@ -96,6 +96,7 @@ const TransportsDataTable = async () => {
 
         const userId = sessionStorage.getItem('userId');
         const data = await GetTransports(userId);
+        const userRolKey = sessionStorage.getItem('userRolKey');
         if (data?.length > 0) {
             const columns = [
                 {
@@ -118,7 +119,7 @@ const TransportsDataTable = async () => {
                 ...Object.keys(data[0]).map(propName => ({
                     title: propName,
                     data: propName,
-                    visible: !propName.includes('Id')
+                    visible: (propName !== 'Cliente' && propName !== 'Id' && propName !== 'TransportTypeId') || (userRolKey === 'Admin') && !propName.includes('Id'),
                 }))
             ];
             $('#TransportTable').DataTable({
