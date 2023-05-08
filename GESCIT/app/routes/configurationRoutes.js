@@ -9,19 +9,20 @@ router.get('/Permisos', (req, res) => {
         Page: 'Configuration/Permissions',
         Categoría: 'Configuracion',
         Modulo: 'Permisos',
-        JSFile: '/js/Configuration/Permissions.js',
+        JSFile: config.BasePath + '/js/Configuration/Permissions.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
-
+        ServiceFile: '',
     };
     res.render('views', data);
 });
 
 router.get('/login', (req, res) => {
     const data = {
-        JSFile: '/js/Configuration/login.js',
+        JSFile: config.BasePath + '/js/Configuration/login.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
+        ServiceFile: '',
     };
     res.render('login', data);
 });

@@ -36,7 +36,7 @@ module.exports = {
             };
         }
     },
-    UpdateRol: async (RolId, Key, Name, Description, StatusKey, Permissions) => {
+    UpdateRol: async (RolId, Key, Name, Description, StatusKey, Permissions, SubPermissions) => {
         try {
             let pool = await sql.connect(config);
             let result = await pool.request()
@@ -46,6 +46,7 @@ module.exports = {
                 .input('Description', sql.VarChar(sql.MAX), Description)
                 .input('StatusKey', sql.VarChar(sql.MAX), StatusKey)
                 .input('Permissions', sql.VarChar(sql.MAX), Permissions)
+                .input('SubPermissions', sql.VarChar(sql.MAX), SubPermissions)
                 .output('Success', sql.Bit)
                 .output('Message', sql.VarChar(sql.MAX))
                 .execute('SpUpdateRol');
@@ -102,7 +103,43 @@ module.exports = {
                 .input('ModuleId', sql.Int, ModuleId)
                 .execute('SpGetRolesActionsByUserIdModuleId');
 
-                return result.recordset;
+            return result.recordset;
+        } catch (error) {
+            return {
+                success: false,
+                message: error.message
+            };
+        }
+    },
+    GetRolesSubModulesActionsPermissionsByRolId: async (RolId,jsonActionsPermissions) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('RolId', sql.Int, RolId)
+                .input('ActionsPermissions', sql.VarChar(sql.MAX), jsonActionsPermissions)
+                .execute('SpGetRolesSubModulesActionsPermissionsByRolId');
+            return {
+                success: true,
+                data: result.recordset
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: error.message
+            };
+        }
+    },
+    GetSubModulesPermissions: async (UserId, ModuleId) => {
+        try {
+            let pool = await sql.connect(config);
+            let result = await pool.request()
+                .input('UserId', sql.Int, UserId)
+                .input('ModuleId', sql.Int, ModuleId)
+                .execute('SpGetSubModulesPermissions');
+            return {
+                success: true,
+                data: result.recordset
+            };
         } catch (error) {
             return {
                 success: false,

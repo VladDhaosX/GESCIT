@@ -18,7 +18,7 @@ const fetchUserData = async () => {
     }
 };
 
-const fetchGetRolesActionsByUserIdModuleId = async (UserId,ModuleId) => {
+const fetchGetRolesActionsByUserIdModuleId = async (UserId, ModuleId) => {
     try {
         const response = await $.ajax({
             url: `${UtilUrlApi}/configuration/GetRolesActionsByUserIdModuleId`,
@@ -56,7 +56,7 @@ const createMenu = async () => {
                 const $moduleItem = $('<li>')
                     .addClass('menu-item')
                     .append($('<a>')
-                        .attr('href', module.Route)
+                        .attr('href', '' + module.Route)
                         .addClass('menu-link')
                         .append($('<i>').addClass(`menu-icon tf-icons bx ${module.Icon}`).attr('style', 'color: #00558C'))
                         .append($('<div>').attr('data-i18n', module.Name).text(module.Name).attr('style', 'color: #00558C'))
@@ -77,7 +77,7 @@ const tooltipTrigger = async () => {
     });
 };
 
-const ToastsNotification = async (titulo, message, type, placement) =>  {
+const ToastsNotification = async (titulo, message, type, placement) => {
     try {
         const placementList = {
             'Top left': 'top-0 start-0',
@@ -123,7 +123,11 @@ const GetRolesActionsByUserIdModuleId = async () => {
     try {
         const userId = sessionStorage.getItem('userId');
         const ModuleId = sessionStorage.getItem('ModuleId');
-        const response = await fetchGetRolesActionsByUserIdModuleId(userId,ModuleId);
+        const response = await fetchGetRolesActionsByUserIdModuleId(userId, ModuleId);
+        const subPermissions = await GetSubModulesPermissions(userId, ModuleId);
+
+        console.log(subPermissions);
+
         const permissions = {};
         response.forEach((perm) => {
             const Permission = perm.Permission;
@@ -132,6 +136,17 @@ const GetRolesActionsByUserIdModuleId = async () => {
                 permissions[ActionKey] = true;
             };
         });
+
+        const subModules = subPermissions.map((sub) => sub.SubModuleName);
+        subModules.forEach((sub) => {
+            const subModuleActions = subPermissions.filter((subPerm) => subPerm.SubModuleName === sub);
+            permissions[sub] = {};
+            subModuleActions.forEach((subPerm) => {
+                permissions[sub][subPerm.ActionName] = subPerm.ActionPermissionStatusId === 1 ? true : false;
+            });
+        });
+
+        console.log(permissions);
         return permissions;
     } catch (error) {
         console.error(error);
@@ -145,10 +160,16 @@ const ValidatePath = () => {
     };
 };
 
-export { 
-    createMenu, 
-    tooltipTrigger, 
-    ToastsNotification,
-    ValidatePath,
-    GetRolesActionsByUserIdModuleId
+const GetSubModulesPermissions = async (UserId, ModuleId) => {
+    try {
+        const response = await $.ajax({
+            url: `${UtilUrlApi}/configuration/GetSubModulesPermissions`,
+            type: 'POST',
+            data: { UserId, ModuleId },
+            dataType: 'json'
+        });
+        return response.success ? response.data : console.log(response.message);
+    } catch (error) {
+        console.error(error);
+    }
 };

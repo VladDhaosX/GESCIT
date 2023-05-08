@@ -261,6 +261,9 @@
               "properties": {
                 "userId": {
                   "example": "any"
+                },
+                "ModuleId": {
+                  "example": "any"
                 }
               }
             }
@@ -378,7 +381,154 @@
                 "Description": {
                   "example": "any"
                 },
-                "StatusId": {
+                "StatusKey": {
+                  "example": "any"
+                },
+                "Permissions": {
+                  "example": "any"
+                },
+                "SubPermissions": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/configuration/GetModuleCategoriesByRolId": {
+      "post": {
+        "tags": [
+          "Configuración"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "RolId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/configuration/GetRolesActionsPermissionsByRolId": {
+      "post": {
+        "tags": [
+          "Configuración"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "RolId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/configuration/GetRolesActionsByUserIdModuleId": {
+      "post": {
+        "tags": [
+          "Configuración"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "UserId": {
+                  "example": "any"
+                },
+                "ModuleId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/configuration/GetRolesSubModulesActionsPermissionsByRolId": {
+      "post": {
+        "tags": [
+          "Configuración"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "RolId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/configuration/GetSubModulesPermissions": {
+      "post": {
+        "tags": [
+          "Configuración"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "UserId": {
+                  "example": "any"
+                },
+                "ModuleId": {
                   "example": "any"
                 }
               }
@@ -716,6 +866,33 @@
         }
       }
     },
+    "/catalogs/GetPresentation": {
+      "post": {
+        "tags": [
+          "Catálogos"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "StatusId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/dates/addOrUpdateDates": {
       "post": {
         "tags": [
@@ -764,6 +941,9 @@
                   "example": "any"
                 },
                 "Volume": {
+                  "example": "any"
+                },
+                "PresentationId": {
                   "example": "any"
                 }
               }
@@ -1156,7 +1336,7 @@
     "/documents/GetDocumentFilesByModuleId": {
       "post": {
         "tags": [
-          "Operaciones"
+          "Catálogos/Documentos"
         ],
         "description": "",
         "parameters": [
@@ -1189,7 +1369,7 @@
     "/documents/AddDocumentFile": {
       "post": {
         "tags": [
-          "Operaciones"
+          "Catálogos/Documentos"
         ],
         "description": "",
         "parameters": [
@@ -1210,6 +1390,12 @@
                 },
                 "ModuleId": {
                   "example": "any"
+                },
+                "ExpiredDate": {
+                  "example": "any"
+                },
+                "IssueDate": {
+                  "example": "any"
                 }
               }
             }
@@ -1228,7 +1414,7 @@
     "/documents/GetDocumentsList": {
       "post": {
         "tags": [
-          "Operaciones"
+          "Catálogos/Documentos"
         ],
         "description": "",
         "parameters": [
@@ -1255,7 +1441,7 @@
     "/documents/GetDocumentById": {
       "post": {
         "tags": [
-          "Operaciones"
+          "Catálogos/Documentos"
         ],
         "description": "",
         "parameters": [
@@ -1278,7 +1464,7 @@
     "/documents/DeleteDocumentById": {
       "post": {
         "tags": [
-          "Operaciones"
+          "Catálogos/Documentos"
         ],
         "description": "",
         "parameters": [
@@ -1305,7 +1491,7 @@
     "/documents/NotDeleteTransportDocuments": {
       "post": {
         "tags": [
-          "Operaciones"
+          "Catálogos/Documentos"
         ],
         "description": "",
         "parameters": [

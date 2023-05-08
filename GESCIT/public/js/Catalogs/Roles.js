@@ -1,39 +1,36 @@
-import * as Utils from '/js/Utils.js';
-await Utils.ValidatePath();
-const UrlApi = window.__env.UrlApi;
+
+let permissions;
+$.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
-    await Utils.createMenu();
+    await ValidatePath();
+    permissions = await GetRolesActionsByUserIdModuleId();
+    await createMenu();
     await initPage();
     await RolesDataTable();
 });
 
-// #region controllers
 const initPage = async () => {
     const btnSearchRol = `
     <button id="btnSearchRol" type="button" title="Buscar"
         class="btn rounded-pill btn-icon btn-outline-primary"
         style="margin-top: 28px;"
-        onclick="RolesDataTable()"
         data-bs-toggle="tooltip" data-bs-placement="top">
         <span class="tf-icons bx bx-search-alt-2"></span>
-    </button>
-    `;
-    const btnNewRol = `
+    </button>`;
+    const btnNewRol = permissions.CREAR ? `
     <button id="btnNewDateModal" type="button" title="Registrar Rol" 
         class="btn rounded-pill btn-icon btn-outline-primary" 
         style="margin-top: 28px;"
         data-bs-toggle="tooltip" data-bs-placement="top">
         <span class="tf-icons bx bx-plus"></span>
-    </button>
-    `;
+    </button>` : '';
     const selectStatus = `
     <label for="selectStatus" class="form-label">Estatus</label>
-    <select id="selectStatus" class="form-control" aria-label=".form-select-sm example" onchange="RolesDataTable()">
+    <select id="selectStatus" class="form-control" aria-label=".form-select-sm example">
         <option value="active">Activo</option>
         <option value="inactive">Inactivo</option>
-    </select>
-    `;
+    </select>`;
 
     $('#ActionsButtons').append(`
     <div class="row">
@@ -55,6 +52,14 @@ const initPage = async () => {
         UpdateRolId();
     });
 
+    $('#btnSearchRol').click(async function () {
+        await RolesDataTable();
+    });
+
+    $('#selectStatus').change(async function () {
+        await RolesDataTable();
+    });
+
     $('#btnNavRolPermissions').on('show.bs.tab', function () {
         if ($.fn.DataTable.isDataTable('#ModulesActionsDataTable')) {
             $('#ModulesActionsDataTable').DataTable().destroy();
@@ -62,9 +67,10 @@ const initPage = async () => {
         };
     });
 
-    $('#btnNavRolPermissions').on('shown.bs.tab', async function () {
-        await ModulesActionsDataTable();
+    $('#btnNavRolSubPermissions').on('shown.bs.tab', async function () {
+        await SubModulesActionsDataTable();
     });
+
 };
 
 const RolesDataTable = async () => {
@@ -84,7 +90,7 @@ const RolesDataTable = async () => {
                 title: 'Acciones', data: 'RolId',
                 render: function (data, type, row) {
                     let buttons = '';
-                    buttons += `
+                    buttons += permissions.EDITAR ? `
                         <button
                             class="btn rounded-pill btn-icon btn-outline-primary" 
                             type="button" 
@@ -94,12 +100,11 @@ const RolesDataTable = async () => {
                             RolId = "${data}"
                             action = "ShowRolModal">
                             <span class="tf-icons bx bx-edit-alt"></span>
-                        </button> 
-                    `;
+                        </button>
+                    ` : '';
                     return buttons;
                 }
             },
-            { title: 'Clave', data: 'LLave' },
             { title: 'Nombre', data: 'Nombre' },
             { title: 'Descripción', data: 'Descripción' },
             { title: 'Estatus', data: 'Estatus' }
@@ -110,10 +115,10 @@ const RolesDataTable = async () => {
             columns: columns,
             order: [],
             language: {
-                url: '/js/datatable-esp.json'
+                url: '../js/datatable-esp.json'
             },
         }).on('draw', async function () {
-            await Utils.tooltipTrigger();
+            tooltipTrigger();
 
             $('[action="ShowRolModal"]').off('click').on('click', async function () {
                 const RolId = $(this).attr('RolId');
@@ -133,13 +138,13 @@ const ShowRolModal = async (RolId) => {
         const ModalTittle = RolId === 0 ? 'Nuevo Rol' : 'Editar Rol';
         $('#ModalTittle').text(ModalTittle);
 
-        const data = RolId === 0 ? null : await GetRolId(RolId);
-        $('#txtKey').val(data?.Key);
+        const data = await GetRolId(RolId) || {};
         $('#txtName').val(data?.Name);
         $('#txtDescription').val(data?.Description);
         $('#ckStatusId').prop('checked', data?.StatusId == '1' ? true : false);
-        data ? $('#txtKey').attr('readonly', true) : $('#txtKey').attr('readonly', false);
 
+        await ModulesActionsDataTable();
+        await SubModulesActionsDataTable();
         $('#ModalRol').modal('show');
         $('.nav-pills button[data-bs-target="#navRolInfo"]').tab('show');
     } catch (error) {
@@ -150,7 +155,6 @@ const ShowRolModal = async (RolId) => {
 const UpdateRolId = async () => {
     try {
         const RolId = sessionStorage.getItem('RolId');
-        const Key = $('#txtKey').val();
         const Name = $('#txtName').val();
         const Description = $('#txtDescription').val();
         const StatusKey = $('#ckStatusId').prop('checked') ? 'Active' : 'Inactive';
@@ -164,19 +168,30 @@ const UpdateRolId = async () => {
             if (moduleId && actionId && isChecked) actionsPermissions.push({ ModuleId: moduleId, ActionId: actionId, Permission: isChecked });
         });
         const jsonActionsPermissions = JSON.stringify(actionsPermissions);
-        const response = await UpdateRol(RolId, Key, Name, Description, StatusKey, jsonActionsPermissions);
+
+        const subChecks = $('#SubModulesActionsDataTable input[type="checkbox"]');
+        const subActionsPermissions = [];
+        subChecks.each(function () {
+            const subModuleId = $(this).attr('submoduleid');
+            const actionid = $(this).attr('actionid');
+            const isChecked = $(this).prop('checked');
+            if (subModuleId && actionid && isChecked) subActionsPermissions.push({ SubModuleId: subModuleId, ActionId: actionid, Permission: isChecked });
+        });
+        const jsonSubActionsPermissions = JSON.stringify(subActionsPermissions);
+
+        const response = await UpdateRol(RolId, Name, Description, StatusKey, jsonActionsPermissions, jsonSubActionsPermissions);
 
         let toastType = "Primary";
         let toastPlacement = "Top right";
         if (response.success) {
             $('#ModalRol').modal('hide');
-            await Utils.ToastsNotification("Roles", response.message, toastType, toastPlacement);
-            await Utils.createMenu();
+            ToastsNotification("Roles", response.message, toastType, toastPlacement);
+            createMenu();
             await RolesDataTable();
         } else {
             toastType = "Danger";
             toastPlacement = "Middle center";
-            await Utils.ToastsNotification("Roles", response.message, toastType, toastPlacement);
+            ToastsNotification("Roles", response.message, toastType, toastPlacement);
         }
 
     } catch (error) {
@@ -189,51 +204,103 @@ const ModulesActionsDataTable = async () => {
         const RolId = sessionStorage.getItem('RolId');
         const data = await GetRolesActionsPermissionsByRolId(RolId) || [];
 
-        const ActionsPermission = data.reduce((acc, item) => {
-            const { ModuleId, ModuleName, ActionName, ActionPermissionStatusId } = item;
-            const existingModuleIndex = acc.findIndex(elem => elem.Modulo === ModuleName);
-            if (existingModuleIndex === -1) {
-                acc.push({ 'ModuleId': ModuleId, 'Modulo': ModuleName, [ActionName]: ActionPermissionStatusId });
-            } else {
-                acc[existingModuleIndex][ActionName] = ActionPermissionStatusId;
-            }
-            return acc;
-        }, []);
+        const Actions = [...new Set(data.map(item => item.ActionName))];
+        const Modules = [...new Set(data.map(item => item.ModuleName))];
 
-        const columns = Object.keys(ActionsPermission[0]).map(item => {
-            const isAction = item !== 'Modulo' && item !== 'ModuleId';
+        const $thead = $('<thead></thead>');
+        const $tbody = $('<tbody></tbody>');
 
-            return {
-                title: item,
-                data: item,
-                visible: !item.includes('Id'),
-                render: isAction
-                    ? (dtData, type, row) => `
-                    <div class="form-check">
-                      <input
-                        ModuleId="${row.ModuleId}"
-                        ActionId="${data?.find(x => x.ActionName == item && x.ModuleId == row.ModuleId)?.ActionId}"
-                        class="form-check-input"
-                        type="checkbox"
-                        ${dtData == '1' ? 'checked' : ''}
-                      />
-                    </div>`
-                    : undefined
-            };
+        $thead.append('<th>Categoría</th>');
+        $thead.append('<th>Menú</th>');
+        Actions.forEach(action => {
+            const $th = $(`<th>${action}</th>`);
+            $thead.append($th);
         });
 
-        $('#ModulesActionsDataTable').DataTable({
-            data: ActionsPermission,
-            columns: columns,
-            order: [],
-            language: {
-                url: '/js/datatable-esp.json'
-            },
-            dom: 'Brtip',
-            paginate: false,
-        }).on('draw', async function () {
-            await Utils.tooltipTrigger();
+        Modules.forEach(module => {
+            const $tr = $('<tr></tr>');
+            const ModuleCategoryName = data.find(item => item.ModuleName === module).ModuleCategoryName;
+            $tr.append('<td>' + ModuleCategoryName + '</td>');
+            const $td = $(`<td>${module}</td>`);
+            $tr.append($td);
+            Actions.forEach(action => {
+                const $td = $(`<td></td>`);
+                const dataAction = data.find(item => item.ModuleName === module && item.ActionName === action);
+                if (dataAction) {
+                    const $input = $(`<input type="checkbox" class="form-check-input" moduleid="${dataAction.ModuleId}" actionid="${dataAction.ActionId}" ${dataAction.ActionPermissionStatusId === 1 ? 'checked' : ''}>`);
+                    $td.append($input);
+                }
+                $tr.append($td);
+            });
+            $tbody.append($tr);
         });
+
+        $('#ModulesActionsDataTable').empty()
+            .append($thead)
+            .append($tbody);
+
+    } catch (error) {
+        console.error(error);
+    };
+};
+
+const SubModulesActionsDataTable = async () => {
+    try {
+        const RolId = sessionStorage.getItem('RolId');
+
+        const checks = $('#ModulesActionsDataTable input[type="checkbox"][actionid="1"]');
+        const actionsPermissions = [];
+        checks.each(function () {
+            const moduleId = $(this).attr('moduleid');
+            const actionId = $(this).attr('actionid');
+            const isChecked = $(this).prop('checked');
+            if (moduleId && actionId && isChecked) actionsPermissions.push({ ModuleId: moduleId, ActionId: actionId, Permission: isChecked });
+        });
+        const jsonActionsPermissions = JSON.stringify(actionsPermissions);
+
+        const data = await GetRolesSubModulesActionsPermissionsByRolId(RolId, jsonActionsPermissions) || [];
+
+        const Actions = [...new Set(data.map(item => item.ActionName))];
+        const Modules = [...new Set(data.map(item => item.ModuleName))];
+        const SubModules = [...new Set(data.map(item => item.SubModuleName))];
+
+        const $thead = $('<thead></thead>');
+        const $tbody = $('<tbody></tbody>');
+
+        $thead.append('<th>Categoría</th>');
+        $thead.append('<th>Menú</th>');
+        $thead.append('<th>Submenú</th>');
+        Actions.forEach(action => {
+            const $th = $(`<th>${action}</th>`);
+            $thead.append($th);
+        });
+
+        Modules.forEach(module => {
+            SubModules.forEach(submodule => {
+                const $tr = $('<tr></tr>');
+                const ModuleCategoryName = data.find(item => item.ModuleName === module && item.SubModuleName === submodule)?.ModuleCategoryName;
+                if (!ModuleCategoryName) return;
+                $tr.append('<td>' + ModuleCategoryName + '</td>');
+                const $td = $(`<td>${module}</td>`);
+                $tr.append($td);
+                const $td2 = $(`<td>${submodule}</td>`);
+                $tr.append($td2);
+                Actions.forEach(action => {
+                    const $td = $(`<td></td>`);
+                    const dataAction = data.find(item => item.ModuleName === module && item.SubModuleName === submodule && item.ActionName === action);
+                    if (dataAction) {
+                        const $input = $(`<input type="checkbox" class="form-check-input" moduleid="${dataAction.ModuleId}" submoduleid="${dataAction.SubModuleId}" actionid="${dataAction.ActionId}" ${dataAction.ActionPermissionStatusId === 1 ? 'checked' : ''}>`);
+                        $td.append($input);
+                    }
+                    $tr.append($td);
+                });
+                $tbody.append($tr);
+            });
+        });
+
+        $('#SubModulesActionsDataTable').empty()
+            .append($thead)
+            .append($tbody);
 
     } catch (error) {
         console.error(error);
@@ -252,130 +319,3 @@ const FillSelectModulesCategory = async (RolId) => {
         console.error(error);
     }
 };
-// #endregion controllers
-// #region fetches
-const GetRoles = async (Status) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/configuration/GetRoles`,
-            type: 'POST',
-            data: {
-                Status
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetRolId = async (RolId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/configuration/GetRolId`,
-            type: 'POST',
-            data: {
-                RolId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const UpdateRol = async (RolId, Key, Name, Description, StatusKey, Permissions) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/configuration/UpdateRol`,
-            type: 'POST',
-            data: {
-                RolId,
-                Key,
-                Name,
-                Description,
-                StatusKey,
-                Permissions
-            },
-            dataType: 'json'
-        });
-        return response;
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetModuleCategoriesByRolId = async (RolId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/configuration/GetModuleCategoriesByRolId`,
-            type: 'POST',
-            data: {
-                RolId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetRolesActionsPermissionsByRolId = async (RolId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/configuration/GetRolesActionsPermissionsByRolId`,
-            type: 'POST',
-            data: {
-                RolId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-// #endregion fetches

@@ -1,13 +1,10 @@
-import * as Utils from '/js/Utils.js';
-import * as TransportsServices from '/js/Services/Catalogs/TransportsServices.js';
-
-await Utils.ValidatePath();
-const UrlApi = window.__env.UrlApi;
-const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+let permissions;
 $.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
-    await Utils.createMenu();
+    await ValidatePath();
+    permissions = await GetRolesActionsByUserIdModuleId();
+    createMenu();
 
     sessionStorage.setItem("TransportId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
@@ -16,19 +13,20 @@ $(document).ready(async function () {
     await FillSelectTransportType();
     await FillSelectDocumentList();
 
-    await Utils.tooltipTrigger();
-
+    tooltipTrigger();
 });
 
 const initButtons = async () => {
     try {
-        $('#ActionsButtons').append(`
+        if (permissions.CREAR) {
+            $('#ActionsButtons').append(`
                 <button id="AddOrUpdateTransportModalButton" type="button" title="Registrar Transporte" 
                     class="btn rounded-pill btn-icon btn-outline-primary" 
                     data-bs-toggle="tooltip" data-bs-placement="top">
                     <span class="tf-icons bx bx-plus"></span>
                 </button>
             `);
+        };
 
         $('#AddOrUpdateTransportModalButton').click(function () {
             AddOrUpdateTransportModal();
@@ -72,18 +70,18 @@ const initButtons = async () => {
             await TransportDocumentsDataTable(TransportId, TemporalDocumentId);
         });
 
-        //On Close Modal 
         $('#AddOrUpdateTransportModal').on('hidden.bs.modal', function () {
             const TransportId = sessionStorage.getItem("TransportId");
             const DocumentType = "Transporte";
             NotDeleteDocuments(TransportId, DocumentType);
         });
 
-        //on TransportDocument change
         $('#TransportDocumentSelect').on('change', function () {
-            //AddOrUpdateTransportDocumentButton val 0
             $('#TransportDocument').val("").trigger('change');
         });
+
+        permissions?.Documentos?.Ver ? $('#DocumentsNavButton').show() : $('#DocumentsNavButton').hide();
+        permissions?.Documentos?.Crear ? $('#divCreateDocument').show() : $('#divCreateDocument').hide();
     } catch (error) {
         console.error(error);
     }
@@ -97,14 +95,14 @@ const TransportsDataTable = async () => {
         };
 
         const userId = sessionStorage.getItem('userId');
-        const data = await TransportsServices.GetTransports(userId);
+        const data = await GetTransports(userId);
         if (data?.length > 0) {
             const columns = [
                 {
                     title: 'Acciones',
                     data: 'Id',
                     render: function (data, type, row) {
-                        return `
+                        return permissions.EDITAR ? `
                             <button 
                                 class="btn rounded-pill btn-icon btn-outline-primary"
                                 type="button" 
@@ -114,7 +112,7 @@ const TransportsDataTable = async () => {
                                 data-bs-placement="top"
                                 action='AddOrUpdateTransportModal'>
                                     <span class="tf-icons bx bx-edit-alt"></span>
-                            </button>`;
+                            </button>` : '';
                     }
                 },
                 ...Object.keys(data[0]).map(propName => ({
@@ -127,7 +125,7 @@ const TransportsDataTable = async () => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: '/js/datatable-esp.json'
+                    url: '../js/datatable-esp.json'
                 },
                 columnDefs: [
                     { "type": "num", "targets": 5 }
@@ -146,7 +144,7 @@ const TransportsDataTable = async () => {
 
 const FillSelectTransportType = async () => {
     try {
-        const data = await TransportsServices.GetTransportType();
+        const data = await GetTransportType();
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -166,7 +164,7 @@ const FillSelectTransportType = async () => {
 const FillSelectDocumentList = async () => {
     try {
         const DocumentType = "Transporte"
-        const data = await TransportsServices.GetDocumentsList(DocumentType);
+        const data = await GetDocumentsList(DocumentType);
 
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
@@ -236,12 +234,12 @@ const AddOrUpdateTransportButton = async () => {
             Capacity
         };
 
-        const response = await TransportsServices.AddOrUpdateTransport(Transport);
+        const response = await AddOrUpdateTransport(Transport);
         const toastType = response.success ? "Primary" : "Danger";
         const toastPlacement = response.success ? "Top right" : "Middle center";
         if (response.success) $('#AddOrUpdateTransportModal').modal('hide');
 
-        await Utils.ToastsNotification("Transportes", response.message, toastType, toastPlacement);
+        ToastsNotification("Transportes", response.message, toastType, toastPlacement);
         await TransportsDataTable(false);
 
     } catch (error) {
@@ -256,7 +254,7 @@ const AddOrUpdateTransportDocumentButton = async () => {
         const TransportDocumentFile = TransportDocument.files[0];
 
         if (TransportDocumentFile.size > 10485760) {
-            await Utils.ToastsNotification("Transportes", "Tamaño máximo permitido: 10 MB", "Danger", "Middle center");
+            ToastsNotification("Transportes", "Tamaño máximo permitido: 10 MB", "Danger", "Middle center");
             return;
         };
 
@@ -268,16 +266,16 @@ const AddOrUpdateTransportDocumentButton = async () => {
             DocumentId: $('#TransportDocumentSelect').val()
         };
 
-        const response = await TransportsServices.AddOrUpdateTransportDocument(TransportDocumentObj);
+        const response = await AddOrUpdateTransportDocument(TransportDocumentObj);
 
         if (!response?.success) {
-            await Utils.ToastsNotification("Transportes", response.message, "Danger", "Middle center");
+            ToastsNotification("Transportes", response.message, "Danger", "Middle center");
             return;
         };
 
         const TemporalDocumentId = response.TemporalDocumentId;
         sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
-        await Utils.ToastsNotification("Transportes", "Se subió el archivo con éxito.", "Primary", "Top right");
+        ToastsNotification("Transportes", "Se subió el archivo con éxito.", "Primary", "Top right");
         $('#TransportDocument').val("").trigger('change');
         await TransportDocumentsDataTable(TransportId, TemporalDocumentId);
 
@@ -293,7 +291,7 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
             $('#TransportDocumentDataTable').html('');
         };
         const DocumentType = "Transporte";
-        const data = await TransportsServices.GetTransportDocument(DocumentType, TransportId, TemporalDocumentId) || [];
+        const data = await GetTransportDocument(DocumentType, TransportId, TemporalDocumentId) || [];
         const dtColumns = ['Fecha', 'Tipo de Documento', 'Nombre', 'Estatus'];
         const columns = [
             {
@@ -304,7 +302,7 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
                     buttons = `
                         <button 
                             class="btn rounded-pill btn-icon btn-outline-primary" 
-                            type="button" 
+                            type="button"
                             data='${JSON.stringify(row)}'
                             title='Descargar'
                             data-bs-toggle="tooltip"
@@ -313,10 +311,10 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
                             <span class="tf-icons bx bxs-download"></span>
                         </button>`;
 
-                    if (row.Estatus != "Aprobado") {
+                    if (permissions?.Documentos?.Eliminar && row.Estatus != "Aprobado") {
                         buttons += `
                             <button 
-                                class="btn rounded-pill btn-icon btn-outline-danger" 
+                                class="btn rounded-pill btn-icon btn-outline-danger"
                                 type="button" 
                                 data='${JSON.stringify(row)}'
                                 title='Eliminar'
@@ -344,14 +342,14 @@ const TransportDocumentsDataTable = async (TransportId, TemporalDocumentId) => {
             data: data,
             columns: columns,
             language: {
-                url: '/js/datatable-esp.json'
+                url: '../js/datatable-esp.json'
             },
             columnDefs: [{
                 defaultContent: "",
                 targets: "_all"
             }]
         }).on('draw', async function () {
-            await Utils.tooltipTrigger();
+            tooltipTrigger();
             $('button[action="DownloadTransportDocument"]').off().click(async function () {
                 await DownloadTransportDocument(this);
             });
@@ -370,7 +368,7 @@ const DownloadTransportDocument = async (e) => {
         const dataObj = JSON.parse(data);
         const DocumentId = dataObj.Id;
 
-        await TransportsServices.GetTransportDocumentById(DocumentId);
+        await GetTransportDocumentById(DocumentId);
     }
 };
 
@@ -382,7 +380,7 @@ const DeleteDocument = async (e) => {
         let dataObj = JSON.parse(data);
         let DocumentId = dataObj.Id;
 
-        const response = await TransportsServices.DeleteDocumentById(DocumentId);
+        const response = await DeleteDocumentById(DocumentId);
         let toastType = 'Primary';
         let toastPlacement = 'Top right';
 
@@ -393,7 +391,7 @@ const DeleteDocument = async (e) => {
             toastPlacement = 'Middle center';
         };
 
-        await Utils.ToastsNotification("Líneas de Transporte", response.message, toastType, toastPlacement);
+        ToastsNotification("Líneas de Transporte", response.message, toastType, toastPlacement);
 
     } catch (error) {
         console.error(error);

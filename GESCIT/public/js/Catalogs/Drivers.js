@@ -1,11 +1,10 @@
-import * as Utils from '/js/Utils.js';
-await Utils.ValidatePath();
-const UrlApi = window.__env.UrlApi;
-const permissions = await Utils.GetRolesActionsByUserIdModuleId();
+let permissions;
 $.blockUI.defaults.baseZ = 4000;
 
 $(document).ready(async function () {
-    await Utils.createMenu();
+    await ValidatePath();
+    permissions = await GetRolesActionsByUserIdModuleId();
+    await createMenu();
 
     sessionStorage.setItem("DriverId", 0);
     sessionStorage.setItem("TemporalDocumentId", 0);
@@ -13,221 +12,21 @@ $(document).ready(async function () {
     await initButtons();
     await DriversDataTable(true);
     await FillSelectDocumentList();
-    await Utils.tooltipTrigger();
+    tooltipTrigger();
 });
 
-//#region fetchs 
-const GetDrivers = async (UserId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/catalogs/GetDrivers`, type: 'POST', data: {
-                UserId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-const GetDocumentsList = async (DocumentType) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            }
-            , complete: function () {
-                $.unblockUI();
-            }
-            , url: `${UrlApi}/documents/GetDocumentsList`
-            , type: 'POST'
-            , dataType: 'json'
-            , data: {
-                DocumentType: DocumentType
-            }
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-const AddOrUpdateDriver = async (Driver) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/catalogs/addOrUpdateDriver`,
-            type: 'POST',
-            data: {
-                Driver
-            },
-            dataType: 'json'
-        });
-        return response;
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-const GetDriverDocument = async (DocumentType, ModuleId, TemporalDocumentId) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/documents/GetDocumentFilesByModuleId`,
-            type: 'POST',
-            data: {
-                DocumentType, ModuleId, TemporalDocumentId
-            },
-            dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const AddOrUpdateDriverDocument = async (DriverDocument) => {
-    try {
-        let formData = new FormData();
-
-        formData.append('userId', DriverDocument.userId);
-        formData.append('TemporalDocumentId', DriverDocument.TemporalDocumentId);
-        formData.append('ModuleId', DriverDocument.DriverId);
-        formData.append('image', DriverDocument.DriverDocumentFile);
-        formData.append('DocumentId', DriverDocument.DocumentId);
-
-        const response = await $.ajax({
-            beforeSend: async function (xhr) {
-                await $.blockUI({ message: null });
-            },
-            complete: async function () {
-                await $.unblockUI();
-            },
-            url: `${UrlApi}/documents/AddDocumentFile`,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false
-        });
-        return response;
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetDriverDocumentById = (DocumentId) => {
-    try {
-        $.ajax({
-            beforeSend: async function (xhr) {
-                await $.blockUI({ message: null });
-            },
-            complete: async function () {
-                await $.unblockUI();
-            },
-            url: `${UrlApi}/documents/GetDocumentById`,
-            type: 'POST',
-            data: {
-                DocumentId
-            },
-            dataType: 'binary',
-            xhrFields: {
-                responseType: 'blob'
-            },
-            success: function (data, textStatus, jqXHR) {
-                var fileName = jqXHR.getResponseHeader('Content-Disposition').split('filename=')[1];
-
-                var blob = data;
-                var bloburl = window.URL.createObjectURL(blob);
-
-                var link = document.createElement('a');
-                link.href = bloburl;
-                link.download = fileName;
-                link.click();
-            }
-        });
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const DeleteDocumentById = async (DocumentId) => {
-    try {
-        return await $.ajax({
-            beforeSend: async function (xhr) {
-                await $.blockUI({ message: null });
-            },
-            complete: async function () {
-                await $.unblockUI();
-            },
-            url: `${UrlApi}/documents/DeleteDocumentById`,
-            type: 'POST',
-            data: {
-                DocumentId
-            },
-            dataType: 'json'
-        });
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const NotDeleteDocuments = async (ModuleId, DocumentType) => {
-    try {
-        return await $.ajax({
-            beforeSend: async function (xhr) {
-                await $.blockUI({ message: null });
-            },
-            complete: async function () {
-                await $.unblockUI();
-            },
-            url: `${UrlApi}/documents/NotDeleteTransportDocuments`,
-            type: 'POST',
-            data: {
-                ModuleId, DocumentType
-            },
-            dataType: 'json'
-        });
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-//#endregion
-//#region Controsllers
 const initButtons = async () => {
     try {
-        $('#ActionsButtons').append(`
-            <button id="AddOrUpdateDriverModalButton" type="button" title="Registrar Chofer" 
-                class="btn rounded-pill btn-icon btn-outline-primary" 
-                data-bs-toggle="tooltip" data-bs-placement="top">
-                <span class="tf-icons bx bx-plus"></span>
-            </button>
-        `);
+
+        if (permissions.CREAR) {
+            $('#ActionsButtons').append(`
+                <button id="AddOrUpdateDriverModalButton" type="button" title="Registrar Chofer" 
+                    class="btn rounded-pill btn-icon btn-outline-primary" 
+                    data-bs-toggle="tooltip" data-bs-placement="top">
+                    <span class="tf-icons bx bx-plus"></span>
+                </button>
+            `);
+        };
 
         $('#AddOrUpdateDriverModalButton').click(async function () {
             await AddOrUpdateDriverModal();
@@ -255,17 +54,18 @@ const initButtons = async () => {
             }
         });
 
-        //On Close Modal 
         $('#AddOrUpdateDriverModal').on('hidden.bs.modal', function () {
             let DriverId = sessionStorage.getItem("DriverId");
             const DocumentType = "Chofer";
             NotDeleteDocuments(DriverId, DocumentType);
         });
 
-        //On DocumentDriverSelect Change
         $('#DocumentDriverSelect').on('change', function () {
             $('#DriverDocument').val("").trigger('change');
         });
+
+        permissions?.Documentos?.Ver ? $('#DocumentsNavButton').show() : $('#DocumentsNavButton').hide();
+        permissions?.Documentos?.Crear ? $('#divCreateDocument').show() : $('#divCreateDocument').hide();
 
     } catch (error) {
         console.error(error);
@@ -276,7 +76,7 @@ const DriversDataTable = async () => {
     try {
         if ($.fn.DataTable.isDataTable('#DriversTable')) {
             $('#DriversTable').DataTable().destroy();
-        }
+        };
 
         const userId = sessionStorage.getItem('userId');
         const data = await GetDrivers(userId) || [];
@@ -285,7 +85,7 @@ const DriversDataTable = async () => {
                 title: 'Acciones',
                 data: 'Id',
                 render: function (data, type, row) {
-                    return `
+                    return permissions.EDITAR ? `
                                     <button 
                                         class="btn rounded-pill btn-icon btn-outline-primary" 
                                         type="button" 
@@ -298,7 +98,7 @@ const DriversDataTable = async () => {
                                     >
                                         <span class="tf-icons bx bx-edit-alt"></span>
                                     </button>
-                                `
+                                ` : '';
                 }
             },
             ...Object.keys(data[0]).map(propName => ({
@@ -314,7 +114,7 @@ const DriversDataTable = async () => {
             data: data,
             columns: columns,
             language: {
-                url: '/js/datatable-esp.json'
+                url: '../js/datatable-esp.json'
             },
             columnDefs: [{
                 className: 'bolded',
@@ -323,7 +123,7 @@ const DriversDataTable = async () => {
                 targets: "_all"
             }]
         }).on('draw', async function () {
-            await Utils.tooltipTrigger();
+            tooltipTrigger();
             $('button[action="AddOrUpdateDriverModal"]').off().on('click', async function () {
                 await AddOrUpdateDriverModal(this);
             });
@@ -421,7 +221,7 @@ const AddOrUpdateDriverButton = async () => {
             toastPlacement = 'Middle center';
         };
 
-        await Utils.ToastsNotification("Choferes", response.message, toastType, toastPlacement);
+        ToastsNotification("Choferes", response.message, toastType, toastPlacement);
 
     } catch (error) {
         console.error(error);
@@ -435,7 +235,7 @@ const AddOrUpdateDriverDocumentButton = async () => {
         const DriverDocumentFile = DriverDocumentInput.files[0];
 
         if (DriverDocumentFile.size > 10485760) {
-            await Utils.ToastsNotification("Choferes", "Tamaño máximo permitido: 10 MB", "Danger", "Middle center");
+            ToastsNotification("Choferes", "Tamaño máximo permitido: 10 MB", "Danger", "Middle center");
             return;
         };
 
@@ -450,13 +250,13 @@ const AddOrUpdateDriverDocumentButton = async () => {
         const response = await AddOrUpdateDriverDocument(DriverDocument);
 
         if (!response?.success) {
-            await Utils.ToastsNotification("Chofer", response.message, "Danger", "Middle center");
+            ToastsNotification("Chofer", response.message, "Danger", "Middle center");
             return;
         };
 
         const TemporalDocumentId = response.TemporalDocumentId;
         sessionStorage.setItem('TemporalDocumentId', TemporalDocumentId);
-        await Utils.ToastsNotification("Chofer", "Se subió el archivo con éxito.", "Primary", "Top right");
+        ToastsNotification("Chofer", "Se subió el archivo con éxito.", "Primary", "Top right");
         $('#DocumentDriverSelect').val(0).trigger('change');
         $('#DriverDocument').val("").trigger('change');
         await DriverDocumentsDataTable(DriverId, TemporalDocumentId);
@@ -476,13 +276,11 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
         const DocumentType = "Chofer";
         const data = await GetDriverDocument(DocumentType, DriverId, TemporalDocumentId);
         if (data.length > 0) {
-            // Crea el arreglo de objetos para las columnas del DataTable
             const columns = [
                 {
                     title: 'Acciones',
                     data: 'Id',
                     render: function (data, type, row) {
-                        const Estatus = row.Estatus;
                         let buttons = `
                         <button 
                             class="btn rounded-pill btn-icon btn-outline-primary" 
@@ -495,7 +293,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                         >
                             <span class="tf-icons bx bxs-download"></span>
                         </button>`;
-                        if (Estatus != "Aprobado") {
+                        if (permissions?.Documentos?.Eliminar && row.Estatus != "Aprobado") {
                             buttons += `
                             <button
                                 class="btn rounded-pill btn-icon btn-outline-danger" 
@@ -524,7 +322,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                 data: data,
                 columns: columns,
                 language: {
-                    url: '/js/datatable-esp.json'
+                    url: '../js/datatable-esp.json'
                 },
                 columnDefs: [{
                     className: 'bolded',
@@ -533,7 +331,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                     targets: "_all"
                 }]
             }).on('draw', async function () {
-                await Utils.tooltipTrigger();
+                tooltipTrigger();
                 $('button[action="DownloadDriverDocument"]').off().on('click', async function () {
                     await DownloadDriverDocument(this);
                 });
@@ -553,7 +351,7 @@ const DownloadDriverDocument = async (e) => {
         const dataObj = JSON.parse(data);
         const DocumentId = dataObj.Id;
 
-        GetDriverDocumentById(DocumentId);
+        await GetDriverDocumentById(DocumentId);
     }
 };
 
@@ -570,16 +368,15 @@ const DeleteDocument = async (e) => {
         let toastPlacement = 'Top right';
 
         if (response.success) {
-            DriverDocumentsDataTable(DriverId, TemporalDocumentId);
+            await DriverDocumentsDataTable(DriverId, TemporalDocumentId);
         } else {
             toastType = 'Danger';
             toastPlacement = 'Middle center';
         };
 
-        await Utils.ToastsNotification("Chofer", response.message, toastType, toastPlacement);
+        ToastsNotification("Chofer", response.message, toastType, toastPlacement);
 
     } catch (error) {
         console.error(error);
     }
 }
-//#endregion

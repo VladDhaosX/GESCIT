@@ -123,12 +123,11 @@ const login = async () => {
         if (response.PrivacyNotice == 1) {
             toastType = 'Primary';
             toastPlacement = 'Top right';
-            window.location.href = response.Route;
+            window.location.href = "" + response.Route;
         } else {
             PrivacyNoticeModal();
         };
     } else {
-        // blockLogin();
         await ToastsNotification(`Login`, response.message, toastType, toastPlacement);
     };
 };

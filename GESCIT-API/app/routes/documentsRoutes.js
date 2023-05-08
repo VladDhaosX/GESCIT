@@ -16,4 +16,8 @@ router.post('/DeleteDocumentById', DocumentsController.DeleteDocumentByIdHandler
 
 router.post('/NotDeleteTransportDocuments', DocumentsController.NotDeleteDocuments);
 
+router.post('/SaveDriverPhoto', upload.single('file'), DocumentsController.SaveDriverPhotoHandler);
+
+router.post('/GetDriverPhoto', DocumentsController.GetDriverPhotoHandler);
+
 module.exports = router;

@@ -9,9 +9,10 @@ router.get('/Citas', (req, res) => {
         Page: 'Dates/Dates',
         Categoría: 'Gestor',
         Modulo: 'Citas',
-        JSFile: '/js/Dates/Dates.js',
+        JSFile: config.BasePath + '/js/Dates/Dates.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
+        ServiceFile: config.BasePath + '/js/Services/Dates/DatesServices.js',
     };
     res.render('views', data);
 });
@@ -21,9 +22,10 @@ router.get('/Asignar', (req, res) => {
         Page: 'Dates/AssignDates',
         Categoría: 'Gestor',
         Modulo: 'Asignar Citas',
-        JSFile: '/js/Dates/AssignDates.js',
+        JSFile: config.BasePath + '/js/Dates/AssignDates.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
+        ServiceFile: config.BasePath + '/js/Services/Dates/AssignDatesServices.js',
     };
     res.render('views', data);
 });
@@ -33,9 +35,10 @@ router.get('/Seguridad', (req, res) => {
         Page: 'Dates/Security',
         Categoría: 'Gestor',
         Modulo: 'Seguridad',
-        JSFile: '/js/Dates/Security.js',
+        JSFile: config.BasePath + '/js/Dates/Security.js',
         BasePath: config.BasePath,
         UrlApi: config.urlApi,
+        ServiceFile: ''
     };
     res.render('views', data);
 });

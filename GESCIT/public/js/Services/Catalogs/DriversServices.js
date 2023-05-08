@@ -1,6 +1,6 @@
 const UrlApi = window.__env.UrlApi;
 
-const GetTransports = async (userId) => {
+const GetDrivers = async (UserId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -10,55 +10,14 @@ const GetTransports = async (userId) => {
             complete: function () {
                 $.unblockUI();
             },
-            url: `${UrlApi}/catalogs/getTransports`, type: 'POST', data: {
-                userId
-            }, // Enviar userId en el cuerpo de la solicitud
+            url: `${UrlApi}/catalogs/GetDrivers`, type: 'POST', data: {
+                UserId
+            },
             dataType: 'json'
         });
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
         console.error(error);
-        $.unblockUI();
-    }
-};
-
-const GetTransportType = async () => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            }, url: `${UrlApi}/catalogs/getTransportType`, type: 'GET', dataType: 'json'
-        });
-        return response.success ? response.data : console.log(response.message);
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
-    }
-};
-
-const AddOrUpdateTransport = async (Transport) => {
-    try {
-        const response = await $.ajax({
-            async: true,
-            beforeSend: function () {
-                $.blockUI({ message: null });
-            },
-            complete: function () {
-                $.unblockUI();
-            },
-            url: `${UrlApi}/catalogs/addOrUpdateTransport`, type: 'POST', data: {
-                Transport
-            }, // Enviar Transport en el cuerpo de la solicitud
-            dataType: 'json'
-        });
-        return response;
-    } catch (error) {
-        console.error(error);
-        $.unblockUI();
     }
 };
 
@@ -79,46 +38,36 @@ const GetDocumentsList = async (DocumentType) => {
                 DocumentType: DocumentType
             }
         });
-
         return response.success ? response.data : console.log(response.message);
     } catch (error) {
         console.error(error);
-        $.unblockUI();
-    };
+    }
 };
 
-const AddOrUpdateTransportDocument = async (TransportDocumentObj) => {
+const AddOrUpdateDriver = async (Driver) => {
     try {
-        let formData = new FormData();
-
-        formData.append('userId', TransportDocumentObj.userId);
-        formData.append('TemporalDocumentId', TransportDocumentObj.TemporalDocumentId);
-        formData.append('ModuleId', TransportDocumentObj.TransportId);
-        formData.append('image', TransportDocumentObj.TransportDocumentFile);
-        formData.append('DocumentId', TransportDocumentObj.DocumentId);
-
         const response = await $.ajax({
-            beforeSend: async function (xhr) {
-                await $.blockUI({ message: null });
+            async: true,
+            beforeSend: function () {
+                $.blockUI({ message: null });
             },
-            complete: async function () {
-                await $.unblockUI();
+            complete: function () {
+                $.unblockUI();
             },
-            url: `${UrlApi}/documents/AddDocumentFile`,
+            url: `${UrlApi}/catalogs/addOrUpdateDriver`,
             type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false
+            data: {
+                Driver
+            },
+            dataType: 'json'
         });
-
         return response;
     } catch (error) {
         console.error(error);
-        $.unblockUI();
-    };
+    }
 };
 
-const GetTransportDocument = async (DocumentType, ModuleId, TemporalDocumentId) => {
+const GetDriverDocument = async (DocumentType, ModuleId, TemporalDocumentId) => {
     try {
         const response = await $.ajax({
             async: true,
@@ -142,7 +91,37 @@ const GetTransportDocument = async (DocumentType, ModuleId, TemporalDocumentId) 
     }
 };
 
-const GetTransportDocumentById = (DocumentId) => {
+const AddOrUpdateDriverDocument = async (DriverDocument) => {
+    try {
+        let formData = new FormData();
+
+        formData.append('userId', DriverDocument.userId);
+        formData.append('TemporalDocumentId', DriverDocument.TemporalDocumentId);
+        formData.append('ModuleId', DriverDocument.DriverId);
+        formData.append('image', DriverDocument.DriverDocumentFile);
+        formData.append('DocumentId', DriverDocument.DocumentId);
+
+        const response = await $.ajax({
+            beforeSend: async function (xhr) {
+                await $.blockUI({ message: null });
+            },
+            complete: async function () {
+                await $.unblockUI();
+            },
+            url: `${UrlApi}/documents/AddDocumentFile`,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false
+        });
+        return response;
+    } catch (error) {
+        console.error(error);
+        $.unblockUI();
+    }
+};
+
+const GetDriverDocumentById = (DocumentId) => {
     try {
         $.ajax({
             beforeSend: async function (xhr) {
