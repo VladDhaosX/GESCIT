@@ -137,15 +137,15 @@ const FillSelectDocumentList = async () => {
     try {
         const DocumentType = "Chofer"
         const data = await GetDocumentsList(DocumentType);
-
+        console.log(data);
         var $options = $();
         const $SeleccionaUnaopción = $('<option>').attr('value', 0).text("Selecciona una opción");
         $options = $options.add($SeleccionaUnaopción);
         data.forEach(function (value) {
-            const $option = $('<option>').attr('value', value.Id).text(value.Name);
+            const $option = $('<option>').attr('value', value.Id).attr('IssueDateRequired', value.IssueDateRequire).attr('DaysToExpire', value.DaysToExpire).text(value.Name);
+            console.log($option);
             $options = $options.add($option);
         });
-
         $('#DocumentDriverSelect').empty();
         $('#DocumentDriverSelect').append($options);
     } catch (error) {
@@ -155,6 +155,24 @@ const FillSelectDocumentList = async () => {
 
 const AddOrUpdateDriverModal = async (e) => {
     try {
+        //limpiar modal y deshabilitar botones en documentos (hasta seleccionar un doc)
+        document.getElementById("DatesRow").innerHTML = "";
+        document.getElementById("DatesRow").innerHTML = `
+                <div class="col mb-3">
+                    <label for="DocumentExpiredDate" class="form-label">Fecha de Vigencia</label>
+                    <input class="form-control" type="date" id="DocumentExpiredDate">
+                </div>
+                <div class="col-md-2 mb-3" style="padding-top: 30px;">
+                    <button id="AddOrUpdateDriverDocumentButton" type="button"
+                        title="Guardar Documento"
+                        class="btn rounded-pill btn-icon btn-outline-primary"
+                        data-bs-toggle="tooltip" data-bs-placement="top">
+                        <span class="tf-icons bx bx-plus"></span>
+                    </button>
+                </div>
+                `;
+        $('#DocumentExpiredDate').prop('disabled', false);
+        //inicia funcionalidad
         let DriverId = 0;
         let TemporalDocumentId = 0;
         if (e) {
@@ -180,7 +198,70 @@ const AddOrUpdateDriverModal = async (e) => {
         };
         $('#DocumentDriverSelect').val(0);
         $('#DriverDocument').val("");
+        $('#DocumentExpiredDate').val(0);
         $('#AddOrUpdateDriverModal').modal('show');
+
+        $('#DocumentDriverSelect').on('change', function () {
+            const issueDateRequired = $(this).find(':selected').attr('IssueDateRequired');
+            const DaysToExpire = $(this).find(':selected').attr('DaysToExpire');
+            //construir campos en caso de tener un documento con fecha de emisión requerida
+            if (issueDateRequired === 'true') {
+                document.getElementById("DatesRow").innerHTML = "";
+                document.getElementById("DatesRow").innerHTML = `
+                <div class="col mb-3" id="">
+                    <label for="DocumentEmittedDate" class="form-label">Fecha de Emisión</label>
+                    <input class="form-control" type="date" id="DocumentEmittedDate">
+                </div>
+                <div class="col mb-3">
+                    <label for="DocumentExpiredDate" class="form-label">Fecha de Vigencia</label>
+                    <input class="form-control" type="date" id="DocumentExpiredDate">
+                </div>
+                <div class="col-md-2 mb-3" style="padding-top: 30px;">
+                    <button id="AddOrUpdateDriverDocumentButton" type="button"
+                        title="Guardar Documento"
+                        class="btn rounded-pill btn-icon btn-outline-primary"
+                        data-bs-toggle="tooltip" data-bs-placement="top">
+                        <span class="tf-icons bx bx-plus"></span>
+                    </button>
+                </div>
+                `;
+
+                $('#DocumentExpiredDate').prop('disabled', true);
+
+                $('#DocumentEmittedDate').on('change', function () {
+                    documentEmittedDate = $(this).val();
+                    const expirationDate = new Date(documentEmittedDate);
+                    expirationDate.setDate(expirationDate.getDate() + parseInt(DaysToExpire));
+                    documentExpiredDate = expirationDate.toISOString().split('T')[0].slice(0, 10);
+                    $('#DocumentExpiredDate').val(documentExpiredDate);
+                });
+
+                $('#AddOrUpdateDriverDocumentButton').click(async function () {
+                    await AddOrUpdateDriverDocumentButton()
+                });
+            //construir campos en caso de que el documento sólamente requiera vigencia
+            } else {
+                document.getElementById("DatesRow").innerHTML = "";
+                document.getElementById("DatesRow").innerHTML = `
+                <div class="col mb-3">
+                    <label for="DocumentExpiredDate" class="form-label">Fecha de Vigencia</label>
+                    <input class="form-control" type="date" id="DocumentExpiredDate">
+                </div>
+                <div class="col-md-2 mb-3" style="padding-top: 30px;">
+                    <button id="AddOrUpdateDriverDocumentButton" type="button"
+                        title="Guardar Documento"
+                        class="btn rounded-pill btn-icon btn-outline-primary"
+                        data-bs-toggle="tooltip" data-bs-placement="top">
+                        <span class="tf-icons bx bx-plus"></span>
+                    </button>
+                </div>
+                `;
+                $('#DocumentExpiredDate').prop('disabled', false);
+                $('#AddOrUpdateDriverDocumentButton').click(async function () {
+                    await AddOrUpdateDriverDocumentButton()
+                });
+            }
+        });
         $('#DocumentsModalNavs button:first').tab('show');
     } catch (error) {
         console.error(error);
@@ -230,9 +311,14 @@ const AddOrUpdateDriverButton = async () => {
 
 const AddOrUpdateDriverDocumentButton = async () => {
     try {
+
         const DriverId = sessionStorage.getItem("DriverId");
         const DriverDocumentInput = $('#DriverDocument')[0];
         const DriverDocumentFile = DriverDocumentInput.files[0];
+        const DocumentId = $('#DocumentDriverSelect').val();
+        const ExpiredDate = $('#DocumentExpiredDate').val();
+        const IssueDate = $('#DocumentEmittedDate').val() || '';
+        console.log(IssueDate);
 
         if (DriverDocumentFile.size > 10485760) {
             ToastsNotification("Choferes", "Tamaño máximo permitido: 10 MB", "Danger", "Middle center");
@@ -244,9 +330,9 @@ const AddOrUpdateDriverDocumentButton = async () => {
             TemporalDocumentId: sessionStorage.getItem('TemporalDocumentId'),
             DriverId: DriverId,
             DriverDocumentFile: DriverDocumentFile,
-            DocumentId: $('#DocumentDriverSelect').val(),
-            ExpiredDate: $('#DocumentExpiredDate').val(),
-            IssueDate: $('#DocumentEmittedDate').val()
+            DocumentId: DocumentId,
+            ExpiredDate: ExpiredDate,
+            IssueDate: IssueDate
         };
 
         const response = await AddOrUpdateDriverDocument(DriverDocument);
@@ -279,8 +365,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
 
         const DocumentType = "Chofer";
         const data = await GetDriverDocument(DocumentType, DriverId, TemporalDocumentId);
-        console.log(data);
-        if (data.length > 0) {
+        if (data) {
             const columns = [
                 {
                     title: 'Acciones',
@@ -331,7 +416,7 @@ const DriverDocumentsDataTable = async (DriverId, TemporalDocumentId) => {
                     title: 'Vigencia',
                     data: 'Vigencia',
                     visible: true
-                }                
+                }
             ];
             $('#DriverDocuments').DataTable({
                 data: data,
